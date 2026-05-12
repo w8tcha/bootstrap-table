@@ -505,6 +505,13 @@ export default {
 
     this.$tableContainer.classList.toggle('has-card-view', this.options.cardView)
 
+    if (this.options.height && !this.$el.offsetWidth && !this.$el.offsetHeight) {
+      if (!this._resizeObserver) {
+        this._setDelayTimeout('resetView', () => this.resetView(), 100)
+      }
+      return
+    }
+
     if (this.options.height) {
       const fixedBody = this.$tableBody
 

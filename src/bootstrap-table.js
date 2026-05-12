@@ -40,7 +40,8 @@ class BootstrapTable {
     this.$el_ = this.$el.cloneNode(true)
     this._timeoutId = {
       header: 0,
-      footer: 0
+      footer: 0,
+      resetView: 0
     }
     this._resizeHandler = null
     this._thDataMap = new WeakMap()
@@ -103,6 +104,10 @@ class BootstrapTable {
   destroy () {
     for (const type of Object.keys(this._timeoutId)) {
       clearTimeout(this._timeoutId[type])
+    }
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect()
+      this._resizeObserver = null
     }
 
     if (this.$container && this.$container.parentNode) {
