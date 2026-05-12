@@ -324,13 +324,13 @@ export default {
           const searchValue = currentTarget.value.toLowerCase()
 
           listItems.forEach(el => {
-            el.style.display = ''
+            el.style.removeProperty('display')
           })
           checkboxes.forEach(cb => {
             const listItem = cb.closest('.dropdown-item-marker')
 
             if (listItem && !listItem.textContent.toLowerCase().includes(searchValue)) {
-              listItem.style.display = 'none'
+              listItem.style.setProperty('display', 'none', 'important')
             }
           })
         })
