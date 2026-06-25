@@ -1,8 +1,5 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+(function (BootstrapTable) {
+	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1976,7 +1973,7 @@
 	 *         Nevets82 <Nevets82@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['fr-BE'] = {
+	BootstrapTable.locales['fr-BE'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Ajouter un niveau';
 	  },
@@ -2116,6 +2113,6 @@
 	    return 'Afficher la vue en cartes';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fr-BE']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fr-BE']);
 
-}));
+})(BootstrapTable);

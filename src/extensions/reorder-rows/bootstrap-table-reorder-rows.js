@@ -1,13 +1,18 @@
 /**
  * @author: Dennis Hernández
  * @update zhixin wen <wenzhixin2010@gmail.com>
+ *
+ * Note: this extension depends on the jQuery tableDnD plugin.
+ * jQuery must be available and the plugin loaded for this to work.
  */
+
+
 
 const rowAttr = (row, index) => ({
   id: `customId_${index}`
 })
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   reorderableRows: false,
   onDragStyle: null,
   onDropStyle: null,
@@ -32,11 +37,11 @@ Object.assign($.fn.bootstrapTable.defaults, {
   }
 })
 
-Object.assign($.fn.bootstrapTable.events, {
+Object.assign(BootstrapTable.events, {
   'reorder-row.bs.table': 'onReorderRow'
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   init (...args) {
     if (!this.options.reorderableRows) {
       super.init(...args)
@@ -60,35 +65,39 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   makeRowsReorderable () {
-    this.$el.tableDnD({
-      onDragStyle: this.options.onDragStyle,
-      onDropStyle: this.options.onDropStyle,
-      onDragClass: this.options.onDragClass,
-      onAllowDrop: (hoveredRow, draggedRow) => this.onAllowDrop(hoveredRow, draggedRow),
-      onDragStop: (table, draggedRow) => this.onDragStop(table, draggedRow),
-      onDragStart: (table, droppedRow) => this.onDropStart(table, droppedRow),
-      onDrop: (table, droppedRow) => this.onDrop(table, droppedRow),
-      dragHandle: this.options.dragHandle
-    })
+    // Requires jQuery tableDnD plugin
+    if (typeof window.$ !== 'undefined') {
+      $(this.$el).tableDnD({
+        onDragStyle: this.options.onDragStyle,
+        onDropStyle: this.options.onDropStyle,
+        onDragClass: this.options.onDragClass,
+        onAllowDrop: (hoveredRow, draggedRow) => this.onAllowDrop(hoveredRow, draggedRow),
+        onDragStop: (table, draggedRow) => this.onDragStop(table, draggedRow),
+        onDragStart: (table, droppedRow) => this.onDropStart(table, droppedRow),
+        onDrop: (table, droppedRow) => this.onDrop(table, droppedRow),
+        dragHandle: this.options.dragHandle
+      })
+    }
   }
 
   onDropStart (table, draggingTd) {
-    this.$draggingTd = $(draggingTd).css('cursor', 'move')
-    this.draggingIndex = $(this.$draggingTd.parent()).data('index')
+    this.$draggingTd = draggingTd
+    this.$draggingTd.style.cursor = 'move'
+    this.draggingIndex = +draggingTd.parentElement?.dataset.index
     // Call the user defined function
     this.options.onReorderRowsDrag(this.data[this.draggingIndex])
   }
 
   onDragStop (table, draggedRow) {
-    const rowIndexDraggedRow = $(draggedRow).data('index')
+    const rowIndexDraggedRow = +draggedRow.dataset.index
     const draggedRowItem = this.data[rowIndexDraggedRow]
 
     this.options.onDragStop(table, draggedRowItem, draggedRow)
   }
 
   onAllowDrop (hoveredRow, draggedRow) {
-    const rowIndexDraggedRow = $(draggedRow).data('index')
-    const rowIndexHoveredRow = $(hoveredRow).data('index')
+    const rowIndexDraggedRow = +draggedRow.dataset.index
+    const rowIndexHoveredRow = +hoveredRow.dataset.index
     const draggedRowItem = this.data[rowIndexDraggedRow]
     const hoveredRowItem = this.data[rowIndexHoveredRow]
 
@@ -96,16 +105,16 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   onDrop (table) {
-    this.$draggingTd.css('cursor', '')
+    this.$draggingTd.style.cursor = ''
     const pageNum = this.options.pageNumber
     const pageSize = this.options.pageSize
     const newData = []
 
     for (let i = 0; i < table.tBodies[0].rows.length; i++) {
-      const $tr = $(table.tBodies[0].rows[i])
+      const tr = table.tBodies[0].rows[i]
 
-      newData.push(this.data[$tr.data('index')])
-      $tr.data('index', i)
+      newData.push(this.data[+tr.dataset.index])
+      tr.dataset.index = i
     }
 
     const draggingRow = this.data[this.draggingIndex]

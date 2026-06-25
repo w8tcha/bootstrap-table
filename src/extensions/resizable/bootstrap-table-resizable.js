@@ -1,26 +1,39 @@
 /**
  * @author: Dennis Hernández
  * @version: v2.0.0
+ *
+ * Note: this extension depends on the resizableColumns jQuery plugin.
+ * jQuery must be available and the plugin loaded for this to work.
  */
 
-const isInit = that => that.$el.data('resizableColumns') !== undefined
+
+
+// resizableColumns stores its state via jQuery .data() so we check for it there
+const isInit = that => {
+  if (typeof window.$ !== 'undefined') {
+    return $(that.$el).data('resizableColumns') !== undefined
+  }
+  return false
+}
 
 const initResizable = that => {
   if (
     that.options.resizable &&
     !that.options.cardView &&
     !isInit(that) &&
-    that.$el.is(':visible')
+    that.$el.offsetParent !== null
   ) {
-    that.$el.resizableColumns({
-      store: window.store
-    })
+    if (typeof window.$ !== 'undefined') {
+      $(that.$el).resizableColumns({
+        store: window.store
+      })
+    }
   }
 }
 
 const destroy = that => {
-  if (isInit(that)) {
-    that.$el.data('resizableColumns').destroy()
+  if (isInit(that) && typeof window.$ !== 'undefined') {
+    $(that.$el).data('resizableColumns').destroy()
   }
 }
 
@@ -29,19 +42,24 @@ const reInitResizable = that => {
   initResizable(that)
 }
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   resizable: false
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
 
   initBody (...args) {
     super.initBody(...args)
 
-    this.$el.off('column-switch.bs.table page-change.bs.table')
-      .on('column-switch.bs.table page-change.bs.table', () => {
-        reInitResizable(this)
-      })
+    if (this._resizableHandler) {
+      this.$el.removeEventListener('column-switch.bs.table', this._resizableHandler)
+      this.$el.removeEventListener('page-change.bs.table', this._resizableHandler)
+    }
+
+    this._resizableHandler = () => reInitResizable(this)
+
+    this.$el.addEventListener('column-switch.bs.table', this._resizableHandler)
+    this.$el.addEventListener('page-change.bs.table', this._resizableHandler)
 
     reInitResizable(this)
   }

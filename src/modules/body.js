@@ -1,32 +1,55 @@
+/* eslint-disable no-use-before-define */
 import Utils from '../utils/index.js'
 import VirtualScroll from '../virtual-scroll/index.js'
 
 export default {
   initBodyEvent () {
-    // click to select by column
-    this.$body.find('> tr[data-index] > td').off('click dblclick').on('click dblclick', e => {
-      const $td = $(e.currentTarget)
+    // Remove old event listeners
+    if (this._bodyClickHandler) {
+      this.$body.removeEventListener('click', this._bodyClickHandler)
+      this.$body.removeEventListener('dblclick', this._bodyClickHandler)
+    }
+    if (this._bodyMousedownHandler) {
+      this.$body.removeEventListener('mousedown', this._bodyMousedownHandler)
+    }
+
+    // click to select by column — use event delegation on $body
+    this._bodyClickHandler = e => {
+      const td = e.target.closest('td')
+
+      if (!td || !this.$body.contains(td)) return
+      const tr = td.parentElement
+
+      if (!tr || !tr.hasAttribute('data-index') || tr.parentElement !== this.$body) return
 
       if (
-        $td.find('.detail-icon').length ||
-        $td.index() - Utils.getDetailViewIndexOffset(this.options) < 0
+        td.querySelector('.detail-icon') ||
+        td.cellIndex - Utils.getDetailViewIndexOffset(this.options) < 0
       ) {
         return
       }
 
-      const $tr = $td.parent()
-      const $cardViewArr = $(e.target).parents('.card-views').children()
-      const $cardViewTarget = $(e.target).parents('.card-view')
-      const rowIndex = $tr.data('index')
+      const cardViewsEl = e.target.closest('.card-views')
+      const cardViewTarget = e.target.closest('.card-view')
+      const rowIndex = +tr.dataset.index
       const item = this.data[rowIndex]
-      const index = this.options.cardView ? $cardViewArr.index($cardViewTarget) : $td[0].cellIndex
+      let index
+
+      if (this.options.cardView) {
+        const cardViewArr = cardViewsEl ? Array.from(cardViewsEl.children) : []
+
+        index = cardViewArr.indexOf(cardViewTarget)
+      } else {
+        index = td.cellIndex
+      }
+
       const fields = this.getVisibleFields()
       const field = fields[index - Utils.getDetailViewIndexOffset(this.options)]
       const column = this.columns[this.fieldsColumnsIndex[field]]
       const value = Utils.getItemField(item, field, this.options.escape, column.escape)
 
-      this.trigger(e.type === 'click' ? 'click-cell' : 'dbl-click-cell', field, value, item, $td)
-      this.trigger(e.type === 'click' ? 'click-row' : 'dbl-click-row', item, $tr, field)
+      this.trigger(e.type === 'click' ? 'click-cell' : 'dbl-click-cell', field, value, item, td)
+      this.trigger(e.type === 'click' ? 'click-row' : 'dbl-click-row', item, tr, field)
 
       // if click to select - then trigger the checkbox/radio click
       if (
@@ -35,36 +58,61 @@ export default {
         column.clickToSelect &&
         !Utils.calculateObjectValue(this.options, this.options.ignoreClickToSelectOn, [e.target])
       ) {
-        const $selectItem = $tr.find(Utils.sprintf('[name="%s"]', this.options.selectItemName))
+        const selectItem = tr.querySelector(Utils.sprintf('[name="%s"]', this.options.selectItemName))
 
-        if ($selectItem.length) {
-          $selectItem[0].click()
+        if (selectItem) {
+          selectItem.click()
         }
       }
 
       if (e.type === 'click' && this.options.detailViewByClick) {
         this.toggleDetailView(rowIndex, this.header.detailFormatters[this.fieldsColumnsIndex[field]])
       }
-    }).off('mousedown').on('mousedown', e => {
-      // https://github.com/jquery/jquery/issues/1741
+    }
+
+    // https://github.com/jquery/jquery/issues/1741
+    this._bodyMousedownHandler = e => {
       this.multipleSelectRowCtrlKey = e.ctrlKey || e.metaKey
       this.multipleSelectRowShiftKey = e.shiftKey
-    })
+    }
 
-    this.$body.find('> tr[data-index] > td > .detail-icon').off('click').on('click', e => {
+    this.$body.addEventListener('click', this._bodyClickHandler)
+    this.$body.addEventListener('dblclick', this._bodyClickHandler)
+    this.$body.addEventListener('mousedown', this._bodyMousedownHandler)
+
+    // detail icon click — delegation
+    if (this._bodyDetailIconHandler) {
+      this.$body.removeEventListener('click', this._bodyDetailIconHandler)
+    }
+    this._bodyDetailIconHandler = e => {
+      const icon = e.target.closest('.detail-icon')
+
+      if (!icon) return
       e.preventDefault()
-      this.toggleDetailView($(e.currentTarget).parent().parent().data('index'))
-      return false
-    })
+      const td = icon.parentElement
+      const tr = td ? td.parentElement : null
 
-    this.$selectItem = this.$body.find(Utils.sprintf('[name="%s"]', this.options.selectItemName))
-    this.$selectItem.off('click').on('click', e => {
+      if (tr && tr.hasAttribute('data-index')) {
+        this.toggleDetailView(+tr.dataset.index)
+      }
+    }
+    this.$body.addEventListener('click', this._bodyDetailIconHandler)
+
+    // select item click
+    this.$selectItem = Array.from(
+      this.$body.querySelectorAll(Utils.sprintf('[name="%s"]', this.options.selectItemName))
+    )
+
+    if (this._selectItemClickHandler) {
+      // handlers were on old elements which are now gone — just reset
+    }
+    this._selectItemClickHandler = e => {
       e.stopImmediatePropagation()
+      const el = e.currentTarget
 
-      const $this = $(e.currentTarget)
-
-      this._toggleCheck($this.prop('checked'), $this.data('index'))
-    })
+      this._toggleCheck(el.checked, +el.dataset.index)
+    }
+    this.$selectItem.forEach(el => el.addEventListener('click', this._selectItemClickHandler))
 
     this.header.events.forEach((_events, i) => {
       let events = _events
@@ -96,19 +144,23 @@ export default {
         }
         const event = events[key]
 
-        this.$body.find('>tr:not(.no-records-found)').each((i, tr) => {
-          const $tr = $(tr)
-          const $td = $tr.find(this.options.cardView ? '.card-views>.card-view' : '>td').eq(fieldIndex)
+        this.$body.querySelectorAll(':scope > tr:not(.no-records-found)').forEach(tr => {
+          const tds = this.options.cardView ? tr.querySelectorAll('.card-views > .card-view') : tr.querySelectorAll(':scope > td')
+          const td = tds[fieldIndex]
+
+          if (!td) return
           const index = key.indexOf(' ')
           const name = key.substring(0, index)
           const el = key.substring(index + 1)
 
-          $td.find(el).off(name).on(name, e => {
-            const index = $tr.data('index')
-            const row = this.data[index]
-            const value = row[field]
+          td.querySelectorAll(el).forEach(target => {
+            target.addEventListener(name, e => {
+              const rowIndex = +tr.dataset.index
+              const row = this.data[rowIndex]
+              const value = row[field]
 
-            event.apply(this, [e, value, row, index])
+              event.apply(this, [e, value, row, rowIndex])
+            })
           })
         })
       }
@@ -343,9 +395,10 @@ export default {
 
     this.trigger('pre-body', data)
 
-    this.$body = this.$el.find('>tbody')
-    if (!this.$body.length) {
-      this.$body = $('<tbody></tbody>').appendTo(this.$el)
+    this.$body = this.$el.querySelector(':scope > tbody')
+    if (!this.$body) {
+      this.$body = document.createElement('tbody')
+      this.$el.appendChild(this.$body)
     }
 
     // Fix #389 Bootstrap-table-flatJSON is not working
@@ -355,7 +408,7 @@ export default {
     }
 
     const rows = []
-    const trFragments = $(document.createDocumentFragment())
+    const trFragments = document.createDocumentFragment()
     let hasTr = false
     const toExpand = []
 
@@ -367,44 +420,44 @@ export default {
 
       hasTr = hasTr || !!tr
       if (tr && tr instanceof Node) {
-
         const uniqueId = this.options.uniqueId
         const toAppend = [tr]
 
         if (uniqueId && item.hasOwnProperty(uniqueId)) {
           const itemUniqueId = item[uniqueId]
+          const oldTr = this.$body.querySelector(
+            Utils.sprintf(':scope > tr[data-uniqueid="%s"][data-has-detail-view]', itemUniqueId)
+          )
+          const oldTrNext = oldTr ? oldTr.nextElementSibling : null
 
-          const oldTr = this.$body.find(Utils.sprintf('> tr[data-uniqueid="%s"][data-has-detail-view]', itemUniqueId))
-          const oldTrNext = oldTr.next()
-
-          if (oldTrNext.is('tr.detail-view')) {
-
+          if (oldTrNext && oldTrNext.classList.contains('detail-view')) {
             toExpand.push(i)
 
             if (!updatedUid || itemUniqueId !== updatedUid) {
-              toAppend.push(oldTrNext[0])
+              toAppend.push(oldTrNext)
             }
           }
         }
 
         if (!this.options.virtualScroll) {
-          trFragments.append(toAppend)
+          toAppend.forEach(el => trFragments.appendChild(el))
         } else {
-          rows.push($('<div>').html(toAppend).html())
+          rows.push(toAppend.map(el => el.outerHTML).join(''))
         }
       }
     }
 
-    this.$el.removeAttr('role')
+    this.$el.removeAttribute('role')
 
     // show no records
     if (!hasTr) {
-      this.$body.html(`<tr class="no-records-found">${Utils.sprintf('<td colspan="%s">%s</td>',
+      this.$body.innerHTML = Utils.sprintf('<tr class="no-records-found"><td colspan="%s">%s</td></tr>',
         this.getVisibleFields().length + Utils.getDetailViewIndexOffset(this.options),
-        this.options.formatNoMatches())}</tr>`)
-      this.$el.attr('role', 'presentation')
+        this.options.formatNoMatches())
+      this.$el.setAttribute('role', 'presentation')
     } else if (!this.options.virtualScroll) {
-      this.$body.html(trFragments)
+      this.$body.innerHTML = ''
+      this.$body.appendChild(trFragments)
     } else {
       if (this.virtualScroll) {
         this.virtualScroll.destroy()
@@ -412,8 +465,8 @@ export default {
       this.virtualScroll = new VirtualScroll({
         rows,
         fixedScroll,
-        scrollEl: this.$tableBody[0],
-        contentEl: this.$body[0],
+        scrollEl: this.$tableBody,
+        contentEl: this.$body,
         itemHeight: this.options.virtualScrollItemHeight,
         callback: (startIndex, endIndex) => {
           this.fitHeader()
@@ -450,98 +503,100 @@ export default {
       this.options.height = params.height
     }
 
-    this.$tableContainer.toggleClass('has-card-view', this.options.cardView)
+    this.$tableContainer.classList.toggle('has-card-view', this.options.cardView)
 
     if (this.options.height) {
-      const fixedBody = this.$tableBody.get(0)
+      const fixedBody = this.$tableBody
 
       this.hasScrollBar = fixedBody.scrollWidth > fixedBody.clientWidth
     }
 
     if (!this.options.cardView && this.options.showHeader && this.options.height) {
-      this.$tableHeader.show()
+      this.$tableHeader.style.display = ''
       this.resetHeader()
-      padding += this.$header.outerHeight(true) + 1
+      padding += this.$header.offsetHeight + 1
     } else {
-      this.$tableHeader.hide()
+      this.$tableHeader.style.display = 'none'
       this.trigger('post-header')
     }
 
     if (!this.options.cardView && this.options.showFooter) {
-      this.$tableFooter.show()
+      this.$tableFooter.style.display = ''
       this.fitFooter()
       if (this.options.height) {
-        padding += this.$tableFooter.outerHeight(true)
+        padding += this.$tableFooter.offsetHeight
       }
     }
 
-    if (this.$container.hasClass('fullscreen')) {
-      this.$tableContainer.css('height', '')
-      this.$tableContainer.css('width', '')
+    if (this.$container.classList.contains('fullscreen')) {
+      this.$tableContainer.style.height = ''
+      this.$tableContainer.style.width = ''
     } else if (this.options.height) {
       if (this.$tableBorder) {
-        this.$tableBorder.css('width', '')
-        this.$tableBorder.css('height', '')
+        this.$tableBorder.style.width = ''
+        this.$tableBorder.style.height = ''
       }
 
-      const toolbarHeight = this.$toolbar.outerHeight(true)
-      const paginationHeight = this.$pagination.outerHeight(true)
+      const toolbarHeight = outerHeight(this.$toolbar)
+      const paginationHeight = this.$pagination.reduce((sum, el) => sum + outerHeight(el), 0)
       const height = this.options.height - toolbarHeight - paginationHeight
-      const $bodyTable = this.$tableBody.find('>table')
-      const tableHeight = $bodyTable.outerHeight()
+      const bodyTable = this.$tableBody.querySelector(':scope > table')
+      const tableHeight = bodyTable ? bodyTable.offsetHeight : 0
 
-      this.$tableContainer.css('height', `${height}px`)
+      this.$tableContainer.style.height = `${height}px`
 
-      if (this.$tableBorder && $bodyTable.is(':visible')) {
+      if (this.$tableBorder && bodyTable && bodyTable.offsetParent !== null) {
         let tableBorderHeight = height - tableHeight - 2
 
         if (this.hasScrollBar) {
           tableBorderHeight -= Utils.getScrollBarWidth()
         }
-        this.$tableBorder.css('width', `${$bodyTable.outerWidth()}px`)
-        this.$tableBorder.css('height', `${tableBorderHeight}px`)
+        this.$tableBorder.style.width = `${bodyTable.offsetWidth}px`
+        this.$tableBorder.style.height = `${tableBorderHeight}px`
       }
     }
 
     if (this.options.cardView) {
       // remove the element css
-      this.$el.css('margin-top', '0')
-      this.$tableContainer.css('padding-bottom', '0')
-      this.$tableFooter.hide()
+      this.$el.style.marginTop = '0'
+      this.$tableContainer.style.paddingBottom = '0'
+      if (this.$tableFooter) this.$tableFooter.style.display = 'none'
     } else {
       // Assign the correct sortable arrow
       this.resetCaret()
-      this.$tableContainer.css('padding-bottom', `${padding}px`)
+      this.$tableContainer.style.paddingBottom = `${padding}px`
     }
 
     this.trigger('reset-view')
   },
 
   showLoading () {
-    this.$tableLoading.toggleClass('open', true)
+    this.$tableLoading.classList.add('open')
 
     let fontSize = this.options.loadingFontSize
 
     if (this.options.loadingFontSize === 'auto') {
-      fontSize = this.$tableLoading.width() * 0.04
+      fontSize = this.$tableLoading.offsetWidth * 0.04
       fontSize = Math.max(12, fontSize)
       fontSize = Math.min(32, fontSize)
       fontSize = `${fontSize}px`
     }
 
-    const $loadingWrap = this.$tableLoading.find('.loading-wrap')
+    const loadingWrap = this.$tableLoading.querySelector('.loading-wrap')
 
-    if ($loadingWrap.length) {
-      $loadingWrap.css('font-size', fontSize)
+    if (loadingWrap) {
+      loadingWrap.style.fontSize = fontSize
     } else {
-      this.$tableLoading.css('font-size', fontSize)
+      this.$tableLoading.style.fontSize = fontSize
     }
 
-    this.$tableLoading.find('.loading-text').css('font-size', fontSize)
+    const loadingText = this.$tableLoading.querySelector('.loading-text')
+
+    if (loadingText) loadingText.style.fontSize = fontSize
   },
 
   hideLoading () {
-    this.$tableLoading.toggleClass('open', false)
+    this.$tableLoading.classList.remove('open')
   },
 
   scrollTo (params) {
@@ -550,7 +605,7 @@ export default {
     if (typeof params === 'object') {
       options = Object.assign(options, params)
     } else if (typeof params === 'string' && params === 'bottom') {
-      options.value = this.$tableBody[0].scrollHeight
+      options.value = this.$tableBody.scrollHeight
     } else if (typeof params === 'string' || typeof params === 'number') {
       options.value = params
     }
@@ -559,16 +614,18 @@ export default {
 
     if (options.unit === 'rows') {
       scrollTo = 0
-      this.$body.find(`> tr:lt(${options.value})`).each((i, el) => {
-        scrollTo += $(el).outerHeight(true)
+      const trs = Array.from(this.$body.querySelectorAll(':scope > tr')).slice(0, options.value)
+
+      trs.forEach(tr => {
+        scrollTo += outerHeight(tr)
       })
     }
 
-    this.$tableBody.scrollTop(scrollTo)
+    this.$tableBody.scrollTop = scrollTo
   },
 
   getScrollPosition () {
-    return this.$tableBody.scrollTop()
+    return this.$tableBody.scrollTop
   },
 
   showRow (params) {
@@ -646,16 +703,26 @@ export default {
     this.initBody()
 
     if (this.options.showColumns) {
-      const $items = this.$toolbar.find('.keep-open input:not(".toggle-all")').prop('disabled', false)
+      const items = Array.from(this.$toolbar.querySelectorAll('.keep-open input:not(.toggle-all)'))
+
+      items.forEach(el => {
+        el.disabled = false
+      })
 
       if (needUpdate) {
         for (const index of changedIndices) {
-          $items.filter(Utils.sprintf('[value="%s"]', index)).prop('checked', checked)
+          const item = items.find(el => el.value === String(index))
+
+          if (item) item.checked = checked
         }
       }
 
-      if ($items.filter(':checked').length <= this.options.minimumCountColumns) {
-        $items.filter(':checked').prop('disabled', true)
+      const checkedItems = items.filter(el => el.checked)
+
+      if (checkedItems.length <= this.options.minimumCountColumns) {
+        checkedItems.forEach(el => {
+          el.disabled = true
+        })
       }
     }
   },
@@ -707,20 +774,32 @@ export default {
     this.initPagination()
     this.initBody()
     if (this.options.showColumns) {
-      const $items = this.$toolbar.find('.keep-open input[type="checkbox"]:not(".toggle-all")').prop('disabled', false)
+      const items = Array.from(this.$toolbar.querySelectorAll('.keep-open input[type="checkbox"]:not(.toggle-all)'))
+
+      items.forEach(el => {
+        el.disabled = false
+      })
 
       if (visible) {
-        $items.prop('checked', visible)
+        items.forEach(el => {
+          el.checked = visible
+        })
       } else {
-        $items.get().reverse().forEach(item => {
-          if ($items.filter(':checked').length > this.options.minimumCountColumns) {
-            $(item).prop('checked', visible)
+        items.slice().reverse().forEach(item => {
+          const checkedItems = items.filter(el => el.checked)
+
+          if (checkedItems.length > this.options.minimumCountColumns) {
+            item.checked = visible
           }
         })
       }
 
-      if ($items.filter(':checked').length <= this.options.minimumCountColumns) {
-        $items.filter(':checked').prop('disabled', true)
+      const checkedItems = items.filter(el => el.checked)
+
+      if (checkedItems.length <= this.options.minimumCountColumns) {
+        checkedItems.forEach(el => {
+          el.disabled = true
+        })
       }
     }
   },
@@ -732,23 +811,29 @@ export default {
     const colspan = +options.colspan || 1
     let i
     let j
-    const $tr = this.$body.find('>tr[data-index]')
+    const trs = Array.from(this.$body.querySelectorAll(':scope > tr[data-index]'))
 
     col += Utils.getDetailViewIndexOffset(this.options)
 
-    const $td = $tr.eq(row).find('>td').eq(col)
+    const td = trs[row] ? Array.from(trs[row].querySelectorAll(':scope > td'))[col] : null
 
     if (row < 0 || col < 0 || row >= this.data.length) {
       return
     }
 
     for (i = row; i < row + rowspan; i++) {
+      const rowTds = trs[i] ? Array.from(trs[i].querySelectorAll(':scope > td')) : []
+
       for (j = col; j < col + colspan; j++) {
-        $tr.eq(i).find('>td').eq(j).hide()
+        if (rowTds[j]) rowTds[j].style.display = 'none'
       }
     }
 
-    $td.attr('rowspan', rowspan).attr('colspan', colspan).show()
+    if (td) {
+      td.setAttribute('rowspan', rowspan)
+      td.setAttribute('colspan', colspan)
+      td.style.display = ''
+    }
   },
 
   getVisibleColumns () {
@@ -758,4 +843,11 @@ export default {
   getHiddenColumns () {
     return this.columns.filter(({ visible }) => !visible)
   }
+}
+
+function outerHeight (el) {
+  if (!el) return 0
+  const style = getComputedStyle(el)
+
+  return el.offsetHeight + (parseInt(style.marginTop) || 0) + (parseInt(style.marginBottom) || 0)
 }

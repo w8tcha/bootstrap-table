@@ -3,7 +3,9 @@
  * Author: Phillip Kruger <phillip.kruger@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['af-ZA'] = $.fn.bootstrapTable.locales['af'] = {
+
+
+BootstrapTable.locales['af-ZA'] = BootstrapTable.locales['af'] = {
   formatAddLevel () {
     return 'Voeg \'n vlak by'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['af-ZA'] = $.fn.bootstrapTable.locales['af'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['af-ZA'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['af-ZA'])

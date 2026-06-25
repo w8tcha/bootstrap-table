@@ -13,11 +13,13 @@
  * @update zhixin wen <wenzhixin2010@gmail.com>
  */
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+
+Object.assign(BootstrapTable.defaults, {
   deferUrl: undefined
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
 
   init (...args) {
     super.init(...args)

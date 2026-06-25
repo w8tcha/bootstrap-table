@@ -1,9 +1,14 @@
 /**
  * @author zhixin wen <wenzhixin2010@gmail.com>
  * extensions: https://github.com/hhurz/tableExport.jquery.plugin
+ *
+ * Note: exportTable() calls this.$el.tableExport() which requires the
+ * tableExport jQuery plugin. jQuery must be available for that call.
  */
 
-const Utils = $.fn.bootstrapTable.utils
+
+
+const Utils = BootstrapTable.utils
 
 const TYPE_NAME = {
   json: 'JSON',
@@ -19,7 +24,7 @@ const TYPE_NAME = {
   pdf: 'PDF'
 }
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   showExport: false,
   exportDataType: 'basic', // basic, all, selected
   exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel'],
@@ -27,12 +32,12 @@ Object.assign($.fn.bootstrapTable.defaults, {
   exportFooter: false
 })
 
-Object.assign($.fn.bootstrapTable.columnDefaults, {
+Object.assign(BootstrapTable.columnDefaults, {
   forceExport: false,
   forceHide: false
 })
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'export', {
+Utils.assignIcons(BootstrapTable.icons, 'export', {
   glyphicon: 'glyphicon-export icon-share',
   fa: 'fa-download',
   bi: 'bi-download',
@@ -40,16 +45,16 @@ Utils.assignIcons($.fn.bootstrapTable.icons, 'export', {
   'material-icons': 'file_download'
 })
 
-Object.assign($.fn.bootstrapTable.locales, {
+Object.assign(BootstrapTable.locales, {
   formatExport () {
     return 'Export data'
   }
 })
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales)
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales)
 
-$.fn.bootstrapTable.methods.push('exportTable')
+BootstrapTable.methods.push('exportTable')
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   // eslint-disable-next-line no-unused-vars
   onExportSaved (exportedRows) {
     return false
@@ -59,12 +64,12 @@ Object.assign($.fn.bootstrapTable.defaults, {
   }
 })
 
-Object.assign($.fn.bootstrapTable.events, {
+Object.assign(BootstrapTable.events, {
   'export-saved.bs.table': 'onExportSaved',
   'export-started.bs.table': 'onExportStarted'
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initToolbar (...args) {
     const o = this.options
     let exportTypes = o.exportTypes
@@ -83,8 +88,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
         o.exportOptions = Utils.calculateObjectValue(null, o.exportOptions)
       }
 
-      this.$export = this.$toolbar.find('>.columns div.export')
-      if (this.$export.length) {
+      this.$export = this.$toolbar.querySelector(':scope > .columns div.export')
+      if (this.$export) {
         this.updateExportButton()
         return
       }
@@ -125,11 +130,14 @@ $.BootstrapTable = class extends $.BootstrapTable {
               `)
 
               for (const type of exportTypes) {
-                if (TYPE_NAME.hasOwnProperty(type)) {
-                  const $item = $(Utils.sprintf(this.constants.html.pageDropdownItem, '', TYPE_NAME[type]))
+                if (Object.prototype.hasOwnProperty.call(TYPE_NAME, type)) {
+                  const template = document.createElement('template')
 
-                  $item.attr('data-type', type)
-                  html.push($item.prop('outerHTML'))
+                  template.innerHTML = Utils.sprintf(this.constants.html.pageDropdownItem, '', TYPE_NAME[type])
+                  const item = template.content.firstElementChild
+
+                  item.dataset.type = type
+                  html.push(item.outerHTML)
                 }
               }
 
@@ -141,23 +149,26 @@ $.BootstrapTable = class extends $.BootstrapTable {
     }
 
     super.initToolbar(...args)
-    this.$export = this.$toolbar.find('>.columns div.export')
+    this.$export = this.$toolbar.querySelector(':scope > .columns div.export')
 
     if (!this.options.showExport) {
       return
     }
 
     this.updateExportButton()
-    let $exportButtons = this.$export.find('[data-type]')
+
+    let exportButtons = [...this.$export.querySelectorAll('[data-type]')]
 
     if (exportTypes.length === 1) {
-      $exportButtons = this.$export
+      exportButtons = [this.$export]
     }
 
-    $exportButtons.click(e => {
-      e.preventDefault()
-      this.exportTable({
-        type: $(e.currentTarget).data('type')
+    exportButtons.forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault()
+        this.exportTable({
+          type: e.currentTarget.dataset.type
+        })
       })
     })
     this.handleToolbar()
@@ -201,25 +212,27 @@ $.BootstrapTable = class extends $.BootstrapTable {
       }
 
       if (o.exportFooter && o.height) {
-        const $footerRow = this.$tableFooter.find('tr').first()
+        const footerRow = this.$tableFooter.querySelector('tr:first-child')
         const footerData = {}
-        const footerHtml = []
+        const footerHtml = [];
 
-        $footerRow.children().forEach((footerCell, index) => {
-          const footerCellHtml = $(footerCell).children('.th-inner').first().html()
+        [...footerRow.children].forEach((footerCell, index) => {
+          const footerCellHtml = footerCell.querySelector('.th-inner')?.innerHTML || ''
 
           footerData[this.columns[index].field] = footerCellHtml === '&nbsp;' ? null : footerCellHtml
-
-          // grab footer cell text into cell index-based array
           footerHtml.push(footerCellHtml)
         })
 
-        this.$body.append(this.$body.children().last()[0].outerHTML)
-        const $lastTableRow = this.$body.children().last()
+        const lastRow = this.$body.querySelector('tr:last-child')
 
-        $lastTableRow.children().forEach((lastTableRowCell, index) => {
-          $(lastTableRowCell).html(footerHtml[index])
-        })
+        if (lastRow) {
+          this.$body.insertAdjacentHTML('beforeend', lastRow.outerHTML)
+          const newLastRow = this.$body.querySelector('tr:last-child');
+
+          [...newLastRow.children].forEach((cell, index) => {
+            cell.innerHTML = footerHtml[index]
+          })
+        }
       }
 
       const hiddenColumns = this.getHiddenColumns()
@@ -234,34 +247,37 @@ $.BootstrapTable = class extends $.BootstrapTable {
         options.fileName = o.exportOptions.fileName()
       }
 
-      this.$el.tableExport(Utils.extend({
-        onAfterSaveToFile: () => {
-          if (o.exportFooter) {
-            this.load(data)
-          }
-
-          if (stateField) {
-            this.showColumn(stateField)
-          }
-          if (isCardView) {
-            this.toggleView()
-          }
-
-          hiddenColumns.forEach(row => {
-            if (row.forceExport) {
-              this.hideColumn(row.field)
+      // tableExport requires jQuery
+      if (typeof window.$ !== 'undefined') {
+        $(this.$el).tableExport(Utils.extend({
+          onAfterSaveToFile: () => {
+            if (o.exportFooter) {
+              this.load(data)
             }
-          })
 
-          this.columns.forEach(row => {
-            if (row.forceHide) {
-              this.showColumn(row.field)
+            if (stateField) {
+              this.showColumn(stateField)
             }
-          })
+            if (isCardView) {
+              this.toggleView()
+            }
 
-          if (callback) callback()
-        }
-      }, o.exportOptions, options))
+            hiddenColumns.forEach(row => {
+              if (row.forceExport) {
+                this.hideColumn(row.field)
+              }
+            })
+
+            this.columns.forEach(row => {
+              if (row.forceHide) {
+                this.showColumn(row.field)
+              }
+            })
+
+            if (callback) callback()
+          }
+        }, o.exportOptions, options))
+      }
     }
 
     // Early return for selected data type when no rows are selected
@@ -283,7 +299,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
         'post-body.bs.table' : 'page-change.bs.table'
       const virtualScroll = this.options.virtualScroll
 
-      this.$el.one(eventName, () => {
+      this.$el.addEventListener(eventName, () => {
         setTimeout(() => {
           const data = this.getData()
 
@@ -293,7 +309,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
           })
           this.trigger('export-saved', data)
         }, 0)
-      })
+      }, { once: true })
       this.options.virtualScroll = false
       this.togglePagination()
     } else if (o.exportDataType === 'selected') {
@@ -338,8 +354,11 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
   updateExportButton () {
     if (this.options.exportDataType === 'selected') {
-      this.$export.find('> button')
-        .prop('disabled', !this.getSelections().length)
+      const btn = this.$export?.querySelector(':scope > button')
+
+      if (btn) {
+        btn.disabled = !this.getSelections().length
+      }
     }
   }
 }

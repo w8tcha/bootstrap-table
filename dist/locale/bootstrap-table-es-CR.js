@@ -1,8 +1,5 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+(function (BootstrapTable) {
+	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1976,7 +1973,7 @@
 	 * Review: Jei (@jeijei4) (20/Oct/2022)
 	 */
 
-	$.fn.bootstrapTable.locales['es-CR'] = {
+	BootstrapTable.locales['es-CR'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2116,6 +2113,6 @@
 	    return 'Mostrar vista en tarjetas';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-CR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-CR']);
 
-}));
+})(BootstrapTable);

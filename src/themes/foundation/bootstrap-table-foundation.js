@@ -4,17 +4,19 @@
  * theme: https://github.com/zurb/foundation-sites
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Utils.extend($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Utils.extend(BootstrapTable.defaults, {
   classes: 'table hover',
   buttonsPrefix: '',
   buttonsClass: 'button'
 })
 
-$.fn.bootstrapTable.theme = 'foundation'
+BootstrapTable.theme = 'foundation'
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initConstants () {
     super.initConstants()
 
@@ -43,21 +45,23 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   handleToolbar () {
-    if (this.$toolbar.find('.dropdown-toggle').length) {
-      this.$toolbar.find('.dropdown-toggle').each((i, el) => {
-        if (!$(el).next().length) {
-          return
-        }
+    const toggles = Array.from(this.$toolbar.querySelectorAll('.dropdown-toggle'))
 
+    if (toggles.length) {
+      toggles.forEach((el, i) => {
+        const next = el.nextElementSibling
+
+        if (!next) return
         const id = `toolbar-columns-id${i}`
 
-        $(el).next().attr('id', id)
-        $(el).attr('data-toggle', id)
-        const $pane = $(el).next()
-          .attr('data-position', 'bottom')
-          .attr('data-alignment', 'right')
-
-        new window.Foundation.Dropdown($pane)
+        next.id = id
+        el.setAttribute('data-toggle', id)
+        next.setAttribute('data-position', 'bottom')
+        next.setAttribute('data-alignment', 'right')
+        // TODO: replace with Foundation native API when jQuery is not available
+        if (window.Foundation?.Dropdown) {
+          new window.Foundation.Dropdown(next)
+        }
       })
 
       this._initDropdown()
@@ -68,37 +72,59 @@ $.BootstrapTable = class extends $.BootstrapTable {
     super.initPagination()
 
     if (this.options.pagination && this.paginationParts.includes('pageSize')) {
-      const $el = this.$pagination.find('.dropdown-toggle')
+      const el = this.$pagination.flatMap(p => [...p.querySelectorAll('.dropdown-toggle')])[0]
+      const pane = this.$pagination.flatMap(p => [...p.querySelectorAll('.dropdown-pane')])[0]
 
-      $el.attr('data-toggle', $el.next().attr('id'))
+      if (el && pane?.id) {
+        el.setAttribute('data-toggle', pane.id)
+      }
 
-      const $pane = this.$pagination.find('.dropdown-pane')
-        .attr('data-position', 'top')
-        .attr('data-alignment', 'left')
-
-      new window.Foundation.Dropdown($pane)
+      if (pane) {
+        pane.setAttribute('data-position', 'top')
+        pane.setAttribute('data-alignment', 'left')
+        // TODO: replace with Foundation native API when jQuery is not available
+        if (window.Foundation?.Dropdown) {
+          new window.Foundation.Dropdown(pane)
+        }
+      }
 
       this._initDropdown()
     }
   }
 
   _initDropdown () {
-    const $dropdowns = this.$container.find('.dropdown-toggle')
+    this._ddToggles?.forEach(t => {
+      if (t._ddClickHandler) t.removeEventListener('click', t._ddClickHandler)
+    })
+    if (this._docClickHandlerFoundation) {
+      document.removeEventListener('click', this._docClickHandlerFoundation)
+    }
 
-    $dropdowns.off('click').on('click', e => {
-      const $this = $(e.currentTarget)
+    this._ddToggles = Array.from(this.$container.querySelectorAll('.dropdown-toggle'))
 
-      e.stopPropagation()
+    this._ddToggles.forEach(toggle => {
+      toggle._ddClickHandler = e => {
+        e.stopPropagation()
+        // TODO: use Foundation native toggle/close API without jQuery
+        const pane = toggle.nextElementSibling
 
-      $this.next().foundation('toggle')
+        if (pane) {
+          const isOpen = pane.classList.contains('is-open')
 
-      if ($dropdowns.not($this).length) {
-        $dropdowns.not($this).next().foundation('close')
+          this._ddToggles.filter(t => t !== toggle).forEach(t => {
+            t.nextElementSibling?.classList.remove('is-open')
+          })
+          pane.classList.toggle('is-open', !isOpen)
+        }
       }
+      toggle.addEventListener('click', toggle._ddClickHandler)
     })
 
-    $(document).off('click.bs.dropdown.foundation').on('click.bs.dropdown.foundation', () => {
-      $dropdowns.next().foundation('close')
-    })
+    this._docClickHandlerFoundation = () => {
+      this._ddToggles?.forEach(t => {
+        t.nextElementSibling?.classList.remove('is-open')
+      })
+    }
+    document.addEventListener('click', this._docClickHandlerFoundation)
   }
 }

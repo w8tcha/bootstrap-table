@@ -3,7 +3,9 @@
  * Author: MJ Vakili <mjv.1989@Gmail.com>
  */
 
-$.fn.bootstrapTable.locales['fa-IR'] = $.fn.bootstrapTable.locales['fa'] = {
+
+
+BootstrapTable.locales['fa-IR'] = BootstrapTable.locales['fa'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['fa-IR'] = $.fn.bootstrapTable.locales['fa'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fa-IR'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fa-IR'])

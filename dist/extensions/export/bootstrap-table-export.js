@@ -1,13 +1,16 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
     for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
     return n;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
   }
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -120,6 +123,12 @@
       return !!t;
     })();
   }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
   function _possibleConstructorReturn(t, e) {
     if (e && ("object" == typeof e || "function" == typeof e)) return e;
     if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
@@ -139,6 +148,9 @@
     return 2 & r && "function" == typeof p ? function (t) {
       return p.apply(e, t);
     } : p;
+  }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
   function _toPrimitive(t, r) {
     if ("object" != typeof t || !t) return t;
@@ -2023,7 +2035,7 @@
 
   requireEs_array_concat();
 
-  var es_array_find = {};
+  var es_array_map = {};
 
   var functionUncurryThisClause;
   var hasRequiredFunctionUncurryThisClause;
@@ -2145,221 +2157,6 @@
   	return arrayIteration;
   }
 
-  var objectDefineProperties = {};
-
-  var objectKeys;
-  var hasRequiredObjectKeys;
-
-  function requireObjectKeys () {
-  	if (hasRequiredObjectKeys) return objectKeys;
-  	hasRequiredObjectKeys = 1;
-  	var internalObjectKeys = requireObjectKeysInternal();
-  	var enumBugKeys = requireEnumBugKeys();
-
-  	// `Object.keys` method
-  	// https://tc39.es/ecma262/#sec-object.keys
-  	// eslint-disable-next-line es/no-object-keys -- safe
-  	objectKeys = Object.keys || function keys(O) {
-  	  return internalObjectKeys(O, enumBugKeys);
-  	};
-  	return objectKeys;
-  }
-
-  var hasRequiredObjectDefineProperties;
-
-  function requireObjectDefineProperties () {
-  	if (hasRequiredObjectDefineProperties) return objectDefineProperties;
-  	hasRequiredObjectDefineProperties = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var V8_PROTOTYPE_DEFINE_BUG = requireV8PrototypeDefineBug();
-  	var definePropertyModule = requireObjectDefineProperty();
-  	var anObject = requireAnObject();
-  	var toIndexedObject = requireToIndexedObject();
-  	var objectKeys = requireObjectKeys();
-
-  	// `Object.defineProperties` method
-  	// https://tc39.es/ecma262/#sec-object.defineproperties
-  	// eslint-disable-next-line es/no-object-defineproperties -- safe
-  	objectDefineProperties.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : function defineProperties(O, Properties) {
-  	  anObject(O);
-  	  var props = toIndexedObject(Properties);
-  	  var keys = objectKeys(Properties);
-  	  var length = keys.length;
-  	  var index = 0;
-  	  var key;
-  	  while (length > index) definePropertyModule.f(O, key = keys[index++], props[key]);
-  	  return O;
-  	};
-  	return objectDefineProperties;
-  }
-
-  var html;
-  var hasRequiredHtml;
-
-  function requireHtml () {
-  	if (hasRequiredHtml) return html;
-  	hasRequiredHtml = 1;
-  	var getBuiltIn = requireGetBuiltIn();
-
-  	html = getBuiltIn('document', 'documentElement');
-  	return html;
-  }
-
-  var objectCreate;
-  var hasRequiredObjectCreate;
-
-  function requireObjectCreate () {
-  	if (hasRequiredObjectCreate) return objectCreate;
-  	hasRequiredObjectCreate = 1;
-  	/* global ActiveXObject -- old IE, WSH */
-  	var anObject = requireAnObject();
-  	var definePropertiesModule = requireObjectDefineProperties();
-  	var enumBugKeys = requireEnumBugKeys();
-  	var hiddenKeys = requireHiddenKeys();
-  	var html = requireHtml();
-  	var documentCreateElement = requireDocumentCreateElement();
-  	var sharedKey = requireSharedKey();
-
-  	var GT = '>';
-  	var LT = '<';
-  	var PROTOTYPE = 'prototype';
-  	var SCRIPT = 'script';
-  	var IE_PROTO = sharedKey('IE_PROTO');
-
-  	var EmptyConstructor = function () { /* empty */ };
-
-  	var scriptTag = function (content) {
-  	  return LT + SCRIPT + GT + content + LT + '/' + SCRIPT + GT;
-  	};
-
-  	// Create object with fake `null` prototype: use ActiveX Object with cleared prototype
-  	var NullProtoObjectViaActiveX = function (activeXDocument) {
-  	  activeXDocument.write(scriptTag(''));
-  	  activeXDocument.close();
-  	  var temp = activeXDocument.parentWindow.Object;
-  	  // eslint-disable-next-line no-useless-assignment -- avoid memory leak
-  	  activeXDocument = null;
-  	  return temp;
-  	};
-
-  	// Create object with fake `null` prototype: use iframe Object with cleared prototype
-  	var NullProtoObjectViaIFrame = function () {
-  	  // Thrash, waste and sodomy: IE GC bug
-  	  var iframe = documentCreateElement('iframe');
-  	  var JS = 'java' + SCRIPT + ':';
-  	  var iframeDocument;
-  	  iframe.style.display = 'none';
-  	  html.appendChild(iframe);
-  	  // https://github.com/zloirock/core-js/issues/475
-  	  iframe.src = String(JS);
-  	  iframeDocument = iframe.contentWindow.document;
-  	  iframeDocument.open();
-  	  iframeDocument.write(scriptTag('document.F=Object'));
-  	  iframeDocument.close();
-  	  return iframeDocument.F;
-  	};
-
-  	// Check for document.domain and active x support
-  	// No need to use active x approach when document.domain is not set
-  	// see https://github.com/es-shims/es5-shim/issues/150
-  	// variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
-  	// avoid IE GC bug
-  	var activeXDocument;
-  	var NullProtoObject = function () {
-  	  try {
-  	    activeXDocument = new ActiveXObject('htmlfile');
-  	  } catch (error) { /* ignore */ }
-  	  NullProtoObject = typeof document != 'undefined'
-  	    ? document.domain && activeXDocument
-  	      ? NullProtoObjectViaActiveX(activeXDocument) // old IE
-  	      : NullProtoObjectViaIFrame()
-  	    : NullProtoObjectViaActiveX(activeXDocument); // WSH
-  	  var length = enumBugKeys.length;
-  	  while (length--) delete NullProtoObject[PROTOTYPE][enumBugKeys[length]];
-  	  return NullProtoObject();
-  	};
-
-  	hiddenKeys[IE_PROTO] = true;
-
-  	// `Object.create` method
-  	// https://tc39.es/ecma262/#sec-object.create
-  	// eslint-disable-next-line es/no-object-create -- safe
-  	objectCreate = Object.create || function create(O, Properties) {
-  	  var result;
-  	  if (O !== null) {
-  	    EmptyConstructor[PROTOTYPE] = anObject(O);
-  	    result = new EmptyConstructor();
-  	    EmptyConstructor[PROTOTYPE] = null;
-  	    // add "__proto__" for Object.getPrototypeOf polyfill
-  	    result[IE_PROTO] = O;
-  	  } else result = NullProtoObject();
-  	  return Properties === undefined ? result : definePropertiesModule.f(result, Properties);
-  	};
-  	return objectCreate;
-  }
-
-  var addToUnscopables;
-  var hasRequiredAddToUnscopables;
-
-  function requireAddToUnscopables () {
-  	if (hasRequiredAddToUnscopables) return addToUnscopables;
-  	hasRequiredAddToUnscopables = 1;
-  	var wellKnownSymbol = requireWellKnownSymbol();
-  	var create = requireObjectCreate();
-  	var defineProperty = requireObjectDefineProperty().f;
-
-  	var UNSCOPABLES = wellKnownSymbol('unscopables');
-  	var ArrayPrototype = Array.prototype;
-
-  	// Array.prototype[@@unscopables]
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	if (ArrayPrototype[UNSCOPABLES] === undefined) {
-  	  defineProperty(ArrayPrototype, UNSCOPABLES, {
-  	    configurable: true,
-  	    value: create(null)
-  	  });
-  	}
-
-  	// add a key to Array.prototype[@@unscopables]
-  	addToUnscopables = function (key) {
-  	  ArrayPrototype[UNSCOPABLES][key] = true;
-  	};
-  	return addToUnscopables;
-  }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_array_map = {};
-
   var hasRequiredEs_array_map;
 
   function requireEs_array_map () {
@@ -2458,6 +2255,24 @@
   requireEs_array_slice();
 
   var es_object_assign = {};
+
+  var objectKeys;
+  var hasRequiredObjectKeys;
+
+  function requireObjectKeys () {
+  	if (hasRequiredObjectKeys) return objectKeys;
+  	hasRequiredObjectKeys = 1;
+  	var internalObjectKeys = requireObjectKeysInternal();
+  	var enumBugKeys = requireEnumBugKeys();
+
+  	// `Object.keys` method
+  	// https://tc39.es/ecma262/#sec-object.keys
+  	// eslint-disable-next-line es/no-object-keys -- safe
+  	objectKeys = Object.keys || function keys(O) {
+  	  return internalObjectKeys(O, enumBugKeys);
+  	};
+  	return objectKeys;
+  }
 
   var objectAssign;
   var hasRequiredObjectAssign;
@@ -2664,6 +2479,141 @@
   	  UNSUPPORTED_Y: UNSUPPORTED_Y
   	};
   	return regexpStickyHelpers;
+  }
+
+  var objectDefineProperties = {};
+
+  var hasRequiredObjectDefineProperties;
+
+  function requireObjectDefineProperties () {
+  	if (hasRequiredObjectDefineProperties) return objectDefineProperties;
+  	hasRequiredObjectDefineProperties = 1;
+  	var DESCRIPTORS = requireDescriptors();
+  	var V8_PROTOTYPE_DEFINE_BUG = requireV8PrototypeDefineBug();
+  	var definePropertyModule = requireObjectDefineProperty();
+  	var anObject = requireAnObject();
+  	var toIndexedObject = requireToIndexedObject();
+  	var objectKeys = requireObjectKeys();
+
+  	// `Object.defineProperties` method
+  	// https://tc39.es/ecma262/#sec-object.defineproperties
+  	// eslint-disable-next-line es/no-object-defineproperties -- safe
+  	objectDefineProperties.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : function defineProperties(O, Properties) {
+  	  anObject(O);
+  	  var props = toIndexedObject(Properties);
+  	  var keys = objectKeys(Properties);
+  	  var length = keys.length;
+  	  var index = 0;
+  	  var key;
+  	  while (length > index) definePropertyModule.f(O, key = keys[index++], props[key]);
+  	  return O;
+  	};
+  	return objectDefineProperties;
+  }
+
+  var html;
+  var hasRequiredHtml;
+
+  function requireHtml () {
+  	if (hasRequiredHtml) return html;
+  	hasRequiredHtml = 1;
+  	var getBuiltIn = requireGetBuiltIn();
+
+  	html = getBuiltIn('document', 'documentElement');
+  	return html;
+  }
+
+  var objectCreate;
+  var hasRequiredObjectCreate;
+
+  function requireObjectCreate () {
+  	if (hasRequiredObjectCreate) return objectCreate;
+  	hasRequiredObjectCreate = 1;
+  	/* global ActiveXObject -- old IE, WSH */
+  	var anObject = requireAnObject();
+  	var definePropertiesModule = requireObjectDefineProperties();
+  	var enumBugKeys = requireEnumBugKeys();
+  	var hiddenKeys = requireHiddenKeys();
+  	var html = requireHtml();
+  	var documentCreateElement = requireDocumentCreateElement();
+  	var sharedKey = requireSharedKey();
+
+  	var GT = '>';
+  	var LT = '<';
+  	var PROTOTYPE = 'prototype';
+  	var SCRIPT = 'script';
+  	var IE_PROTO = sharedKey('IE_PROTO');
+
+  	var EmptyConstructor = function () { /* empty */ };
+
+  	var scriptTag = function (content) {
+  	  return LT + SCRIPT + GT + content + LT + '/' + SCRIPT + GT;
+  	};
+
+  	// Create object with fake `null` prototype: use ActiveX Object with cleared prototype
+  	var NullProtoObjectViaActiveX = function (activeXDocument) {
+  	  activeXDocument.write(scriptTag(''));
+  	  activeXDocument.close();
+  	  var temp = activeXDocument.parentWindow.Object;
+  	  // eslint-disable-next-line no-useless-assignment -- avoid memory leak
+  	  activeXDocument = null;
+  	  return temp;
+  	};
+
+  	// Create object with fake `null` prototype: use iframe Object with cleared prototype
+  	var NullProtoObjectViaIFrame = function () {
+  	  // Thrash, waste and sodomy: IE GC bug
+  	  var iframe = documentCreateElement('iframe');
+  	  var JS = 'java' + SCRIPT + ':';
+  	  var iframeDocument;
+  	  iframe.style.display = 'none';
+  	  html.appendChild(iframe);
+  	  // https://github.com/zloirock/core-js/issues/475
+  	  iframe.src = String(JS);
+  	  iframeDocument = iframe.contentWindow.document;
+  	  iframeDocument.open();
+  	  iframeDocument.write(scriptTag('document.F=Object'));
+  	  iframeDocument.close();
+  	  return iframeDocument.F;
+  	};
+
+  	// Check for document.domain and active x support
+  	// No need to use active x approach when document.domain is not set
+  	// see https://github.com/es-shims/es5-shim/issues/150
+  	// variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
+  	// avoid IE GC bug
+  	var activeXDocument;
+  	var NullProtoObject = function () {
+  	  try {
+  	    activeXDocument = new ActiveXObject('htmlfile');
+  	  } catch (error) { /* ignore */ }
+  	  NullProtoObject = typeof document != 'undefined'
+  	    ? document.domain && activeXDocument
+  	      ? NullProtoObjectViaActiveX(activeXDocument) // old IE
+  	      : NullProtoObjectViaIFrame()
+  	    : NullProtoObjectViaActiveX(activeXDocument); // WSH
+  	  var length = enumBugKeys.length;
+  	  while (length--) delete NullProtoObject[PROTOTYPE][enumBugKeys[length]];
+  	  return NullProtoObject();
+  	};
+
+  	hiddenKeys[IE_PROTO] = true;
+
+  	// `Object.create` method
+  	// https://tc39.es/ecma262/#sec-object.create
+  	// eslint-disable-next-line es/no-object-create -- safe
+  	objectCreate = Object.create || function create(O, Properties) {
+  	  var result;
+  	  if (O !== null) {
+  	    EmptyConstructor[PROTOTYPE] = anObject(O);
+  	    result = new EmptyConstructor();
+  	    EmptyConstructor[PROTOTYPE] = null;
+  	    // add "__proto__" for Object.getPrototypeOf polyfill
+  	    result[IE_PROTO] = O;
+  	  } else result = NullProtoObject();
+  	  return Properties === undefined ? result : definePropertiesModule.f(result, Properties);
+  	};
+  	return objectCreate;
   }
 
   var regexpUnsupportedDotAll;
@@ -3474,9 +3424,12 @@
   /**
    * @author zhixin wen <wenzhixin2010@gmail.com>
    * extensions: https://github.com/hhurz/tableExport.jquery.plugin
+   *
+   * Note: exportTable() calls this.$el.tableExport() which requires the
+   * tableExport jQuery plugin. jQuery must be available for that call.
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
+  var Utils = BootstrapTable.utils;
   var TYPE_NAME = {
     json: 'JSON',
     xml: 'XML',
@@ -3490,7 +3443,7 @@
     powerpoint: 'MS-Powerpoint',
     pdf: 'PDF'
   };
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     showExport: false,
     exportDataType: 'basic',
     // basic, all, selected
@@ -3498,25 +3451,25 @@
     exportOptions: {},
     exportFooter: false
   });
-  Object.assign($.fn.bootstrapTable.columnDefaults, {
+  Object.assign(BootstrapTable.columnDefaults, {
     forceExport: false,
     forceHide: false
   });
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'export', {
+  Utils.assignIcons(BootstrapTable.icons, 'export', {
     glyphicon: 'glyphicon-export icon-share',
     fa: 'fa-download',
     bi: 'bi-download',
     icon: 'icon-download',
     'material-icons': 'file_download'
   });
-  Object.assign($.fn.bootstrapTable.locales, {
+  Object.assign(BootstrapTable.locales, {
     formatExport: function formatExport() {
       return 'Export data';
     }
   });
-  Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales);
-  $.fn.bootstrapTable.methods.push('exportTable');
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, BootstrapTable.locales);
+  BootstrapTable.methods.push('exportTable');
+  Object.assign(BootstrapTable.defaults, {
     // eslint-disable-next-line no-unused-vars
     onExportSaved: function onExportSaved(exportedRows) {
       return false;
@@ -3525,17 +3478,17 @@
       return false;
     }
   });
-  Object.assign($.fn.bootstrapTable.events, {
+  Object.assign(BootstrapTable.events, {
     'export-saved.bs.table': 'onExportSaved',
     'export-started.bs.table': 'onExportStarted'
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initToolbar",
       value: function initToolbar() {
         var _this = this;
@@ -3552,8 +3505,8 @@
           if (typeof o.exportOptions === 'string') {
             o.exportOptions = Utils.calculateObjectValue(null, o.exportOptions);
           }
-          this.$export = this.$toolbar.find('>.columns div.export');
-          if (this.$export.length) {
+          this.$export = this.$toolbar.querySelector(':scope > .columns div.export');
+          if (this.$export) {
             this.updateExportButton();
             return;
           }
@@ -3570,10 +3523,12 @@
                 try {
                   for (_iterator.s(); !(_step = _iterator.n()).done;) {
                     var type = _step.value;
-                    if (TYPE_NAME.hasOwnProperty(type)) {
-                      var $item = $(Utils.sprintf(_this.constants.html.pageDropdownItem, '', TYPE_NAME[type]));
-                      $item.attr('data-type', type);
-                      html.push($item.prop('outerHTML'));
+                    if (Object.prototype.hasOwnProperty.call(TYPE_NAME, type)) {
+                      var template = document.createElement('template');
+                      template.innerHTML = Utils.sprintf(_this.constants.html.pageDropdownItem, '', TYPE_NAME[type]);
+                      var item = template.content.firstElementChild;
+                      item.dataset.type = type;
+                      html.push(item.outerHTML);
                     }
                   }
                 } catch (err) {
@@ -3590,20 +3545,22 @@
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initToolbar", this, 3)(args);
-        this.$export = this.$toolbar.find('>.columns div.export');
+        _superPropGet(_default, "initToolbar", this, 3)(args);
+        this.$export = this.$toolbar.querySelector(':scope > .columns div.export');
         if (!this.options.showExport) {
           return;
         }
         this.updateExportButton();
-        var $exportButtons = this.$export.find('[data-type]');
+        var exportButtons = _toConsumableArray(this.$export.querySelectorAll('[data-type]'));
         if (exportTypes.length === 1) {
-          $exportButtons = this.$export;
+          exportButtons = [this.$export];
         }
-        $exportButtons.click(function (e) {
-          e.preventDefault();
-          _this.exportTable({
-            type: $(e.currentTarget).data('type')
+        exportButtons.forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            _this.exportTable({
+              type: e.currentTarget.dataset.type
+            });
           });
         });
         this.handleToolbar();
@@ -3614,8 +3571,8 @@
         if (!this.$export) {
           return;
         }
-        if (_superPropGet(_class, "handleToolbar", this, 1)) {
-          _superPropGet(_class, "handleToolbar", this, 3)([]);
+        if (_superPropGet(_default, "handleToolbar", this, 1)) {
+          _superPropGet(_default, "handleToolbar", this, 3)([]);
         }
       }
     }, {
@@ -3643,21 +3600,23 @@
             o.exportOptions.ignoreColumn = [detailViewIndex].concat(o.exportOptions.ignoreColumn || []);
           }
           if (o.exportFooter && o.height) {
-            var $footerRow = _this2.$tableFooter.find('tr').first();
+            var footerRow = _this2.$tableFooter.querySelector('tr:first-child');
             var footerData = {};
             var footerHtml = [];
-            $footerRow.children().forEach(function (footerCell, index) {
-              var footerCellHtml = $(footerCell).children('.th-inner').first().html();
+            _toConsumableArray(footerRow.children).forEach(function (footerCell, index) {
+              var _footerCell$querySele;
+              var footerCellHtml = ((_footerCell$querySele = footerCell.querySelector('.th-inner')) === null || _footerCell$querySele === void 0 ? void 0 : _footerCell$querySele.innerHTML) || '';
               footerData[_this2.columns[index].field] = footerCellHtml === '&nbsp;' ? null : footerCellHtml;
-
-              // grab footer cell text into cell index-based array
               footerHtml.push(footerCellHtml);
             });
-            _this2.$body.append(_this2.$body.children().last()[0].outerHTML);
-            var $lastTableRow = _this2.$body.children().last();
-            $lastTableRow.children().forEach(function (lastTableRowCell, index) {
-              $(lastTableRowCell).html(footerHtml[index]);
-            });
+            var lastRow = _this2.$body.querySelector('tr:last-child');
+            if (lastRow) {
+              _this2.$body.insertAdjacentHTML('beforeend', lastRow.outerHTML);
+              var newLastRow = _this2.$body.querySelector('tr:last-child');
+              _toConsumableArray(newLastRow.children).forEach(function (cell, index) {
+                cell.innerHTML = footerHtml[index];
+              });
+            }
           }
           var hiddenColumns = _this2.getHiddenColumns();
           hiddenColumns.forEach(function (row) {
@@ -3668,30 +3627,34 @@
           if (typeof o.exportOptions.fileName === 'function') {
             options.fileName = o.exportOptions.fileName();
           }
-          _this2.$el.tableExport(Utils.extend({
-            onAfterSaveToFile: function onAfterSaveToFile() {
-              if (o.exportFooter) {
-                _this2.load(data);
-              }
-              if (stateField) {
-                _this2.showColumn(stateField);
-              }
-              if (isCardView) {
-                _this2.toggleView();
-              }
-              hiddenColumns.forEach(function (row) {
-                if (row.forceExport) {
-                  _this2.hideColumn(row.field);
+
+          // tableExport requires jQuery
+          if (typeof window.$ !== 'undefined') {
+            $(_this2.$el).tableExport(Utils.extend({
+              onAfterSaveToFile: function onAfterSaveToFile() {
+                if (o.exportFooter) {
+                  _this2.load(data);
                 }
-              });
-              _this2.columns.forEach(function (row) {
-                if (row.forceHide) {
-                  _this2.showColumn(row.field);
+                if (stateField) {
+                  _this2.showColumn(stateField);
                 }
-              });
-              if (callback) callback();
-            }
-          }, o.exportOptions, options));
+                if (isCardView) {
+                  _this2.toggleView();
+                }
+                hiddenColumns.forEach(function (row) {
+                  if (row.forceExport) {
+                    _this2.hideColumn(row.field);
+                  }
+                });
+                _this2.columns.forEach(function (row) {
+                  if (row.forceHide) {
+                    _this2.showColumn(row.field);
+                  }
+                });
+                if (callback) callback();
+              }
+            }, o.exportOptions, options));
+          }
         };
 
         // Early return for selected data type when no rows are selected
@@ -3708,7 +3671,7 @@
         if (o.exportDataType === 'all' && o.pagination) {
           var eventName = o.sidePagination === 'server' ? 'post-body.bs.table' : 'page-change.bs.table';
           var virtualScroll = this.options.virtualScroll;
-          this.$el.one(eventName, function () {
+          this.$el.addEventListener(eventName, function () {
             setTimeout(function () {
               var data = _this2.getData();
               doExport(function () {
@@ -3717,6 +3680,8 @@
               });
               _this2.trigger('export-saved', data);
             }, 0);
+          }, {
+            once: true
           });
           this.options.virtualScroll = false;
           this.togglePagination();
@@ -3753,17 +3718,23 @@
     }, {
       key: "updateSelected",
       value: function updateSelected() {
-        _superPropGet(_class, "updateSelected", this, 3)([]);
+        _superPropGet(_default, "updateSelected", this, 3)([]);
         this.updateExportButton();
       }
     }, {
       key: "updateExportButton",
       value: function updateExportButton() {
         if (this.options.exportDataType === 'selected') {
-          this.$export.find('> button').prop('disabled', !this.getSelections().length);
+          var _this$$export;
+          var btn = (_this$$export = this.$export) === null || _this$$export === void 0 ? void 0 : _this$$export.querySelector(':scope > button');
+          if (btn) {
+            btn.disabled = !this.getSelections().length;
+          }
         }
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

@@ -3,9 +3,11 @@
  * @update: zhixin wen <wenzhixin2010@gmail.com>
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Object.assign(BootstrapTable.defaults, {
   treeEnable: false,
   treeShowField: null,
   idField: 'id',
@@ -13,7 +15,7 @@ Object.assign($.fn.bootstrapTable.defaults, {
   rootParentId: null
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
 
   init (...args) {
     this._rowStyle = this.options.rowStyle
@@ -71,7 +73,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
         ].join(' ')
         return res
       }
-      this.initTr(node, $.inArray(node, data), data, parentDom)
+      this.initTr(node, data.indexOf(node), data, parentDom)
     }
   }
 

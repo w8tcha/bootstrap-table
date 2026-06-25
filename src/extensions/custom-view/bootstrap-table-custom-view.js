@@ -3,15 +3,17 @@
  * @github: https://github.com/UtechtDustin
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Object.assign(BootstrapTable.defaults, {
   customView: false,
   showCustomView: false,
   customViewDefaultView: false
 })
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'customViewOn', {
+Utils.assignIcons(BootstrapTable.icons, 'customViewOn', {
   glyphicon: 'glyphicon-list',
   fa: 'fa-list',
   bi: 'bi-list',
@@ -19,7 +21,7 @@ Utils.assignIcons($.fn.bootstrapTable.icons, 'customViewOn', {
   'material-icons': 'list'
 })
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'customViewOff', {
+Utils.assignIcons(BootstrapTable.icons, 'customViewOff', {
   glyphicon: 'glyphicon-thumbnails',
   fa: 'fa-th',
   bi: 'bi-grid',
@@ -27,7 +29,7 @@ Utils.assignIcons($.fn.bootstrapTable.icons, 'customViewOff', {
   'material-icons': 'grid_on'
 })
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   onCustomViewPostBody () {
     return false
   },
@@ -39,7 +41,7 @@ Object.assign($.fn.bootstrapTable.defaults, {
   }
 })
 
-Object.assign($.fn.bootstrapTable.locales, {
+Object.assign(BootstrapTable.locales, {
   formatToggleCustomViewOn () {
     return 'Show custom view'
   },
@@ -47,17 +49,17 @@ Object.assign($.fn.bootstrapTable.locales, {
     return 'Hide custom view'
   }
 })
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales)
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales)
 
-$.fn.bootstrapTable.methods.push('toggleCustomView')
+BootstrapTable.methods.push('toggleCustomView')
 
-Object.assign($.fn.bootstrapTable.events, {
+Object.assign(BootstrapTable.events, {
   'custom-view-post-body.bs.table': 'onCustomViewPostBody',
   'custom-view-pre-body.bs.table': 'onCustomViewPreBody',
   'toggle-custom-view.bs.table': 'onToggleCustomView'
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
 
   init () {
     this.customViewDefaultView = this.options.customViewDefaultView
@@ -90,13 +92,14 @@ $.BootstrapTable = class extends $.BootstrapTable {
       return
     }
 
-    const $table = this.$el
-    const $customViewContainer = this.$container.find('.fixed-table-custom-view')
+    const table = this.$el
+    const customViewContainer = this.$container.querySelector('.fixed-table-custom-view')
 
-    $table.hide()
-    $customViewContainer.hide()
+    table.style.display = 'none'
+    if (customViewContainer) customViewContainer.style.display = 'none'
+
     if (!this.options.customView || !this.customViewDefaultView) {
-      $table.show()
+      table.style.display = ''
       return
     }
 
@@ -104,10 +107,11 @@ $.BootstrapTable = class extends $.BootstrapTable {
     const value = Utils.calculateObjectValue(this, this.options.customView, [data], '')
 
     this.trigger('custom-view-pre-body', data, value)
-    if ($customViewContainer.length === 1) {
-      $customViewContainer.show().html(value)
+    if (customViewContainer) {
+      customViewContainer.style.display = ''
+      customViewContainer.innerHTML = value
     } else {
-      this.$tableBody.after(`<div class="fixed-table-custom-view">${value}</div>`)
+      this.$tableBody.insertAdjacentHTML('afterend', `<div class="fixed-table-custom-view">${value}</div>`)
     }
 
     this.trigger('custom-view-post-body', data, value)
@@ -119,10 +123,13 @@ $.BootstrapTable = class extends $.BootstrapTable {
     const icon = this.options.showButtonIcons ? this.customViewDefaultView ? this.options.icons.customViewOn : this.options.icons.customViewOff : ''
     const text = this.options.showButtonText ? this.customViewDefaultView ? this.options.formatToggleCustomViewOff() : this.options.formatToggleCustomViewOn() : ''
 
-    this.$toolbar.find('button[name="customView"]')
-      .html(`${Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, icon)} ${text}`)
-      .attr('aria-label', text)
-      .attr('title', text)
+    const btn = this.$toolbar.querySelector('button[name="customView"]')
+
+    if (btn) {
+      btn.innerHTML = `${Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, icon)} ${text}`
+      btn.setAttribute('aria-label', text)
+      btn.setAttribute('title', text)
+    }
 
     this.initBody()
     this.trigger('toggle-custom-view', this.customViewDefaultView)

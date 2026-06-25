@@ -1,9 +1,17 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
+  function _arrayLikeToArray(r, a) {
+    (null == a || a > r.length) && (a = r.length);
+    for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+    return n;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
+  }
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     return e;
@@ -59,6 +67,12 @@
       return !!t;
     })();
   }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
   function _possibleConstructorReturn(t, e) {
     if (e && ("object" == typeof e || "function" == typeof e)) return e;
     if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
@@ -79,6 +93,9 @@
       return p.apply(e, t);
     } : p;
   }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
+  }
   function _toPrimitive(t, r) {
     if ("object" != typeof t || !t) return t;
     var e = t[Symbol.toPrimitive];
@@ -93,10 +110,17 @@
     var i = _toPrimitive(t, "string");
     return "symbol" == typeof i ? i : i + "";
   }
+  function _unsupportedIterableToArray(r, a) {
+    if (r) {
+      if ("string" == typeof r) return _arrayLikeToArray(r, a);
+      var t = {}.toString.call(r).slice(8, -1);
+      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+    }
+  }
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-  var es_array_find = {};
+  var es_object_assign = {};
 
   var globalThis_1;
   var hasRequiredGlobalThis;
@@ -1612,6 +1636,264 @@
   	return _export;
   }
 
+  var objectKeys;
+  var hasRequiredObjectKeys;
+
+  function requireObjectKeys () {
+  	if (hasRequiredObjectKeys) return objectKeys;
+  	hasRequiredObjectKeys = 1;
+  	var internalObjectKeys = requireObjectKeysInternal();
+  	var enumBugKeys = requireEnumBugKeys();
+
+  	// `Object.keys` method
+  	// https://tc39.es/ecma262/#sec-object.keys
+  	// eslint-disable-next-line es/no-object-keys -- safe
+  	objectKeys = Object.keys || function keys(O) {
+  	  return internalObjectKeys(O, enumBugKeys);
+  	};
+  	return objectKeys;
+  }
+
+  var objectAssign;
+  var hasRequiredObjectAssign;
+
+  function requireObjectAssign () {
+  	if (hasRequiredObjectAssign) return objectAssign;
+  	hasRequiredObjectAssign = 1;
+  	var DESCRIPTORS = requireDescriptors();
+  	var uncurryThis = requireFunctionUncurryThis();
+  	var call = requireFunctionCall();
+  	var fails = requireFails();
+  	var objectKeys = requireObjectKeys();
+  	var getOwnPropertySymbolsModule = requireObjectGetOwnPropertySymbols();
+  	var propertyIsEnumerableModule = requireObjectPropertyIsEnumerable();
+  	var toObject = requireToObject();
+  	var IndexedObject = requireIndexedObject();
+
+  	// eslint-disable-next-line es/no-object-assign -- safe
+  	var $assign = Object.assign;
+  	// eslint-disable-next-line es/no-object-defineproperty -- required for testing
+  	var defineProperty = Object.defineProperty;
+  	var concat = uncurryThis([].concat);
+
+  	// `Object.assign` method
+  	// https://tc39.es/ecma262/#sec-object.assign
+  	objectAssign = !$assign || fails(function () {
+  	  // should have correct order of operations (Edge bug)
+  	  if (DESCRIPTORS && $assign({ b: 1 }, $assign(defineProperty({}, 'a', {
+  	    enumerable: true,
+  	    get: function () {
+  	      defineProperty(this, 'b', {
+  	        value: 3,
+  	        enumerable: false
+  	      });
+  	    }
+  	  }), { b: 2 })).b !== 1) return true;
+  	  // should work with symbols and should have deterministic property order (V8 bug)
+  	  var A = {};
+  	  var B = {};
+  	  // eslint-disable-next-line es/no-symbol -- safe
+  	  var symbol = Symbol('assign detection');
+  	  var alphabet = 'abcdefghijklmnopqrst';
+  	  A[symbol] = 7;
+  	  // eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	  alphabet.split('').forEach(function (chr) { B[chr] = chr; });
+  	  return $assign({}, A)[symbol] !== 7 || objectKeys($assign({}, B)).join('') !== alphabet;
+  	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars -- required for `.length`
+  	  var T = toObject(target);
+  	  var argumentsLength = arguments.length;
+  	  var index = 1;
+  	  var getOwnPropertySymbols = getOwnPropertySymbolsModule.f;
+  	  var propertyIsEnumerable = propertyIsEnumerableModule.f;
+  	  while (argumentsLength > index) {
+  	    var S = IndexedObject(arguments[index++]);
+  	    var keys = getOwnPropertySymbols ? concat(objectKeys(S), getOwnPropertySymbols(S)) : objectKeys(S);
+  	    var length = keys.length;
+  	    var j = 0;
+  	    var key;
+  	    while (length > j) {
+  	      key = keys[j++];
+  	      if (!DESCRIPTORS || call(propertyIsEnumerable, S, key)) T[key] = S[key];
+  	    }
+  	  } return T;
+  	} : $assign;
+  	return objectAssign;
+  }
+
+  var hasRequiredEs_object_assign;
+
+  function requireEs_object_assign () {
+  	if (hasRequiredEs_object_assign) return es_object_assign;
+  	hasRequiredEs_object_assign = 1;
+  	var $ = require_export();
+  	var assign = requireObjectAssign();
+
+  	// `Object.assign` method
+  	// https://tc39.es/ecma262/#sec-object.assign
+  	// eslint-disable-next-line es/no-object-assign -- required for testing
+  	$({ target: 'Object', stat: true, arity: 2, forced: Object.assign !== assign }, {
+  	  assign: assign
+  	});
+  	return es_object_assign;
+  }
+
+  requireEs_object_assign();
+
+  var es_object_toString = {};
+
+  var toStringTagSupport;
+  var hasRequiredToStringTagSupport;
+
+  function requireToStringTagSupport () {
+  	if (hasRequiredToStringTagSupport) return toStringTagSupport;
+  	hasRequiredToStringTagSupport = 1;
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+  	var test = {};
+  	// eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
+  	test[TO_STRING_TAG] = 'z';
+
+  	toStringTagSupport = String(test) === '[object z]';
+  	return toStringTagSupport;
+  }
+
+  var classof;
+  var hasRequiredClassof;
+
+  function requireClassof () {
+  	if (hasRequiredClassof) return classof;
+  	hasRequiredClassof = 1;
+  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
+  	var isCallable = requireIsCallable();
+  	var classofRaw = requireClassofRaw();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+  	var $Object = Object;
+
+  	// ES3 wrong here
+  	var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) === 'Arguments';
+
+  	// fallback for IE11 Script Access Denied error
+  	var tryGet = function (it, key) {
+  	  try {
+  	    return it[key];
+  	  } catch (error) { /* empty */ }
+  	};
+
+  	// getting tag from ES6+ `Object.prototype.toString`
+  	classof = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
+  	  var O, tag, result;
+  	  return it === undefined ? 'Undefined' : it === null ? 'Null'
+  	    // @@toStringTag case
+  	    : typeof (tag = tryGet(O = $Object(it), TO_STRING_TAG)) == 'string' ? tag
+  	    // builtinTag case
+  	    : CORRECT_ARGUMENTS ? classofRaw(O)
+  	    // ES3 arguments fallback
+  	    : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result;
+  	};
+  	return classof;
+  }
+
+  var objectToString;
+  var hasRequiredObjectToString;
+
+  function requireObjectToString () {
+  	if (hasRequiredObjectToString) return objectToString;
+  	hasRequiredObjectToString = 1;
+  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
+  	var classof = requireClassof();
+
+  	// `Object.prototype.toString` method implementation
+  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
+  	objectToString = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
+  	  return '[object ' + classof(this) + ']';
+  	};
+  	return objectToString;
+  }
+
+  var hasRequiredEs_object_toString;
+
+  function requireEs_object_toString () {
+  	if (hasRequiredEs_object_toString) return es_object_toString;
+  	hasRequiredEs_object_toString = 1;
+  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
+  	var defineBuiltIn = requireDefineBuiltIn();
+  	var toString = requireObjectToString();
+
+  	// `Object.prototype.toString` method
+  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
+  	if (!TO_STRING_TAG_SUPPORT) {
+  	  defineBuiltIn(Object.prototype, 'toString', toString, { unsafe: true });
+  	}
+  	return es_object_toString;
+  }
+
+  requireEs_object_toString();
+
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
   var functionUncurryThisClause;
   var hasRequiredFunctionUncurryThisClause;
 
@@ -1667,61 +1949,6 @@
   	  return classof(argument) === 'Array';
   	};
   	return isArray;
-  }
-
-  var toStringTagSupport;
-  var hasRequiredToStringTagSupport;
-
-  function requireToStringTagSupport () {
-  	if (hasRequiredToStringTagSupport) return toStringTagSupport;
-  	hasRequiredToStringTagSupport = 1;
-  	var wellKnownSymbol = requireWellKnownSymbol();
-
-  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-  	var test = {};
-  	// eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
-  	test[TO_STRING_TAG] = 'z';
-
-  	toStringTagSupport = String(test) === '[object z]';
-  	return toStringTagSupport;
-  }
-
-  var classof;
-  var hasRequiredClassof;
-
-  function requireClassof () {
-  	if (hasRequiredClassof) return classof;
-  	hasRequiredClassof = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var isCallable = requireIsCallable();
-  	var classofRaw = requireClassofRaw();
-  	var wellKnownSymbol = requireWellKnownSymbol();
-
-  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-  	var $Object = Object;
-
-  	// ES3 wrong here
-  	var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) === 'Arguments';
-
-  	// fallback for IE11 Script Access Denied error
-  	var tryGet = function (it, key) {
-  	  try {
-  	    return it[key];
-  	  } catch (error) { /* empty */ }
-  	};
-
-  	// getting tag from ES6+ `Object.prototype.toString`
-  	classof = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
-  	  var O, tag, result;
-  	  return it === undefined ? 'Undefined' : it === null ? 'Null'
-  	    // @@toStringTag case
-  	    : typeof (tag = tryGet(O = $Object(it), TO_STRING_TAG)) == 'string' ? tag
-  	    // builtinTag case
-  	    : CORRECT_ARGUMENTS ? classofRaw(O)
-  	    // ES3 arguments fallback
-  	    : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result;
-  	};
-  	return classof;
   }
 
   var isConstructor;
@@ -1928,343 +2155,75 @@
   	return arrayIteration;
   }
 
-  var objectDefineProperties = {};
+  var arrayMethodIsStrict;
+  var hasRequiredArrayMethodIsStrict;
 
-  var objectKeys;
-  var hasRequiredObjectKeys;
-
-  function requireObjectKeys () {
-  	if (hasRequiredObjectKeys) return objectKeys;
-  	hasRequiredObjectKeys = 1;
-  	var internalObjectKeys = requireObjectKeysInternal();
-  	var enumBugKeys = requireEnumBugKeys();
-
-  	// `Object.keys` method
-  	// https://tc39.es/ecma262/#sec-object.keys
-  	// eslint-disable-next-line es/no-object-keys -- safe
-  	objectKeys = Object.keys || function keys(O) {
-  	  return internalObjectKeys(O, enumBugKeys);
-  	};
-  	return objectKeys;
-  }
-
-  var hasRequiredObjectDefineProperties;
-
-  function requireObjectDefineProperties () {
-  	if (hasRequiredObjectDefineProperties) return objectDefineProperties;
-  	hasRequiredObjectDefineProperties = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var V8_PROTOTYPE_DEFINE_BUG = requireV8PrototypeDefineBug();
-  	var definePropertyModule = requireObjectDefineProperty();
-  	var anObject = requireAnObject();
-  	var toIndexedObject = requireToIndexedObject();
-  	var objectKeys = requireObjectKeys();
-
-  	// `Object.defineProperties` method
-  	// https://tc39.es/ecma262/#sec-object.defineproperties
-  	// eslint-disable-next-line es/no-object-defineproperties -- safe
-  	objectDefineProperties.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : function defineProperties(O, Properties) {
-  	  anObject(O);
-  	  var props = toIndexedObject(Properties);
-  	  var keys = objectKeys(Properties);
-  	  var length = keys.length;
-  	  var index = 0;
-  	  var key;
-  	  while (length > index) definePropertyModule.f(O, key = keys[index++], props[key]);
-  	  return O;
-  	};
-  	return objectDefineProperties;
-  }
-
-  var html;
-  var hasRequiredHtml;
-
-  function requireHtml () {
-  	if (hasRequiredHtml) return html;
-  	hasRequiredHtml = 1;
-  	var getBuiltIn = requireGetBuiltIn();
-
-  	html = getBuiltIn('document', 'documentElement');
-  	return html;
-  }
-
-  var objectCreate;
-  var hasRequiredObjectCreate;
-
-  function requireObjectCreate () {
-  	if (hasRequiredObjectCreate) return objectCreate;
-  	hasRequiredObjectCreate = 1;
-  	/* global ActiveXObject -- old IE, WSH */
-  	var anObject = requireAnObject();
-  	var definePropertiesModule = requireObjectDefineProperties();
-  	var enumBugKeys = requireEnumBugKeys();
-  	var hiddenKeys = requireHiddenKeys();
-  	var html = requireHtml();
-  	var documentCreateElement = requireDocumentCreateElement();
-  	var sharedKey = requireSharedKey();
-
-  	var GT = '>';
-  	var LT = '<';
-  	var PROTOTYPE = 'prototype';
-  	var SCRIPT = 'script';
-  	var IE_PROTO = sharedKey('IE_PROTO');
-
-  	var EmptyConstructor = function () { /* empty */ };
-
-  	var scriptTag = function (content) {
-  	  return LT + SCRIPT + GT + content + LT + '/' + SCRIPT + GT;
-  	};
-
-  	// Create object with fake `null` prototype: use ActiveX Object with cleared prototype
-  	var NullProtoObjectViaActiveX = function (activeXDocument) {
-  	  activeXDocument.write(scriptTag(''));
-  	  activeXDocument.close();
-  	  var temp = activeXDocument.parentWindow.Object;
-  	  // eslint-disable-next-line no-useless-assignment -- avoid memory leak
-  	  activeXDocument = null;
-  	  return temp;
-  	};
-
-  	// Create object with fake `null` prototype: use iframe Object with cleared prototype
-  	var NullProtoObjectViaIFrame = function () {
-  	  // Thrash, waste and sodomy: IE GC bug
-  	  var iframe = documentCreateElement('iframe');
-  	  var JS = 'java' + SCRIPT + ':';
-  	  var iframeDocument;
-  	  iframe.style.display = 'none';
-  	  html.appendChild(iframe);
-  	  // https://github.com/zloirock/core-js/issues/475
-  	  iframe.src = String(JS);
-  	  iframeDocument = iframe.contentWindow.document;
-  	  iframeDocument.open();
-  	  iframeDocument.write(scriptTag('document.F=Object'));
-  	  iframeDocument.close();
-  	  return iframeDocument.F;
-  	};
-
-  	// Check for document.domain and active x support
-  	// No need to use active x approach when document.domain is not set
-  	// see https://github.com/es-shims/es5-shim/issues/150
-  	// variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
-  	// avoid IE GC bug
-  	var activeXDocument;
-  	var NullProtoObject = function () {
-  	  try {
-  	    activeXDocument = new ActiveXObject('htmlfile');
-  	  } catch (error) { /* ignore */ }
-  	  NullProtoObject = typeof document != 'undefined'
-  	    ? document.domain && activeXDocument
-  	      ? NullProtoObjectViaActiveX(activeXDocument) // old IE
-  	      : NullProtoObjectViaIFrame()
-  	    : NullProtoObjectViaActiveX(activeXDocument); // WSH
-  	  var length = enumBugKeys.length;
-  	  while (length--) delete NullProtoObject[PROTOTYPE][enumBugKeys[length]];
-  	  return NullProtoObject();
-  	};
-
-  	hiddenKeys[IE_PROTO] = true;
-
-  	// `Object.create` method
-  	// https://tc39.es/ecma262/#sec-object.create
-  	// eslint-disable-next-line es/no-object-create -- safe
-  	objectCreate = Object.create || function create(O, Properties) {
-  	  var result;
-  	  if (O !== null) {
-  	    EmptyConstructor[PROTOTYPE] = anObject(O);
-  	    result = new EmptyConstructor();
-  	    EmptyConstructor[PROTOTYPE] = null;
-  	    // add "__proto__" for Object.getPrototypeOf polyfill
-  	    result[IE_PROTO] = O;
-  	  } else result = NullProtoObject();
-  	  return Properties === undefined ? result : definePropertiesModule.f(result, Properties);
-  	};
-  	return objectCreate;
-  }
-
-  var addToUnscopables;
-  var hasRequiredAddToUnscopables;
-
-  function requireAddToUnscopables () {
-  	if (hasRequiredAddToUnscopables) return addToUnscopables;
-  	hasRequiredAddToUnscopables = 1;
-  	var wellKnownSymbol = requireWellKnownSymbol();
-  	var create = requireObjectCreate();
-  	var defineProperty = requireObjectDefineProperty().f;
-
-  	var UNSCOPABLES = wellKnownSymbol('unscopables');
-  	var ArrayPrototype = Array.prototype;
-
-  	// Array.prototype[@@unscopables]
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	if (ArrayPrototype[UNSCOPABLES] === undefined) {
-  	  defineProperty(ArrayPrototype, UNSCOPABLES, {
-  	    configurable: true,
-  	    value: create(null)
-  	  });
-  	}
-
-  	// add a key to Array.prototype[@@unscopables]
-  	addToUnscopables = function (key) {
-  	  ArrayPrototype[UNSCOPABLES][key] = true;
-  	};
-  	return addToUnscopables;
-  }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_object_assign = {};
-
-  var objectAssign;
-  var hasRequiredObjectAssign;
-
-  function requireObjectAssign () {
-  	if (hasRequiredObjectAssign) return objectAssign;
-  	hasRequiredObjectAssign = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var uncurryThis = requireFunctionUncurryThis();
-  	var call = requireFunctionCall();
+  function requireArrayMethodIsStrict () {
+  	if (hasRequiredArrayMethodIsStrict) return arrayMethodIsStrict;
+  	hasRequiredArrayMethodIsStrict = 1;
   	var fails = requireFails();
-  	var objectKeys = requireObjectKeys();
-  	var getOwnPropertySymbolsModule = requireObjectGetOwnPropertySymbols();
-  	var propertyIsEnumerableModule = requireObjectPropertyIsEnumerable();
-  	var toObject = requireToObject();
-  	var IndexedObject = requireIndexedObject();
 
-  	// eslint-disable-next-line es/no-object-assign -- safe
-  	var $assign = Object.assign;
-  	// eslint-disable-next-line es/no-object-defineproperty -- required for testing
-  	var defineProperty = Object.defineProperty;
-  	var concat = uncurryThis([].concat);
-
-  	// `Object.assign` method
-  	// https://tc39.es/ecma262/#sec-object.assign
-  	objectAssign = !$assign || fails(function () {
-  	  // should have correct order of operations (Edge bug)
-  	  if (DESCRIPTORS && $assign({ b: 1 }, $assign(defineProperty({}, 'a', {
-  	    enumerable: true,
-  	    get: function () {
-  	      defineProperty(this, 'b', {
-  	        value: 3,
-  	        enumerable: false
-  	      });
-  	    }
-  	  }), { b: 2 })).b !== 1) return true;
-  	  // should work with symbols and should have deterministic property order (V8 bug)
-  	  var A = {};
-  	  var B = {};
-  	  // eslint-disable-next-line es/no-symbol -- safe
-  	  var symbol = Symbol('assign detection');
-  	  var alphabet = 'abcdefghijklmnopqrst';
-  	  A[symbol] = 7;
-  	  // eslint-disable-next-line es/no-array-prototype-foreach -- safe
-  	  alphabet.split('').forEach(function (chr) { B[chr] = chr; });
-  	  return $assign({}, A)[symbol] !== 7 || objectKeys($assign({}, B)).join('') !== alphabet;
-  	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars -- required for `.length`
-  	  var T = toObject(target);
-  	  var argumentsLength = arguments.length;
-  	  var index = 1;
-  	  var getOwnPropertySymbols = getOwnPropertySymbolsModule.f;
-  	  var propertyIsEnumerable = propertyIsEnumerableModule.f;
-  	  while (argumentsLength > index) {
-  	    var S = IndexedObject(arguments[index++]);
-  	    var keys = getOwnPropertySymbols ? concat(objectKeys(S), getOwnPropertySymbols(S)) : objectKeys(S);
-  	    var length = keys.length;
-  	    var j = 0;
-  	    var key;
-  	    while (length > j) {
-  	      key = keys[j++];
-  	      if (!DESCRIPTORS || call(propertyIsEnumerable, S, key)) T[key] = S[key];
-  	    }
-  	  } return T;
-  	} : $assign;
-  	return objectAssign;
-  }
-
-  var hasRequiredEs_object_assign;
-
-  function requireEs_object_assign () {
-  	if (hasRequiredEs_object_assign) return es_object_assign;
-  	hasRequiredEs_object_assign = 1;
-  	var $ = require_export();
-  	var assign = requireObjectAssign();
-
-  	// `Object.assign` method
-  	// https://tc39.es/ecma262/#sec-object.assign
-  	// eslint-disable-next-line es/no-object-assign -- required for testing
-  	$({ target: 'Object', stat: true, arity: 2, forced: Object.assign !== assign }, {
-  	  assign: assign
-  	});
-  	return es_object_assign;
-  }
-
-  requireEs_object_assign();
-
-  var es_object_toString = {};
-
-  var objectToString;
-  var hasRequiredObjectToString;
-
-  function requireObjectToString () {
-  	if (hasRequiredObjectToString) return objectToString;
-  	hasRequiredObjectToString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var classof = requireClassof();
-
-  	// `Object.prototype.toString` method implementation
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	objectToString = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
-  	  return '[object ' + classof(this) + ']';
+  	arrayMethodIsStrict = function (METHOD_NAME, argument) {
+  	  var method = [][METHOD_NAME];
+  	  return !!method && fails(function () {
+  	    // eslint-disable-next-line no-useless-call -- required for testing
+  	    method.call(null, argument || function () { return 1; }, 1);
+  	  });
   	};
-  	return objectToString;
+  	return arrayMethodIsStrict;
   }
 
-  var hasRequiredEs_object_toString;
+  var arrayForEach;
+  var hasRequiredArrayForEach;
 
-  function requireEs_object_toString () {
-  	if (hasRequiredEs_object_toString) return es_object_toString;
-  	hasRequiredEs_object_toString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var defineBuiltIn = requireDefineBuiltIn();
-  	var toString = requireObjectToString();
+  function requireArrayForEach () {
+  	if (hasRequiredArrayForEach) return arrayForEach;
+  	hasRequiredArrayForEach = 1;
+  	var $forEach = requireArrayIteration().forEach;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
 
-  	// `Object.prototype.toString` method
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	if (!TO_STRING_TAG_SUPPORT) {
-  	  defineBuiltIn(Object.prototype, 'toString', toString, { unsafe: true });
+  	var STRICT_METHOD = arrayMethodIsStrict('forEach');
+
+  	// `Array.prototype.forEach` method implementation
+  	// https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	arrayForEach = !STRICT_METHOD ? function forEach(callbackfn /* , thisArg */) {
+  	  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	// eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	} : [].forEach;
+  	return arrayForEach;
+  }
+
+  var hasRequiredWeb_domCollections_forEach;
+
+  function requireWeb_domCollections_forEach () {
+  	if (hasRequiredWeb_domCollections_forEach) return web_domCollections_forEach;
+  	hasRequiredWeb_domCollections_forEach = 1;
+  	var globalThis = requireGlobalThis();
+  	var DOMIterables = requireDomIterables();
+  	var DOMTokenListPrototype = requireDomTokenListPrototype();
+  	var forEach = requireArrayForEach();
+  	var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+
+  	var handlePrototype = function (CollectionPrototype) {
+  	  // some Chrome versions have non-configurable methods on DOMTokenList
+  	  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+  	    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  	  } catch (error) {
+  	    CollectionPrototype.forEach = forEach;
+  	  }
+  	};
+
+  	for (var COLLECTION_NAME in DOMIterables) {
+  	  if (DOMIterables[COLLECTION_NAME]) {
+  	    handlePrototype(globalThis[COLLECTION_NAME] && globalThis[COLLECTION_NAME].prototype);
+  	  }
   	}
-  	return es_object_toString;
+
+  	handlePrototype(DOMTokenListPrototype);
+  	return web_domCollections_forEach;
   }
 
-  requireEs_object_toString();
+  requireWeb_domCollections_forEach();
 
   /**
    * @author vincent loh <vincent.ml@gmail.com>
@@ -2272,62 +2231,76 @@
    * @update zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.defaults, {
     stickyHeader: false,
     stickyHeaderOffsetY: 0,
     stickyHeaderOffsetLeft: 0,
     stickyHeaderOffsetRight: 0
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initHeader",
       value: function initHeader() {
         var _this = this;
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initHeader", this)(args);
+        _superPropGet(_default, "initHeader", this)(args);
         if (!this.options.stickyHeader) {
           return;
         }
-        this.$tableBody.find('.sticky-header-container,.sticky_anchor_begin,.sticky_anchor_end').remove();
-        this.$el.before('<div class="sticky-header-container"></div>');
-        this.$el.before('<div class="sticky_anchor_begin"></div>');
-        this.$el.after('<div class="sticky_anchor_end"></div>');
-        this.$header.addClass('sticky-header');
+        this.$tableBody.querySelectorAll('.sticky-header-container,.sticky_anchor_begin,.sticky_anchor_end').forEach(function (el) {
+          return el.remove();
+        });
+        this.$el.insertAdjacentHTML('beforebegin', '<div class="sticky-header-container"></div>');
+        this.$el.insertAdjacentHTML('beforebegin', '<div class="sticky_anchor_begin"></div>');
+        this.$el.insertAdjacentHTML('afterend', '<div class="sticky_anchor_end"></div>');
+        this.$header.classList.add('sticky-header');
 
         // clone header just once, to be used as sticky header
         // deep clone header, using source header affects tbody>td width
-        this.$stickyContainer = this.$tableBody.find('.sticky-header-container');
-        this.$stickyBegin = this.$tableBody.find('.sticky_anchor_begin');
-        this.$stickyEnd = this.$tableBody.find('.sticky_anchor_end');
-        this.$stickyHeader = this.$header.clone(true, true);
+        this.$stickyContainer = this.$tableBody.querySelector('.sticky-header-container');
+        this.$stickyBegin = this.$tableBody.querySelector('.sticky_anchor_begin');
+        this.$stickyEnd = this.$tableBody.querySelector('.sticky_anchor_end');
+        this.$stickyHeader = this.$header.cloneNode(true);
 
         // render sticky on window scroll or resize
-        var resizeEvent = Utils.getEventName('resize.sticky-header-table', this.$el.attr('id'));
-        var scrollEvent = Utils.getEventName('scroll.sticky-header-table', this.$el.attr('id'));
-        $(window).off(resizeEvent).on(resizeEvent, function () {
+        var resizeEvent = Utils.getEventName('resize.sticky-header-table', this.$el.getAttribute('id'));
+        var scrollEvent = Utils.getEventName('scroll.sticky-header-table', this.$el.getAttribute('id'));
+        if (this._stickyResizeHandler) {
+          window.removeEventListener(resizeEvent, this._stickyResizeHandler);
+        }
+        if (this._stickyScrollHandler) {
+          window.removeEventListener(scrollEvent, this._stickyScrollHandler);
+        }
+        if (this._stickyBodyScrollHandler) {
+          this.$tableBody.removeEventListener('scroll', this._stickyBodyScrollHandler);
+        }
+        this._stickyResizeHandler = function () {
           return _this.renderStickyHeader();
-        });
-        $(window).off(scrollEvent).on(scrollEvent, function () {
+        };
+        this._stickyScrollHandler = function () {
           return _this.renderStickyHeader();
-        });
-        this.$tableBody.off('scroll').on('scroll', function () {
+        };
+        this._stickyBodyScrollHandler = function () {
           return _this.matchPositionX();
-        });
+        };
+        window.addEventListener(resizeEvent, this._stickyResizeHandler);
+        window.addEventListener(scrollEvent, this._stickyScrollHandler);
+        this.$tableBody.addEventListener('scroll', this._stickyBodyScrollHandler);
       }
     }, {
       key: "onColumnSearch",
       value: function onColumnSearch(_ref) {
         var currentTarget = _ref.currentTarget,
           keyCode = _ref.keyCode;
-        _superPropGet(_class, "onColumnSearch", this)([{
+        _superPropGet(_default, "onColumnSearch", this)([{
           currentTarget: currentTarget,
           keyCode: keyCode
         }]);
@@ -2343,13 +2316,20 @@
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "resetView", this)(args);
+        _superPropGet(_default, "resetView", this)(args);
         if (!this.options.stickyHeader) {
           return;
         }
-        $('.bootstrap-table.fullscreen').off('scroll').on('scroll', function () {
-          return _this2.renderStickyHeader();
-        });
+        var fullscreen = document.querySelector('.bootstrap-table.fullscreen');
+        if (fullscreen) {
+          if (this._fullscreenScrollHandler) {
+            fullscreen.removeEventListener('scroll', this._fullscreenScrollHandler);
+          }
+          this._fullscreenScrollHandler = function () {
+            return _this2.renderStickyHeader();
+          };
+          fullscreen.addEventListener('scroll', this._fullscreenScrollHandler);
+        }
       }
     }, {
       key: "resetCaret",
@@ -2357,14 +2337,19 @@
         for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
           args[_key3] = arguments[_key3];
         }
-        _superPropGet(_class, "resetCaret", this)(args);
+        _superPropGet(_default, "resetCaret", this)(args);
         if (!this.options.stickyHeader) {
           return;
         }
         if (this.$stickyHeader) {
-          var $ths = this.$stickyHeader.find('th');
-          this.$header.find('th').each(function (i, th) {
-            $ths.eq(i).find('.sortable').attr('class', $(th).find('.sortable').attr('class'));
+          var ths = _toConsumableArray(this.$stickyHeader.querySelectorAll('th'));
+          this.$header.querySelectorAll('th').forEach(function (th, i) {
+            var _ths$i;
+            var sortable = (_ths$i = ths[i]) === null || _ths$i === void 0 ? void 0 : _ths$i.querySelector('.sortable');
+            var srcSortable = th.querySelector('.sortable');
+            if (sortable && srcSortable) {
+              sortable.setAttribute('class', srcSortable.getAttribute('class'));
+            }
           });
         }
       }
@@ -2372,57 +2357,64 @@
       key: "horizontalScroll",
       value: function horizontalScroll() {
         var _this3 = this;
-        _superPropGet(_class, "horizontalScroll", this)([]);
+        _superPropGet(_default, "horizontalScroll", this)([]);
         if (!this.options.stickyHeader) {
           return;
         }
-        this.$tableBody.on('scroll', function () {
+        if (this._stickyHScrollHandler) {
+          this.$tableBody.removeEventListener('scroll', this._stickyHScrollHandler);
+        }
+        this._stickyHScrollHandler = function () {
           return _this3.matchPositionX();
-        });
+        };
+        this.$tableBody.addEventListener('scroll', this._stickyHScrollHandler);
       }
     }, {
       key: "renderStickyHeader",
       value: function renderStickyHeader() {
         var _this4 = this;
-        var that = this;
-        if (!this.$stickyContainer || !this.$stickyContainer.length || !this.$stickyBegin || !this.$stickyBegin.length || !this.$stickyEnd || !this.$stickyEnd.length) {
+        if (!this.$stickyContainer || !this.$stickyBegin || !this.$stickyEnd) {
           return;
         }
-        this.$stickyHeader = this.$header.clone(true, true);
+        this.$stickyHeader = this.$header.cloneNode(true);
         if (this.options.filterControl) {
-          $(this.$stickyHeader).off('keyup change mouseup').on('keyup change mouse', function (e) {
-            var $target = $(e.target);
-            var value = $target.val();
-            var field = $target.parents('th').data('field');
-            var $coreTh = that.$header.find("th[data-field=\"".concat(field, "\"]"));
-            if ($target.is('input')) {
-              $coreTh.find('input').val(value);
-            } else if ($target.is('select')) {
-              var $select = $coreTh.find('select');
-              var normalizedValue = value === null ? $select.prop('multiple') ? [] : null : value;
-              $select.val(normalizedValue);
-            }
-            that.triggerSearch();
+          this.$stickyHeader.querySelectorAll('input, select').forEach(function (el) {
+            el.addEventListener('keyup', function (e) {
+              return _this4._onStickyFilterEvent(e);
+            });
+            el.addEventListener('change', function (e) {
+              return _this4._onStickyFilterEvent(e);
+            });
+            el.addEventListener('mouseup', function (e) {
+              return _this4._onStickyFilterEvent(e);
+            });
           });
         }
-        var top = $(window).scrollTop();
+        var top = window.scrollY;
         // top anchor scroll position, minus header height
-        var start = this.$stickyBegin.offset().top - this.options.stickyHeaderOffsetY;
+        var start = this.$stickyBegin.getBoundingClientRect().top + window.scrollY - this.options.stickyHeaderOffsetY;
         // bottom anchor scroll position, minus header height, minus sticky height
-        var end = this.$stickyEnd.offset().top - this.options.stickyHeaderOffsetY - this.$header.height();
+        var end = this.$stickyEnd.getBoundingClientRect().top + window.scrollY - this.options.stickyHeaderOffsetY - this.$header.offsetHeight;
 
         // show sticky when top anchor touches header, and when bottom anchor not exceeded
         if (top > start && top <= end) {
+          var _this$$el$closest;
           // ensure clone and source column widths are the same
-          this.$stickyHeader.find('tr').each(function (indexRows, rows) {
-            $(rows).find('th').each(function (index, el) {
-              $(el).css('min-width', _this4.$header.find("tr:eq(".concat(indexRows, ")")).find("th:eq(".concat(index, ")")).css('width'));
+          var srcRows = _toConsumableArray(this.$header.querySelectorAll('tr'));
+          this.$stickyHeader.querySelectorAll('tr').forEach(function (row, indexRows) {
+            _toConsumableArray(row.querySelectorAll('th')).forEach(function (el, index) {
+              var _srcRows$indexRows;
+              var srcTh = (_srcRows$indexRows = srcRows[indexRows]) === null || _srcRows$indexRows === void 0 ? void 0 : _srcRows$indexRows.querySelectorAll('th')[index];
+              if (srcTh) {
+                el.style.minWidth = srcTh.style.width;
+              }
             });
           });
           // match bootstrap table style
-          this.$stickyContainer.show().addClass('fix-sticky fixed-table-container');
+          this.$stickyContainer.style.display = '';
+          this.$stickyContainer.classList.add('fix-sticky', 'fixed-table-container');
           // stick it in position
-          var coords = this.$tableBody[0].getBoundingClientRect();
+          var coords = this.$tableBody.getBoundingClientRect();
           var width = '100%';
           var stickyHeaderOffsetLeft = this.options.stickyHeaderOffsetLeft;
           var stickyHeaderOffsetRight = this.options.stickyHeaderOffsetRight;
@@ -2432,32 +2424,61 @@
           if (!stickyHeaderOffsetRight) {
             width = "".concat(coords.width, "px");
           }
-          if (this.$el.closest('.bootstrap-table').hasClass('fullscreen')) {
+          if ((_this$$el$closest = this.$el.closest('.bootstrap-table')) !== null && _this$$el$closest !== void 0 && _this$$el$closest.classList.contains('fullscreen')) {
             stickyHeaderOffsetLeft = 0;
             stickyHeaderOffsetRight = 0;
             width = '100%';
           }
-          this.$stickyContainer.css('top', "".concat(this.options.stickyHeaderOffsetY, "px"));
-          this.$stickyContainer.css('left', "".concat(stickyHeaderOffsetLeft, "px"));
-          this.$stickyContainer.css('right', "".concat(stickyHeaderOffsetRight, "px"));
-          this.$stickyContainer.css('width', "".concat(width));
+          this.$stickyContainer.style.top = "".concat(this.options.stickyHeaderOffsetY, "px");
+          this.$stickyContainer.style.left = "".concat(stickyHeaderOffsetLeft, "px");
+          this.$stickyContainer.style.right = "".concat(stickyHeaderOffsetRight, "px");
+          this.$stickyContainer.style.width = width;
           // create scrollable container for header
-          this.$stickyTable = $('<table/>');
-          this.$stickyTable.addClass(this.options.classes);
+          this.$stickyTable = document.createElement('table');
+          this.$stickyTable.className = this.options.classes;
           // append cloned header to dom
-          this.$stickyContainer.html(this.$stickyTable.append(this.$stickyHeader));
+          this.$stickyTable.appendChild(this.$stickyHeader);
+          this.$stickyContainer.innerHTML = '';
+          this.$stickyContainer.appendChild(this.$stickyTable);
           // match clone and source header positions when left-right scroll
           this.matchPositionX();
         } else {
-          this.$stickyContainer.removeClass('fix-sticky').hide();
+          this.$stickyContainer.classList.remove('fix-sticky');
+          this.$stickyContainer.style.display = 'none';
+        }
+      }
+    }, {
+      key: "_onStickyFilterEvent",
+      value: function _onStickyFilterEvent(e) {
+        var target = e.target;
+        var value = target.value;
+        var th = target.closest('th[data-field]');
+        var field = th === null || th === void 0 ? void 0 : th.dataset.field;
+        if (!field) return;
+        var coreTh = this.$header.querySelector("th[data-field=\"".concat(field, "\"]"));
+        if (!coreTh) return;
+        if (target.tagName === 'INPUT') {
+          var coreInput = coreTh.querySelector('input');
+          if (coreInput) coreInput.value = value;
+        } else if (target.tagName === 'SELECT') {
+          var coreSelect = coreTh.querySelector('select');
+          if (coreSelect) {
+            var normalizedValue = value === null ? coreSelect.multiple ? [] : null : value;
+            coreSelect.value = normalizedValue;
+          }
+        }
+        if (typeof this.triggerSearch === 'function') {
+          this.triggerSearch();
         }
       }
     }, {
       key: "matchPositionX",
       value: function matchPositionX() {
-        this.$stickyContainer.scrollLeft(this.$tableBody.scrollLeft());
+        this.$stickyContainer.scrollLeft = this.$tableBody.scrollLeft;
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

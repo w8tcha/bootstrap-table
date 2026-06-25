@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -2181,6 +2181,9 @@
   /**
    * @author: Dennis Hernández
    * @update zhixin wen <wenzhixin2010@gmail.com>
+   *
+   * Note: this extension depends on the jQuery tableDnD plugin.
+   * jQuery must be available and the plugin loaded for this to work.
    */
 
   var rowAttr = function rowAttr(row, index) {
@@ -2188,7 +2191,7 @@
       id: "customId_".concat(index)
     };
   };
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     reorderableRows: false,
     onDragStyle: null,
     onDropStyle: null,
@@ -2212,16 +2215,16 @@
       return true;
     }
   });
-  Object.assign($.fn.bootstrapTable.events, {
+  Object.assign(BootstrapTable.events, {
     'reorder-row.bs.table': 'onReorderRow'
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "init",
       value: function init() {
         var _this = this;
@@ -2229,7 +2232,7 @@
           args[_key] = arguments[_key];
         }
         if (!this.options.reorderableRows) {
-          _superPropGet(_class, "init", this)(args);
+          _superPropGet(_default, "init", this)(args);
           return;
         }
         if (this.options.useRowAttrFunc) {
@@ -2242,51 +2245,56 @@
             onPostBody.call(_this.options, _this.options.data);
           }, 1);
         };
-        _superPropGet(_class, "init", this)(args);
+        _superPropGet(_default, "init", this)(args);
       }
     }, {
       key: "makeRowsReorderable",
       value: function makeRowsReorderable() {
         var _this2 = this;
-        this.$el.tableDnD({
-          onDragStyle: this.options.onDragStyle,
-          onDropStyle: this.options.onDropStyle,
-          onDragClass: this.options.onDragClass,
-          onAllowDrop: function onAllowDrop(hoveredRow, draggedRow) {
-            return _this2.onAllowDrop(hoveredRow, draggedRow);
-          },
-          onDragStop: function onDragStop(table, draggedRow) {
-            return _this2.onDragStop(table, draggedRow);
-          },
-          onDragStart: function onDragStart(table, droppedRow) {
-            return _this2.onDropStart(table, droppedRow);
-          },
-          onDrop: function onDrop(table, droppedRow) {
-            return _this2.onDrop(table, droppedRow);
-          },
-          dragHandle: this.options.dragHandle
-        });
+        // Requires jQuery tableDnD plugin
+        if (typeof window.$ !== 'undefined') {
+          $(this.$el).tableDnD({
+            onDragStyle: this.options.onDragStyle,
+            onDropStyle: this.options.onDropStyle,
+            onDragClass: this.options.onDragClass,
+            onAllowDrop: function onAllowDrop(hoveredRow, draggedRow) {
+              return _this2.onAllowDrop(hoveredRow, draggedRow);
+            },
+            onDragStop: function onDragStop(table, draggedRow) {
+              return _this2.onDragStop(table, draggedRow);
+            },
+            onDragStart: function onDragStart(table, droppedRow) {
+              return _this2.onDropStart(table, droppedRow);
+            },
+            onDrop: function onDrop(table, droppedRow) {
+              return _this2.onDrop(table, droppedRow);
+            },
+            dragHandle: this.options.dragHandle
+          });
+        }
       }
     }, {
       key: "onDropStart",
       value: function onDropStart(table, draggingTd) {
-        this.$draggingTd = $(draggingTd).css('cursor', 'move');
-        this.draggingIndex = $(this.$draggingTd.parent()).data('index');
+        var _draggingTd$parentEle;
+        this.$draggingTd = draggingTd;
+        this.$draggingTd.style.cursor = 'move';
+        this.draggingIndex = +((_draggingTd$parentEle = draggingTd.parentElement) === null || _draggingTd$parentEle === void 0 ? void 0 : _draggingTd$parentEle.dataset.index);
         // Call the user defined function
         this.options.onReorderRowsDrag(this.data[this.draggingIndex]);
       }
     }, {
       key: "onDragStop",
       value: function onDragStop(table, draggedRow) {
-        var rowIndexDraggedRow = $(draggedRow).data('index');
+        var rowIndexDraggedRow = +draggedRow.dataset.index;
         var draggedRowItem = this.data[rowIndexDraggedRow];
         this.options.onDragStop(table, draggedRowItem, draggedRow);
       }
     }, {
       key: "onAllowDrop",
       value: function onAllowDrop(hoveredRow, draggedRow) {
-        var rowIndexDraggedRow = $(draggedRow).data('index');
-        var rowIndexHoveredRow = $(hoveredRow).data('index');
+        var rowIndexDraggedRow = +draggedRow.dataset.index;
+        var rowIndexHoveredRow = +hoveredRow.dataset.index;
         var draggedRowItem = this.data[rowIndexDraggedRow];
         var hoveredRowItem = this.data[rowIndexHoveredRow];
         return this.options.onAllowDrop(hoveredRowItem, draggedRowItem, hoveredRow, draggedRow);
@@ -2294,14 +2302,14 @@
     }, {
       key: "onDrop",
       value: function onDrop(table) {
-        this.$draggingTd.css('cursor', '');
+        this.$draggingTd.style.cursor = '';
         var pageNum = this.options.pageNumber;
         var pageSize = this.options.pageSize;
         var newData = [];
         for (var i = 0; i < table.tBodies[0].rows.length; i++) {
-          var $tr = $(table.tBodies[0].rows[i]);
-          newData.push(this.data[$tr.data('index')]);
-          $tr.data('index', i);
+          var tr = table.tBodies[0].rows[i];
+          newData.push(this.data[+tr.dataset.index]);
+          tr.dataset.index = i;
         }
         var draggingRow = this.data[this.draggingIndex];
         var droppedIndex = newData.indexOf(this.data[this.draggingIndex]);
@@ -2324,7 +2332,7 @@
       key: "initSearch",
       value: function initSearch() {
         this.ignoreInitSort = true;
-        _superPropGet(_class, "initSearch", this)([]);
+        _superPropGet(_default, "initSearch", this)([]);
       }
     }, {
       key: "initSort",
@@ -2333,9 +2341,11 @@
           this.ignoreInitSort = false;
           return;
         }
-        _superPropGet(_class, "initSort", this)([]);
+        _superPropGet(_default, "initSort", this)([]);
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

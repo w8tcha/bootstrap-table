@@ -4,17 +4,18 @@
  * theme: https://github.com/jgthms/bulma/
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Utils.extend($.fn.bootstrapTable.defaults, {
+const Utils = BootstrapTable.utils
+
+Utils.extend(BootstrapTable.defaults, {
   classes: 'table is-bordered is-hoverable',
   buttonsPrefix: '',
   buttonsClass: 'button'
 })
 
-$.fn.bootstrapTable.theme = 'bulma'
+BootstrapTable.theme = 'bulma'
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initConstants () {
     super.initConstants()
 
@@ -47,7 +48,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   handleToolbar () {
-    if (this.$toolbar.find('.dropdown').length) {
+    if (this.$toolbar.querySelector('.dropdown')) {
       this._initDropdown()
     }
   }
@@ -61,18 +62,27 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   _initDropdown () {
-    const $dropdowns = this.$container.find('.dropdown:not(.is-hoverable)')
+    this._dropdowns?.forEach(d => {
+      if (d._ddClickHandler) d.removeEventListener('click', d._ddClickHandler)
+    })
+    if (this._docClickHandlerBulma) {
+      document.removeEventListener('click', this._docClickHandlerBulma)
+    }
 
-    $dropdowns.off('click').on('click', e => {
-      const $this = $(e.currentTarget)
+    this._dropdowns = Array.from(this.$container.querySelectorAll('.dropdown:not(.is-hoverable)'))
 
-      e.stopPropagation()
-      $dropdowns.not($this).removeClass('is-active')
-      $this.toggleClass('is-active')
+    this._dropdowns.forEach(dropdown => {
+      dropdown._ddClickHandler = e => {
+        e.stopPropagation()
+        this._dropdowns.filter(d => d !== dropdown).forEach(d => d.classList.remove('is-active'))
+        dropdown.classList.toggle('is-active')
+      }
+      dropdown.addEventListener('click', dropdown._ddClickHandler)
     })
 
-    $(document).off('click.bs.dropdown.bulma').on('click.bs.dropdown.bulma', () => {
-      $dropdowns.removeClass('is-active')
-    })
+    this._docClickHandlerBulma = () => {
+      this._dropdowns?.forEach(d => d.classList.remove('is-active'))
+    }
+    document.addEventListener('click', this._docClickHandlerBulma)
   }
 }

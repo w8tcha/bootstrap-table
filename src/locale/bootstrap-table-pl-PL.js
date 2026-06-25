@@ -4,7 +4,9 @@
  * Update: kerogos <kerog @ wp pl>
  */
 
-$.fn.bootstrapTable.locales['pl-PL'] = $.fn.bootstrapTable.locales['pl'] = {
+
+
+BootstrapTable.locales['pl-PL'] = BootstrapTable.locales['pl'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -189,4 +191,4 @@ $.fn.bootstrapTable.locales['pl-PL'] = $.fn.bootstrapTable.locales['pl'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['pl-PL'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['pl-PL'])

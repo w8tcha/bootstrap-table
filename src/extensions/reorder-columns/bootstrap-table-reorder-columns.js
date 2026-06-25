@@ -2,26 +2,33 @@
  * @author: Dennis Hernández
  * @update: https://github.com/wenzhixin
  * @version: v1.2.0
+ *
+ * Note: this extension depends on the jQuery dragtable plugin.
+ * jQuery must be available and the plugin loaded for this to work.
  */
 
-$.akottr.dragtable.prototype._restoreState = function (persistObj) {
-  let i = 0
 
-  for (const [field, value] of Object.entries(persistObj)) {
-    const $th = this.originalTable.el.find(`th[data-field="${field}"]`)
 
-    if (!$th.length) {
-      i++
-      continue
+if (typeof window.$ !== 'undefined' && window.$.akottr?.dragtable?.prototype) {
+  window.$.akottr.dragtable.prototype._restoreState = function (persistObj) {
+    let i = 0
+
+    for (const [field, value] of Object.entries(persistObj)) {
+      const $th = this.originalTable.el.find(`th[data-field="${field}"]`)
+
+      if (!$th.length) {
+        i++
+        continue
+      }
+
+      this.originalTable.startIndex = $th.prevAll().length + 1
+      this.originalTable.endIndex = parseInt(value, 10) + 1 - i
+      this._bubbleCols()
     }
-
-    this.originalTable.startIndex = $th.prevAll().length + 1
-    this.originalTable.endIndex = parseInt(value, 10) + 1 - i
-    this._bubbleCols()
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   reorderableColumns: false,
   maxMovingRows: 10,
   // eslint-disable-next-line no-unused-vars
@@ -31,13 +38,13 @@ Object.assign($.fn.bootstrapTable.defaults, {
   dragaccept: null
 })
 
-Object.assign($.fn.bootstrapTable.events, {
+Object.assign(BootstrapTable.events, {
   'reorder-column.bs.table': 'onReorderColumn'
 })
 
-$.fn.bootstrapTable.methods.push('orderColumns')
+BootstrapTable.methods.push('orderColumns')
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initHeader (...args) {
     super.initHeader(...args)
 
@@ -59,12 +66,13 @@ $.BootstrapTable = class extends $.BootstrapTable {
     const columns = []
     const optionsColumns = []
 
-    const $headerRow = this.$header.find('tr').last()
-    const $headerCells = ($headerRow.length ? $headerRow : this.$header).find('th[data-field]:not(.detail)')
+    const headerRows = this.$header.querySelectorAll('tr')
+    const lastRow = headerRows[headerRows.length - 1] || this.$header
+    const headerCells = [...(lastRow.querySelectorAll ? lastRow : this.$header).querySelectorAll('th[data-field]:not(.detail)')]
 
-    $headerCells.each((i, el) => {
-      ths.push($(el).data('field'))
-      formatters.push($(el).data('formatter'))
+    headerCells.forEach(el => {
+      ths.push(el.dataset.field)
+      formatters.push(el.dataset.formatter)
     })
 
     if (ths.length < this.columns.length) {
@@ -146,6 +154,9 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   makeColumnsReorderable (order = null) {
+    if (typeof window.$ === 'undefined') {
+      return
+    }
     try {
       $(this.$el).dragtable('destroy')
     } catch {
@@ -185,16 +196,17 @@ $.BootstrapTable = class extends $.BootstrapTable {
       return
     }
 
-    const $headerRow = this.$header.find('tr').last()
-    const $target = $headerRow.length ? $headerRow : this.$header
+    const headerRows = this.$header.querySelectorAll('tr')
+    const lastRow = headerRows[headerRows.length - 1]
+    const target = lastRow || this.$header
 
     const sortedEntries = Object.entries(order).sort((a, b) => a[1] - b[1])
 
     for (const [field] of sortedEntries) {
-      const $th = $target.find(`th[data-field="${field}"]`)
+      const th = target.querySelector(`th[data-field="${field}"]`)
 
-      if ($th.length) {
-        $target.append($th)
+      if (th) {
+        target.appendChild(th)
       }
     }
 

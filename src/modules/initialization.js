@@ -6,19 +6,19 @@ export default {
     const opts = this.options
 
     this.constants = Constants.CONSTANTS
-    this.constants.theme = $.fn.bootstrapTable.theme
+    this.constants.theme = BootstrapTable.theme
     this.constants.dataToggle = this.constants.html.dataToggle || 'data-toggle'
 
     // init iconsPrefix and icons
-    const iconsPrefix = Utils.getIconsPrefix($.fn.bootstrapTable.theme)
+    const iconsPrefix = Utils.getIconsPrefix(BootstrapTable.theme)
 
     if (typeof opts.icons === 'string') {
       opts.icons = Utils.calculateObjectValue(null, opts.icons)
     }
 
-    opts.iconsPrefix = opts.iconsPrefix || $.fn.bootstrapTable.defaults.iconsPrefix || iconsPrefix
+    opts.iconsPrefix = opts.iconsPrefix || BootstrapTable.iconsPrefix || iconsPrefix
     opts.icons = Object.assign(Utils.getIcons(Constants.ICONS, opts.iconsPrefix),
-      $.fn.bootstrapTable.defaults.icons, opts.icons)
+      BootstrapTable.icons, opts.icons)
 
     // init buttons class
     const buttonsPrefix = opts.buttonsPrefix ? `${opts.buttonsPrefix}-` : ''
@@ -37,7 +37,7 @@ export default {
 
   initLocale () {
     if (this.options.locale) {
-      const locales = $.fn.bootstrapTable.locales
+      const locales = BootstrapTable.LOCALES
       const parts = this.options.locale.split(/-|_/)
 
       parts[0] = parts[0].toLowerCase()
@@ -78,7 +78,7 @@ export default {
     const loadingTemplate = Utils.calculateObjectValue(this.options,
       this.options.loadingTemplate, [this.options.formatLoadingMessage()])
 
-    this.$container = $(`
+    const containerHtml = `
       <div class="bootstrap-table ${this.constants.theme}">
       <div class="fixed-table-toolbar"></div>
       ${topPagination}
@@ -93,95 +93,117 @@ export default {
       </div>
       ${bottomPagination}
       </div>
-    `)
+    `
+    const template = document.createElement('template')
 
-    this.$container.insertAfter(this.$el)
-    this.$tableContainer = this.$container.find('.fixed-table-container')
-    this.$tableHeader = this.$container.find('.fixed-table-header')
-    this.$tableBody = this.$container.find('.fixed-table-body')
-    this.$tableLoading = this.$container.find('.fixed-table-loading')
-    this.$tableFooter = this.$el.find('tfoot')
+    template.innerHTML = containerHtml.trim()
+    this.$container = template.content.firstChild
+
+    this.$el.after(this.$container)
+    this.$tableContainer = this.$container.querySelector('.fixed-table-container')
+    this.$tableHeader = this.$container.querySelector('.fixed-table-header')
+    this.$tableBody = this.$container.querySelector('.fixed-table-body')
+    this.$tableLoading = this.$container.querySelector('.fixed-table-loading')
+    this.$tableFooter = this.$el.querySelector('tfoot')
     // checking if custom table-toolbar exists or not
     if (this.options.buttonsToolbar) {
-      this.$toolbar = $('body').find(this.options.buttonsToolbar)
+      this.$toolbar = document.querySelector(this.options.buttonsToolbar) ||
+        document.body.querySelector(this.options.buttonsToolbar)
     } else {
-      this.$toolbar = this.$container.find('.fixed-table-toolbar')
+      this.$toolbar = this.$container.querySelector('.fixed-table-toolbar')
     }
 
-    this.$pagination = this.$container.find('.fixed-table-pagination')
+    this.$pagination = Array.from(this.$container.querySelectorAll('.fixed-table-pagination'))
 
-    this.$tableBody.append(this.$el)
-    this.$container.after('<div class="clearfix"></div>')
+    this.$tableBody.appendChild(this.$el)
 
-    this.$el.addClass(this.options.classes)
-    this.$tableLoading.addClass(this.options.classes)
+    const clearfixDiv = document.createElement('div')
+
+    clearfixDiv.className = 'clearfix'
+    this.$container.after(clearfixDiv)
+
+    for (const cls of this.options.classes.split(' ').filter(c => c)) {
+      this.$el.classList.add(cls)
+      this.$tableLoading.classList.add(cls)
+    }
 
     if (this.options.height) {
-      this.$tableContainer.addClass('fixed-height')
+      this.$tableContainer.classList.add('fixed-height')
 
       if (this.options.showFooter) {
-        this.$tableContainer.addClass('has-footer')
+        this.$tableContainer.classList.add('has-footer')
       }
 
       if (this.options.classes.split(' ').includes('table-bordered')) {
-        this.$tableBody.append('<div class="fixed-table-border"></div>')
-        this.$tableBorder = this.$tableBody.find('.fixed-table-border')
-        this.$tableLoading.addClass('fixed-table-border')
+        const borderDiv = document.createElement('div')
+
+        borderDiv.className = 'fixed-table-border'
+        this.$tableBody.appendChild(borderDiv)
+        this.$tableBorder = borderDiv
+        this.$tableLoading.classList.add('fixed-table-border')
       }
 
-      this.$tableFooter = this.$container.find('.fixed-table-footer')
+      this.$tableFooter = this.$container.querySelector('.fixed-table-footer')
     }
   },
 
   initTable () {
     const columns = []
 
-    this.$header = this.$el.find('>thead')
-    if (!this.$header.length) {
-      this.$header = $(`<thead class="${this.options.theadClasses}"></thead>`).appendTo(this.$el)
+    this.$header = this.$el.querySelector(':scope > thead')
+    if (!this.$header) {
+      this.$header = document.createElement('thead')
+      if (this.options.theadClasses) {
+        this.$header.setAttribute('class', this.options.theadClasses)
+      }
+      this.$el.appendChild(this.$header)
     } else if (this.options.theadClasses) {
-      this.$header.addClass(this.options.theadClasses)
+      for (const cls of this.options.theadClasses.split(' ').filter(c => c)) {
+        this.$header.classList.add(cls)
+      }
     }
 
     this._headerTrClasses = []
     this._headerTrStyles = []
-    this.$header.find('tr').each((i, el) => {
-      const $tr = $(el)
+    // eslint-disable-next-line no-unused-vars
+    this.$header.querySelectorAll('tr').forEach((tr, i) => {
       const column = []
 
-      $tr.find('th').each((i, el) => {
-        const $th = $(el)
-
+      // eslint-disable-next-line no-unused-vars
+      tr.querySelectorAll('th').forEach((th, j) => {
         // #2014: getFieldIndex and elsewhere assume this is string, causes issues if not
-        if (typeof $th.data('field') !== 'undefined') {
-          $th.data('field', `${$th.data('field')}`)
+        if (typeof th.dataset.field !== 'undefined') {
+          th.dataset.field = `${th.dataset.field}`
         }
-        const _data = Object.assign({}, $th.data())
+
+        // eslint-disable-next-line no-use-before-define
+        const _data = getThAllData(th)
 
         for (const key in _data) {
-          if ($.fn.bootstrapTable.columnDefaults.hasOwnProperty(key)) {
+          if (BootstrapTable.COLUMN_DEFAULTS.hasOwnProperty(key)) {
             delete _data[key]
           }
         }
 
         column.push(Utils.extend({}, {
           _data: Utils.getRealDataAttr(_data),
-          title: $th.html(),
-          class: $th.attr('class'),
-          titleTooltip: $th.attr('title'),
-          rowspan: $th.attr('rowspan') ? +$th.attr('rowspan') : undefined,
-          colspan: $th.attr('colspan') ? +$th.attr('colspan') : undefined,
-          scope: $th.attr('scope') ? $th.attr('scope') : undefined,
-          style: Utils.normalizeStyle($th.attr('style'))
-        }, $th.data()))
+          title: th.innerHTML,
+          class: th.getAttribute('class'),
+          titleTooltip: th.getAttribute('title'),
+          rowspan: th.getAttribute('rowspan') ? +th.getAttribute('rowspan') : undefined,
+          colspan: th.getAttribute('colspan') ? +th.getAttribute('colspan') : undefined,
+          scope: th.getAttribute('scope') ? th.getAttribute('scope') : undefined,
+          style: Utils.normalizeStyle(th.getAttribute('style'))
+        // eslint-disable-next-line no-use-before-define
+        }, getThAllData(th)))
       })
       columns.push(column)
 
-      if ($tr.attr('class')) {
-        this._headerTrClasses.push($tr.attr('class'))
+      if (tr.getAttribute('class')) {
+        this._headerTrClasses.push(tr.getAttribute('class'))
       }
-      if ($tr.attr('style')) {
-        this._headerTrStyles.push($tr.attr('style'))
+      if (tr.getAttribute('style')) {
+        this._headerTrStyles.push(tr.getAttribute('style'))
       }
     })
 
@@ -212,7 +234,8 @@ export default {
 
     // if options.data is setting, do not process tbody and tfoot data
     if (!this.options.data.length) {
-      const htmlData = Utils.trToData(this.columns, this.$el.find('>tbody>tr').get())
+      const htmlData = Utils.trToData(this.columns,
+        Array.from(this.$el.querySelectorAll(':scope > tbody > tr')))
 
       if (htmlData.length) {
         this.options.data = htmlData
@@ -221,17 +244,36 @@ export default {
     }
 
     if (!(this.options.pagination && this.options.sidePagination !== 'server')) {
-      this.footerData = Utils.trToData(this.columns, this.$el.find('>tfoot>tr').get())
+      this.footerData = Utils.trToData(this.columns,
+        Array.from(this.$el.querySelectorAll(':scope > tfoot > tr')))
     }
 
     if (this.footerData) {
-      this.$el.find('tfoot').html('<tr></tr>')
+      const tfoot = this.$el.querySelector('tfoot')
+
+      if (tfoot) {
+        tfoot.innerHTML = '<tr></tr>'
+      }
     }
 
     if (!this.options.showFooter || this.options.cardView) {
-      this.$tableFooter.hide()
-    } else {
-      this.$tableFooter.show()
+      if (this.$tableFooter) this.$tableFooter.style.display = 'none'
+    } else if (this.$tableFooter) this.$tableFooter.style.display = ''
+  }
+}
+
+function getThAllData (th) {
+  const data = {}
+
+  // eslint-disable-next-line guard-for-in
+  for (const key in th.dataset) {
+    const value = th.dataset[key]
+
+    try {
+      data[key] = JSON.parse(value)
+    } catch {
+      data[key] = value
     }
   }
+  return data
 }

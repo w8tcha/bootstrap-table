@@ -2,7 +2,9 @@
  * @author: Dennis Hernández
  * @update zhixin wen <wenzhixin2010@gmail.com>
  */
-const Utils = $.fn.bootstrapTable.utils
+
+
+const Utils = BootstrapTable.utils
 const UtilsCookie = {
   cookieIds: {
     sortOrder: 'bs.table.sortOrder',
@@ -153,14 +155,14 @@ const UtilsCookie = {
         let filterContainer = header
 
         if (that.options.filterControlContainer) {
-          filterContainer = $(`${that.options.filterControlContainer}`)
+          filterContainer = document.querySelector(that.options.filterControlContainer)
         }
 
-        filterContainer.find(searchControls).each(function () {
-          const field = $(this).closest('[data-field]').data('field')
+        filterContainer.querySelectorAll(searchControls).forEach(el => {
+          const field = el.closest('[data-field]')?.dataset.field
           const filteredCookies = parsedCookieFilters.filter(cookie => cookie.field === field)
 
-          applyCookieFilters(this, filteredCookies)
+          applyCookieFilters(el, filteredCookies)
         })
 
         that.initColumnSearch(cachedFilters)
@@ -171,7 +173,7 @@ const UtilsCookie = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   cookie: false,
   cookieExpire: '2h',
   cookiePath: null,
@@ -200,15 +202,15 @@ Object.assign($.fn.bootstrapTable.defaults, {
   }
 })
 
-$.fn.bootstrapTable.methods.push('getCookies')
-$.fn.bootstrapTable.methods.push('deleteCookie')
+BootstrapTable.methods.push('getCookies')
+BootstrapTable.methods.push('deleteCookie')
 
-Object.assign($.fn.bootstrapTable.utils, {
+Object.assign(BootstrapTable.utils, {
   setCookie: UtilsCookie.setCookie,
   getCookie: UtilsCookie.getCookie
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   init () {
     if (this.options.cookie) {
       if (
@@ -246,7 +248,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
         this.options.cookiesEnabled
 
       if (this.options.filterControl) {
-        this.$el.on('column-search.bs.table', (e, field, text) => {
+        this.$el.addEventListener('column-search.bs.table', e => {
+          const [field, text] = e.detail || []
           let isNewField = true
 
           for (let i = 0; i < this._filterControls.length; i++) {
@@ -264,7 +267,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
           }
 
           UtilsCookie.setCookie(this, UtilsCookie.cookieIds.filterControl, JSON.stringify(this._filterControls))
-        }).on('created-controls.bs.table', UtilsCookie.initCookieFilters(this))
+        })
+        this.$el.addEventListener('created-controls.bs.table', () => UtilsCookie.initCookieFilters(this))
       }
     }
     super.init()

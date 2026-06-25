@@ -1,9 +1,26 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.BootstrapTable = {}, global.jQuery));
-})(this, (function (exports, $) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.BootstrapTable = {}, global.BootstrapTable));
+})(this, (function (exports, BootstrapTable) { 'use strict';
 
+  function _arrayLikeToArray(r, a) {
+    (null == a || a > r.length) && (a = r.length);
+    for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+    return n;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
+  }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
+  }
   function _typeof(o) {
     "@babel/helpers - typeof";
 
@@ -12,6 +29,13 @@
     } : function (o) {
       return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
     }, _typeof(o);
+  }
+  function _unsupportedIterableToArray(r, a) {
+    if (r) {
+      if ("string" == typeof r) return _arrayLikeToArray(r, a);
+      var t = {}.toString.call(r).slice(8, -1);
+      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+    }
   }
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -2021,7 +2045,7 @@
 
   requireEs_array_filter();
 
-  var es_array_find = {};
+  var es_array_includes = {};
 
   var objectDefineProperties = {};
 
@@ -2204,39 +2228,6 @@
   	};
   	return addToUnscopables;
   }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_array_includes = {};
 
   var hasRequiredEs_array_includes;
 
@@ -2644,6 +2635,1498 @@
   }
 
   requireEs_object_toString();
+
+  var es_promise = {};
+
+  var es_promise_constructor = {};
+
+  var environment;
+  var hasRequiredEnvironment;
+
+  function requireEnvironment () {
+  	if (hasRequiredEnvironment) return environment;
+  	hasRequiredEnvironment = 1;
+  	/* global Bun, Deno -- detection */
+  	var globalThis = requireGlobalThis();
+  	var userAgent = requireEnvironmentUserAgent();
+  	var classof = requireClassofRaw();
+
+  	var userAgentStartsWith = function (string) {
+  	  return userAgent.slice(0, string.length) === string;
+  	};
+
+  	environment = (function () {
+  	  if (userAgentStartsWith('Bun/')) return 'BUN';
+  	  if (userAgentStartsWith('Cloudflare-Workers')) return 'CLOUDFLARE';
+  	  if (userAgentStartsWith('Deno/')) return 'DENO';
+  	  if (userAgentStartsWith('Node.js/')) return 'NODE';
+  	  if (globalThis.Bun && typeof Bun.version == 'string') return 'BUN';
+  	  if (globalThis.Deno && typeof Deno.version == 'object') return 'DENO';
+  	  if (classof(globalThis.process) === 'process') return 'NODE';
+  	  if (globalThis.window && globalThis.document) return 'BROWSER';
+  	  return 'REST';
+  	})();
+  	return environment;
+  }
+
+  var environmentIsNode;
+  var hasRequiredEnvironmentIsNode;
+
+  function requireEnvironmentIsNode () {
+  	if (hasRequiredEnvironmentIsNode) return environmentIsNode;
+  	hasRequiredEnvironmentIsNode = 1;
+  	var ENVIRONMENT = requireEnvironment();
+
+  	environmentIsNode = ENVIRONMENT === 'NODE';
+  	return environmentIsNode;
+  }
+
+  var path;
+  var hasRequiredPath;
+
+  function requirePath () {
+  	if (hasRequiredPath) return path;
+  	hasRequiredPath = 1;
+  	var globalThis = requireGlobalThis();
+
+  	path = globalThis;
+  	return path;
+  }
+
+  var functionUncurryThisAccessor;
+  var hasRequiredFunctionUncurryThisAccessor;
+
+  function requireFunctionUncurryThisAccessor () {
+  	if (hasRequiredFunctionUncurryThisAccessor) return functionUncurryThisAccessor;
+  	hasRequiredFunctionUncurryThisAccessor = 1;
+  	var uncurryThis = requireFunctionUncurryThis();
+  	var aCallable = requireACallable();
+
+  	functionUncurryThisAccessor = function (object, key, method) {
+  	  try {
+  	    // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+  	    return uncurryThis(aCallable(Object.getOwnPropertyDescriptor(object, key)[method]));
+  	  } catch (error) { /* empty */ }
+  	};
+  	return functionUncurryThisAccessor;
+  }
+
+  var isPossiblePrototype;
+  var hasRequiredIsPossiblePrototype;
+
+  function requireIsPossiblePrototype () {
+  	if (hasRequiredIsPossiblePrototype) return isPossiblePrototype;
+  	hasRequiredIsPossiblePrototype = 1;
+  	var isObject = requireIsObject();
+
+  	isPossiblePrototype = function (argument) {
+  	  return isObject(argument) || argument === null;
+  	};
+  	return isPossiblePrototype;
+  }
+
+  var aPossiblePrototype;
+  var hasRequiredAPossiblePrototype;
+
+  function requireAPossiblePrototype () {
+  	if (hasRequiredAPossiblePrototype) return aPossiblePrototype;
+  	hasRequiredAPossiblePrototype = 1;
+  	var isPossiblePrototype = requireIsPossiblePrototype();
+
+  	var $String = String;
+  	var $TypeError = TypeError;
+
+  	aPossiblePrototype = function (argument) {
+  	  if (isPossiblePrototype(argument)) return argument;
+  	  throw new $TypeError("Can't set " + $String(argument) + ' as a prototype');
+  	};
+  	return aPossiblePrototype;
+  }
+
+  var objectSetPrototypeOf;
+  var hasRequiredObjectSetPrototypeOf;
+
+  function requireObjectSetPrototypeOf () {
+  	if (hasRequiredObjectSetPrototypeOf) return objectSetPrototypeOf;
+  	hasRequiredObjectSetPrototypeOf = 1;
+  	/* eslint-disable no-proto -- safe */
+  	var uncurryThisAccessor = requireFunctionUncurryThisAccessor();
+  	var isObject = requireIsObject();
+  	var requireObjectCoercible = requireRequireObjectCoercible();
+  	var aPossiblePrototype = requireAPossiblePrototype();
+
+  	// `Object.setPrototypeOf` method
+  	// https://tc39.es/ecma262/#sec-object.setprototypeof
+  	// Works with __proto__ only. Old v8 can't work with null proto objects.
+  	// eslint-disable-next-line es/no-object-setprototypeof -- safe
+  	objectSetPrototypeOf = Object.setPrototypeOf || ('__proto__' in {} ? function () {
+  	  var CORRECT_SETTER = false;
+  	  var test = {};
+  	  var setter;
+  	  try {
+  	    setter = uncurryThisAccessor(Object.prototype, '__proto__', 'set');
+  	    setter(test, []);
+  	    CORRECT_SETTER = test instanceof Array;
+  	  } catch (error) { /* empty */ }
+  	  return function setPrototypeOf(O, proto) {
+  	    requireObjectCoercible(O);
+  	    aPossiblePrototype(proto);
+  	    if (!isObject(O)) return O;
+  	    if (CORRECT_SETTER) setter(O, proto);
+  	    else O.__proto__ = proto;
+  	    return O;
+  	  };
+  	}() : undefined);
+  	return objectSetPrototypeOf;
+  }
+
+  var setToStringTag;
+  var hasRequiredSetToStringTag;
+
+  function requireSetToStringTag () {
+  	if (hasRequiredSetToStringTag) return setToStringTag;
+  	hasRequiredSetToStringTag = 1;
+  	var defineProperty = requireObjectDefineProperty().f;
+  	var hasOwn = requireHasOwnProperty();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+
+  	setToStringTag = function (target, TAG, STATIC) {
+  	  if (target && !STATIC) target = target.prototype;
+  	  if (target && !hasOwn(target, TO_STRING_TAG)) {
+  	    defineProperty(target, TO_STRING_TAG, { configurable: true, value: TAG });
+  	  }
+  	};
+  	return setToStringTag;
+  }
+
+  var defineBuiltInAccessor;
+  var hasRequiredDefineBuiltInAccessor;
+
+  function requireDefineBuiltInAccessor () {
+  	if (hasRequiredDefineBuiltInAccessor) return defineBuiltInAccessor;
+  	hasRequiredDefineBuiltInAccessor = 1;
+  	var makeBuiltIn = requireMakeBuiltIn();
+  	var defineProperty = requireObjectDefineProperty();
+
+  	defineBuiltInAccessor = function (target, name, descriptor) {
+  	  if (descriptor.get) makeBuiltIn(descriptor.get, name, { getter: true });
+  	  if (descriptor.set) makeBuiltIn(descriptor.set, name, { setter: true });
+  	  return defineProperty.f(target, name, descriptor);
+  	};
+  	return defineBuiltInAccessor;
+  }
+
+  var setSpecies;
+  var hasRequiredSetSpecies;
+
+  function requireSetSpecies () {
+  	if (hasRequiredSetSpecies) return setSpecies;
+  	hasRequiredSetSpecies = 1;
+  	var getBuiltIn = requireGetBuiltIn();
+  	var defineBuiltInAccessor = requireDefineBuiltInAccessor();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+  	var DESCRIPTORS = requireDescriptors();
+
+  	var SPECIES = wellKnownSymbol('species');
+
+  	setSpecies = function (CONSTRUCTOR_NAME) {
+  	  var Constructor = getBuiltIn(CONSTRUCTOR_NAME);
+
+  	  if (DESCRIPTORS && Constructor && !Constructor[SPECIES]) {
+  	    defineBuiltInAccessor(Constructor, SPECIES, {
+  	      configurable: true,
+  	      get: function () { return this; }
+  	    });
+  	  }
+  	};
+  	return setSpecies;
+  }
+
+  var anInstance;
+  var hasRequiredAnInstance;
+
+  function requireAnInstance () {
+  	if (hasRequiredAnInstance) return anInstance;
+  	hasRequiredAnInstance = 1;
+  	var isPrototypeOf = requireObjectIsPrototypeOf();
+
+  	var $TypeError = TypeError;
+
+  	anInstance = function (it, Prototype) {
+  	  if (isPrototypeOf(Prototype, it)) return it;
+  	  throw new $TypeError('Incorrect invocation');
+  	};
+  	return anInstance;
+  }
+
+  var aConstructor;
+  var hasRequiredAConstructor;
+
+  function requireAConstructor () {
+  	if (hasRequiredAConstructor) return aConstructor;
+  	hasRequiredAConstructor = 1;
+  	var isConstructor = requireIsConstructor();
+  	var tryToString = requireTryToString();
+
+  	var $TypeError = TypeError;
+
+  	// `Assert: IsConstructor(argument) is true`
+  	aConstructor = function (argument) {
+  	  if (isConstructor(argument)) return argument;
+  	  throw new $TypeError(tryToString(argument) + ' is not a constructor');
+  	};
+  	return aConstructor;
+  }
+
+  var speciesConstructor;
+  var hasRequiredSpeciesConstructor;
+
+  function requireSpeciesConstructor () {
+  	if (hasRequiredSpeciesConstructor) return speciesConstructor;
+  	hasRequiredSpeciesConstructor = 1;
+  	var anObject = requireAnObject();
+  	var aConstructor = requireAConstructor();
+  	var isNullOrUndefined = requireIsNullOrUndefined();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var SPECIES = wellKnownSymbol('species');
+
+  	// `SpeciesConstructor` abstract operation
+  	// https://tc39.es/ecma262/#sec-speciesconstructor
+  	speciesConstructor = function (O, defaultConstructor) {
+  	  var C = anObject(O).constructor;
+  	  var S;
+  	  return C === undefined || isNullOrUndefined(S = anObject(C)[SPECIES]) ? defaultConstructor : aConstructor(S);
+  	};
+  	return speciesConstructor;
+  }
+
+  var functionApply;
+  var hasRequiredFunctionApply;
+
+  function requireFunctionApply () {
+  	if (hasRequiredFunctionApply) return functionApply;
+  	hasRequiredFunctionApply = 1;
+  	var NATIVE_BIND = requireFunctionBindNative();
+
+  	var FunctionPrototype = Function.prototype;
+  	var apply = FunctionPrototype.apply;
+  	var call = FunctionPrototype.call;
+
+  	// eslint-disable-next-line es/no-function-prototype-bind, es/no-reflect -- safe
+  	functionApply = typeof Reflect == 'object' && Reflect.apply || (NATIVE_BIND ? call.bind(apply) : function () {
+  	  return call.apply(apply, arguments);
+  	});
+  	return functionApply;
+  }
+
+  var validateArgumentsLength;
+  var hasRequiredValidateArgumentsLength;
+
+  function requireValidateArgumentsLength () {
+  	if (hasRequiredValidateArgumentsLength) return validateArgumentsLength;
+  	hasRequiredValidateArgumentsLength = 1;
+  	var $TypeError = TypeError;
+
+  	validateArgumentsLength = function (passed, required) {
+  	  if (passed < required) throw new $TypeError('Not enough arguments');
+  	  return passed;
+  	};
+  	return validateArgumentsLength;
+  }
+
+  var environmentIsIos;
+  var hasRequiredEnvironmentIsIos;
+
+  function requireEnvironmentIsIos () {
+  	if (hasRequiredEnvironmentIsIos) return environmentIsIos;
+  	hasRequiredEnvironmentIsIos = 1;
+  	var userAgent = requireEnvironmentUserAgent();
+
+  	environmentIsIos = /ipad|iphone|ipod/i.test(userAgent) && /applewebkit/i.test(userAgent);
+  	return environmentIsIos;
+  }
+
+  var task;
+  var hasRequiredTask;
+
+  function requireTask () {
+  	if (hasRequiredTask) return task;
+  	hasRequiredTask = 1;
+  	var globalThis = requireGlobalThis();
+  	var apply = requireFunctionApply();
+  	var bind = requireFunctionBindContext();
+  	var isCallable = requireIsCallable();
+  	var hasOwn = requireHasOwnProperty();
+  	var fails = requireFails();
+  	var html = requireHtml();
+  	var arraySlice = requireArraySlice();
+  	var createElement = requireDocumentCreateElement();
+  	var validateArgumentsLength = requireValidateArgumentsLength();
+  	var IS_IOS = requireEnvironmentIsIos();
+  	var IS_NODE = requireEnvironmentIsNode();
+
+  	var set = globalThis.setImmediate;
+  	var clear = globalThis.clearImmediate;
+  	var process = globalThis.process;
+  	var Dispatch = globalThis.Dispatch;
+  	var Function = globalThis.Function;
+  	var MessageChannel = globalThis.MessageChannel;
+  	var String = globalThis.String;
+  	var counter = 0;
+  	var queue = {};
+  	var ONREADYSTATECHANGE = 'onreadystatechange';
+  	var $location, defer, channel, port;
+
+  	fails(function () {
+  	  // Deno throws a ReferenceError on `location` access without `--location` flag
+  	  $location = globalThis.location;
+  	});
+
+  	var run = function (id) {
+  	  if (hasOwn(queue, id)) {
+  	    var fn = queue[id];
+  	    delete queue[id];
+  	    fn();
+  	  }
+  	};
+
+  	var runner = function (id) {
+  	  return function () {
+  	    run(id);
+  	  };
+  	};
+
+  	var eventListener = function (event) {
+  	  run(event.data);
+  	};
+
+  	var globalPostMessageDefer = function (id) {
+  	  // old engines have not location.origin
+  	  globalThis.postMessage(String(id), $location.protocol + '//' + $location.host);
+  	};
+
+  	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+  	if (!set || !clear) {
+  	  set = function setImmediate(handler) {
+  	    validateArgumentsLength(arguments.length, 1);
+  	    var fn = isCallable(handler) ? handler : Function(handler);
+  	    var args = arraySlice(arguments, 1);
+  	    queue[++counter] = function () {
+  	      apply(fn, undefined, args);
+  	    };
+  	    defer(counter);
+  	    return counter;
+  	  };
+  	  clear = function clearImmediate(id) {
+  	    delete queue[id];
+  	  };
+  	  // Node.js 0.8-
+  	  if (IS_NODE) {
+  	    defer = function (id) {
+  	      process.nextTick(runner(id));
+  	    };
+  	  // Sphere (JS game engine) Dispatch API
+  	  } else if (Dispatch && Dispatch.now) {
+  	    defer = function (id) {
+  	      Dispatch.now(runner(id));
+  	    };
+  	  // Browsers with MessageChannel, includes WebWorkers
+  	  // except iOS - https://github.com/zloirock/core-js/issues/624
+  	  } else if (MessageChannel && !IS_IOS) {
+  	    channel = new MessageChannel();
+  	    port = channel.port2;
+  	    channel.port1.onmessage = eventListener;
+  	    defer = bind(port.postMessage, port);
+  	  // Browsers with postMessage, skip WebWorkers
+  	  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
+  	  } else if (
+  	    globalThis.addEventListener &&
+  	    isCallable(globalThis.postMessage) &&
+  	    !globalThis.importScripts &&
+  	    $location && $location.protocol !== 'file:' &&
+  	    !fails(globalPostMessageDefer)
+  	  ) {
+  	    defer = globalPostMessageDefer;
+  	    globalThis.addEventListener('message', eventListener, false);
+  	  // IE8-
+  	  } else if (ONREADYSTATECHANGE in createElement('script')) {
+  	    defer = function (id) {
+  	      html.appendChild(createElement('script'))[ONREADYSTATECHANGE] = function () {
+  	        html.removeChild(this);
+  	        run(id);
+  	      };
+  	    };
+  	  // Rest old browsers
+  	  } else {
+  	    defer = function (id) {
+  	      setTimeout(runner(id), 0);
+  	    };
+  	  }
+  	}
+
+  	task = {
+  	  set: set,
+  	  clear: clear
+  	};
+  	return task;
+  }
+
+  var safeGetBuiltIn;
+  var hasRequiredSafeGetBuiltIn;
+
+  function requireSafeGetBuiltIn () {
+  	if (hasRequiredSafeGetBuiltIn) return safeGetBuiltIn;
+  	hasRequiredSafeGetBuiltIn = 1;
+  	var globalThis = requireGlobalThis();
+  	var DESCRIPTORS = requireDescriptors();
+
+  	// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+  	var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+
+  	// Avoid NodeJS experimental warning
+  	safeGetBuiltIn = function (name) {
+  	  if (!DESCRIPTORS) return globalThis[name];
+  	  var descriptor = getOwnPropertyDescriptor(globalThis, name);
+  	  return descriptor && descriptor.value;
+  	};
+  	return safeGetBuiltIn;
+  }
+
+  var queue;
+  var hasRequiredQueue;
+
+  function requireQueue () {
+  	if (hasRequiredQueue) return queue;
+  	hasRequiredQueue = 1;
+  	var Queue = function () {
+  	  this.head = null;
+  	  this.tail = null;
+  	};
+
+  	Queue.prototype = {
+  	  add: function (item) {
+  	    var entry = { item: item, next: null };
+  	    var tail = this.tail;
+  	    if (tail) tail.next = entry;
+  	    else this.head = entry;
+  	    this.tail = entry;
+  	  },
+  	  get: function () {
+  	    var entry = this.head;
+  	    if (entry) {
+  	      var next = this.head = entry.next;
+  	      if (next === null) this.tail = null;
+  	      return entry.item;
+  	    }
+  	  }
+  	};
+
+  	queue = Queue;
+  	return queue;
+  }
+
+  var environmentIsIosPebble;
+  var hasRequiredEnvironmentIsIosPebble;
+
+  function requireEnvironmentIsIosPebble () {
+  	if (hasRequiredEnvironmentIsIosPebble) return environmentIsIosPebble;
+  	hasRequiredEnvironmentIsIosPebble = 1;
+  	var userAgent = requireEnvironmentUserAgent();
+
+  	environmentIsIosPebble = /ipad|iphone|ipod/i.test(userAgent) && typeof Pebble != 'undefined';
+  	return environmentIsIosPebble;
+  }
+
+  var environmentIsWebosWebkit;
+  var hasRequiredEnvironmentIsWebosWebkit;
+
+  function requireEnvironmentIsWebosWebkit () {
+  	if (hasRequiredEnvironmentIsWebosWebkit) return environmentIsWebosWebkit;
+  	hasRequiredEnvironmentIsWebosWebkit = 1;
+  	var userAgent = requireEnvironmentUserAgent();
+
+  	environmentIsWebosWebkit = /web0s(?!.*chrome)/i.test(userAgent);
+  	return environmentIsWebosWebkit;
+  }
+
+  var microtask_1;
+  var hasRequiredMicrotask;
+
+  function requireMicrotask () {
+  	if (hasRequiredMicrotask) return microtask_1;
+  	hasRequiredMicrotask = 1;
+  	var globalThis = requireGlobalThis();
+  	var safeGetBuiltIn = requireSafeGetBuiltIn();
+  	var bind = requireFunctionBindContext();
+  	var macrotask = requireTask().set;
+  	var Queue = requireQueue();
+  	var IS_IOS = requireEnvironmentIsIos();
+  	var IS_IOS_PEBBLE = requireEnvironmentIsIosPebble();
+  	var IS_WEBOS_WEBKIT = requireEnvironmentIsWebosWebkit();
+  	var IS_NODE = requireEnvironmentIsNode();
+
+  	var MutationObserver = globalThis.MutationObserver || globalThis.WebKitMutationObserver;
+  	var document = globalThis.document;
+  	var process = globalThis.process;
+  	var Promise = globalThis.Promise;
+  	var microtask = safeGetBuiltIn('queueMicrotask');
+  	var notify, toggle, node, promise, then;
+
+  	// modern engines have queueMicrotask method
+  	if (!microtask) {
+  	  var queue = new Queue();
+
+  	  var flush = function () {
+  	    var parent, fn;
+  	    if (IS_NODE && (parent = process.domain)) parent.exit();
+  	    while (fn = queue.get()) try {
+  	      fn();
+  	    } catch (error) {
+  	      if (queue.head) notify();
+  	      throw error;
+  	    }
+  	    if (parent) parent.enter();
+  	  };
+
+  	  // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
+  	  // also except WebOS Webkit https://github.com/zloirock/core-js/issues/898
+  	  if (!IS_IOS && !IS_NODE && !IS_WEBOS_WEBKIT && MutationObserver && document) {
+  	    toggle = true;
+  	    node = document.createTextNode('');
+  	    new MutationObserver(flush).observe(node, { characterData: true });
+  	    notify = function () {
+  	      node.data = toggle = !toggle;
+  	    };
+  	  // environments with maybe non-completely correct, but existent Promise
+  	  } else if (!IS_IOS_PEBBLE && Promise && Promise.resolve) {
+  	    // Promise.resolve without an argument throws an error in LG WebOS 2
+  	    promise = Promise.resolve(undefined);
+  	    // workaround of WebKit ~ iOS Safari 10.1 bug
+  	    promise.constructor = Promise;
+  	    then = bind(promise.then, promise);
+  	    notify = function () {
+  	      then(flush);
+  	    };
+  	  // Node.js without promises
+  	  } else if (IS_NODE) {
+  	    notify = function () {
+  	      process.nextTick(flush);
+  	    };
+  	  // for other environments - macrotask based on:
+  	  // - setImmediate
+  	  // - MessageChannel
+  	  // - window.postMessage
+  	  // - onreadystatechange
+  	  // - setTimeout
+  	  } else {
+  	    // `webpack` dev server bug on IE global methods - use bind(fn, global)
+  	    macrotask = bind(macrotask, globalThis);
+  	    notify = function () {
+  	      macrotask(flush);
+  	    };
+  	  }
+
+  	  microtask = function (fn) {
+  	    if (!queue.head) notify();
+  	    queue.add(fn);
+  	  };
+  	}
+
+  	microtask_1 = microtask;
+  	return microtask_1;
+  }
+
+  var hostReportErrors;
+  var hasRequiredHostReportErrors;
+
+  function requireHostReportErrors () {
+  	if (hasRequiredHostReportErrors) return hostReportErrors;
+  	hasRequiredHostReportErrors = 1;
+  	hostReportErrors = function (a, b) {
+  	  try {
+  	    // eslint-disable-next-line no-console -- safe
+  	    arguments.length === 1 ? console.error(a) : console.error(a, b);
+  	  } catch (error) { /* empty */ }
+  	};
+  	return hostReportErrors;
+  }
+
+  var perform;
+  var hasRequiredPerform;
+
+  function requirePerform () {
+  	if (hasRequiredPerform) return perform;
+  	hasRequiredPerform = 1;
+  	perform = function (exec) {
+  	  try {
+  	    return { error: false, value: exec() };
+  	  } catch (error) {
+  	    return { error: true, value: error };
+  	  }
+  	};
+  	return perform;
+  }
+
+  var promiseNativeConstructor;
+  var hasRequiredPromiseNativeConstructor;
+
+  function requirePromiseNativeConstructor () {
+  	if (hasRequiredPromiseNativeConstructor) return promiseNativeConstructor;
+  	hasRequiredPromiseNativeConstructor = 1;
+  	var globalThis = requireGlobalThis();
+
+  	promiseNativeConstructor = globalThis.Promise;
+  	return promiseNativeConstructor;
+  }
+
+  var promiseConstructorDetection;
+  var hasRequiredPromiseConstructorDetection;
+
+  function requirePromiseConstructorDetection () {
+  	if (hasRequiredPromiseConstructorDetection) return promiseConstructorDetection;
+  	hasRequiredPromiseConstructorDetection = 1;
+  	var globalThis = requireGlobalThis();
+  	var NativePromiseConstructor = requirePromiseNativeConstructor();
+  	var isCallable = requireIsCallable();
+  	var isForced = requireIsForced();
+  	var inspectSource = requireInspectSource();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+  	var ENVIRONMENT = requireEnvironment();
+  	var IS_PURE = requireIsPure();
+  	var V8_VERSION = requireEnvironmentV8Version();
+
+  	var NativePromisePrototype = NativePromiseConstructor && NativePromiseConstructor.prototype;
+  	var SPECIES = wellKnownSymbol('species');
+  	var SUBCLASSING = false;
+  	var NATIVE_PROMISE_REJECTION_EVENT = isCallable(globalThis.PromiseRejectionEvent);
+
+  	var FORCED_PROMISE_CONSTRUCTOR = isForced('Promise', function () {
+  	  var PROMISE_CONSTRUCTOR_SOURCE = inspectSource(NativePromiseConstructor);
+  	  var GLOBAL_CORE_JS_PROMISE = PROMISE_CONSTRUCTOR_SOURCE !== String(NativePromiseConstructor);
+  	  // V8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
+  	  // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
+  	  // We can't detect it synchronously, so just check versions
+  	  if (!GLOBAL_CORE_JS_PROMISE && V8_VERSION === 66) return true;
+  	  // We need Promise#{ catch, finally } in the pure version for preventing prototype pollution
+  	  if (IS_PURE && !(NativePromisePrototype['catch'] && NativePromisePrototype['finally'])) return true;
+  	  // We can't use @@species feature detection in V8 since it causes
+  	  // deoptimization and performance degradation
+  	  // https://github.com/zloirock/core-js/issues/679
+  	  if (!V8_VERSION || V8_VERSION < 51 || !/native code/.test(PROMISE_CONSTRUCTOR_SOURCE)) {
+  	    // Detect correctness of subclassing with @@species support
+  	    var promise = new NativePromiseConstructor(function (resolve) { resolve(1); });
+  	    var FakePromise = function (exec) {
+  	      exec(function () { /* empty */ }, function () { /* empty */ });
+  	    };
+  	    var constructor = promise.constructor = {};
+  	    constructor[SPECIES] = FakePromise;
+  	    SUBCLASSING = promise.then(function () { /* empty */ }) instanceof FakePromise;
+  	    if (!SUBCLASSING) return true;
+  	  // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
+  	  } return !GLOBAL_CORE_JS_PROMISE && (ENVIRONMENT === 'BROWSER' || ENVIRONMENT === 'DENO') && !NATIVE_PROMISE_REJECTION_EVENT;
+  	});
+
+  	promiseConstructorDetection = {
+  	  CONSTRUCTOR: FORCED_PROMISE_CONSTRUCTOR,
+  	  REJECTION_EVENT: NATIVE_PROMISE_REJECTION_EVENT,
+  	  SUBCLASSING: SUBCLASSING
+  	};
+  	return promiseConstructorDetection;
+  }
+
+  var newPromiseCapability = {};
+
+  var hasRequiredNewPromiseCapability;
+
+  function requireNewPromiseCapability () {
+  	if (hasRequiredNewPromiseCapability) return newPromiseCapability;
+  	hasRequiredNewPromiseCapability = 1;
+  	var aCallable = requireACallable();
+
+  	var $TypeError = TypeError;
+
+  	var PromiseCapability = function (C) {
+  	  var resolve, reject;
+  	  this.promise = new C(function ($$resolve, $$reject) {
+  	    if (resolve !== undefined || reject !== undefined) throw new $TypeError('Bad Promise constructor');
+  	    resolve = $$resolve;
+  	    reject = $$reject;
+  	  });
+  	  this.resolve = aCallable(resolve);
+  	  this.reject = aCallable(reject);
+  	};
+
+  	// `NewPromiseCapability` abstract operation
+  	// https://tc39.es/ecma262/#sec-newpromisecapability
+  	newPromiseCapability.f = function (C) {
+  	  return new PromiseCapability(C);
+  	};
+  	return newPromiseCapability;
+  }
+
+  var hasRequiredEs_promise_constructor;
+
+  function requireEs_promise_constructor () {
+  	if (hasRequiredEs_promise_constructor) return es_promise_constructor;
+  	hasRequiredEs_promise_constructor = 1;
+  	var $ = require_export();
+  	var IS_PURE = requireIsPure();
+  	var IS_NODE = requireEnvironmentIsNode();
+  	var globalThis = requireGlobalThis();
+  	var path = requirePath();
+  	var call = requireFunctionCall();
+  	var defineBuiltIn = requireDefineBuiltIn();
+  	var setPrototypeOf = requireObjectSetPrototypeOf();
+  	var setToStringTag = requireSetToStringTag();
+  	var setSpecies = requireSetSpecies();
+  	var aCallable = requireACallable();
+  	var isCallable = requireIsCallable();
+  	var isObject = requireIsObject();
+  	var anInstance = requireAnInstance();
+  	var speciesConstructor = requireSpeciesConstructor();
+  	var task = requireTask().set;
+  	var microtask = requireMicrotask();
+  	var hostReportErrors = requireHostReportErrors();
+  	var perform = requirePerform();
+  	var Queue = requireQueue();
+  	var InternalStateModule = requireInternalState();
+  	var NativePromiseConstructor = requirePromiseNativeConstructor();
+  	var PromiseConstructorDetection = requirePromiseConstructorDetection();
+  	var newPromiseCapabilityModule = requireNewPromiseCapability();
+
+  	var PROMISE = 'Promise';
+  	var FORCED_PROMISE_CONSTRUCTOR = PromiseConstructorDetection.CONSTRUCTOR;
+  	var NATIVE_PROMISE_REJECTION_EVENT = PromiseConstructorDetection.REJECTION_EVENT;
+  	var NATIVE_PROMISE_SUBCLASSING = PromiseConstructorDetection.SUBCLASSING;
+  	var getInternalPromiseState = InternalStateModule.getterFor(PROMISE);
+  	var setInternalState = InternalStateModule.set;
+  	var NativePromisePrototype = NativePromiseConstructor && NativePromiseConstructor.prototype;
+  	var PromiseConstructor = NativePromiseConstructor;
+  	var PromisePrototype = NativePromisePrototype;
+  	var TypeError = globalThis.TypeError;
+  	var document = globalThis.document;
+  	var process = globalThis.process;
+  	var newPromiseCapability = newPromiseCapabilityModule.f;
+  	var newGenericPromiseCapability = newPromiseCapability;
+
+  	var DISPATCH_EVENT = !!(document && document.createEvent && globalThis.dispatchEvent);
+  	var UNHANDLED_REJECTION = 'unhandledrejection';
+  	var REJECTION_HANDLED = 'rejectionhandled';
+  	var PENDING = 0;
+  	var FULFILLED = 1;
+  	var REJECTED = 2;
+  	var HANDLED = 1;
+  	var UNHANDLED = 2;
+
+  	var Internal, OwnPromiseCapability, PromiseWrapper, nativeThen;
+
+  	// helpers
+  	var isThenable = function (it) {
+  	  var then;
+  	  return isObject(it) && isCallable(then = it.then) ? then : false;
+  	};
+
+  	var callReaction = function (reaction, state) {
+  	  var value = state.value;
+  	  var ok = state.state === FULFILLED;
+  	  var handler = ok ? reaction.ok : reaction.fail;
+  	  var resolve = reaction.resolve;
+  	  var reject = reaction.reject;
+  	  var domain = reaction.domain;
+  	  var result, then, exited;
+  	  try {
+  	    if (handler) {
+  	      if (!ok) {
+  	        if (state.rejection === UNHANDLED) onHandleUnhandled(state);
+  	        state.rejection = HANDLED;
+  	      }
+  	      if (handler === true) result = value;
+  	      else {
+  	        if (domain) domain.enter();
+  	        result = handler(value); // can throw
+  	        if (domain) {
+  	          domain.exit();
+  	          exited = true;
+  	        }
+  	      }
+  	      if (result === reaction.promise) {
+  	        reject(new TypeError('Promise-chain cycle'));
+  	      } else if (then = isThenable(result)) {
+  	        call(then, result, resolve, reject);
+  	      } else resolve(result);
+  	    } else reject(value);
+  	  } catch (error) {
+  	    if (domain && !exited) domain.exit();
+  	    reject(error);
+  	  }
+  	};
+
+  	var notify = function (state, isReject) {
+  	  if (state.notified) return;
+  	  state.notified = true;
+  	  microtask(function () {
+  	    var reactions = state.reactions;
+  	    var reaction;
+  	    while (reaction = reactions.get()) {
+  	      callReaction(reaction, state);
+  	    }
+  	    state.notified = false;
+  	    if (isReject && !state.rejection) onUnhandled(state);
+  	  });
+  	};
+
+  	var dispatchEvent = function (name, promise, reason) {
+  	  var event, handler;
+  	  if (DISPATCH_EVENT) {
+  	    event = document.createEvent('Event');
+  	    event.promise = promise;
+  	    event.reason = reason;
+  	    event.initEvent(name, false, true);
+  	    globalThis.dispatchEvent(event);
+  	  } else event = { promise: promise, reason: reason };
+  	  if (!NATIVE_PROMISE_REJECTION_EVENT && (handler = globalThis['on' + name])) handler(event);
+  	  else if (name === UNHANDLED_REJECTION) hostReportErrors('Unhandled promise rejection', reason);
+  	};
+
+  	var onUnhandled = function (state) {
+  	  call(task, globalThis, function () {
+  	    var promise = state.facade;
+  	    var value = state.value;
+  	    var IS_UNHANDLED = isUnhandled(state);
+  	    var result;
+  	    if (IS_UNHANDLED) {
+  	      result = perform(function () {
+  	        if (IS_NODE) {
+  	          process.emit('unhandledRejection', value, promise);
+  	        } else dispatchEvent(UNHANDLED_REJECTION, promise, value);
+  	      });
+  	      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
+  	      state.rejection = IS_NODE || isUnhandled(state) ? UNHANDLED : HANDLED;
+  	      if (result.error) throw result.value;
+  	    }
+  	  });
+  	};
+
+  	var isUnhandled = function (state) {
+  	  return state.rejection !== HANDLED && !state.parent;
+  	};
+
+  	var onHandleUnhandled = function (state) {
+  	  call(task, globalThis, function () {
+  	    var promise = state.facade;
+  	    if (IS_NODE) {
+  	      process.emit('rejectionHandled', promise);
+  	    } else dispatchEvent(REJECTION_HANDLED, promise, state.value);
+  	  });
+  	};
+
+  	var bind = function (fn, state, unwrap) {
+  	  return function (value) {
+  	    fn(state, value, unwrap);
+  	  };
+  	};
+
+  	var internalReject = function (state, value, unwrap) {
+  	  if (state.done) return;
+  	  state.done = true;
+  	  if (unwrap) state = unwrap;
+  	  state.value = value;
+  	  state.state = REJECTED;
+  	  notify(state, true);
+  	};
+
+  	var internalResolve = function (state, value, unwrap) {
+  	  if (state.done) return;
+  	  state.done = true;
+  	  if (unwrap) state = unwrap;
+  	  try {
+  	    if (state.facade === value) throw new TypeError("Promise can't be resolved itself");
+  	    var then = isThenable(value);
+  	    if (then) {
+  	      microtask(function () {
+  	        var wrapper = { done: false };
+  	        try {
+  	          call(then, value,
+  	            bind(internalResolve, wrapper, state),
+  	            bind(internalReject, wrapper, state)
+  	          );
+  	        } catch (error) {
+  	          internalReject(wrapper, error, state);
+  	        }
+  	      });
+  	    } else {
+  	      state.value = value;
+  	      state.state = FULFILLED;
+  	      notify(state, false);
+  	    }
+  	  } catch (error) {
+  	    internalReject({ done: false }, error, state);
+  	  }
+  	};
+
+  	// constructor polyfill
+  	if (FORCED_PROMISE_CONSTRUCTOR) {
+  	  // 25.4.3.1 Promise(executor)
+  	  PromiseConstructor = function Promise(executor) {
+  	    anInstance(this, PromisePrototype);
+  	    aCallable(executor);
+  	    call(Internal, this);
+  	    var state = getInternalPromiseState(this);
+  	    try {
+  	      executor(bind(internalResolve, state), bind(internalReject, state));
+  	    } catch (error) {
+  	      internalReject(state, error);
+  	    }
+  	  };
+
+  	  PromisePrototype = PromiseConstructor.prototype;
+
+  	  // eslint-disable-next-line no-unused-vars -- required for `.length`
+  	  Internal = function Promise(executor) {
+  	    setInternalState(this, {
+  	      type: PROMISE,
+  	      done: false,
+  	      notified: false,
+  	      parent: false,
+  	      reactions: new Queue(),
+  	      rejection: false,
+  	      state: PENDING,
+  	      value: null
+  	    });
+  	  };
+
+  	  // `Promise.prototype.then` method
+  	  // https://tc39.es/ecma262/#sec-promise.prototype.then
+  	  Internal.prototype = defineBuiltIn(PromisePrototype, 'then', function then(onFulfilled, onRejected) {
+  	    var state = getInternalPromiseState(this);
+  	    var reaction = newPromiseCapability(speciesConstructor(this, PromiseConstructor));
+  	    state.parent = true;
+  	    reaction.ok = isCallable(onFulfilled) ? onFulfilled : true;
+  	    reaction.fail = isCallable(onRejected) && onRejected;
+  	    reaction.domain = IS_NODE ? process.domain : undefined;
+  	    if (state.state === PENDING) state.reactions.add(reaction);
+  	    else microtask(function () {
+  	      callReaction(reaction, state);
+  	    });
+  	    return reaction.promise;
+  	  });
+
+  	  OwnPromiseCapability = function () {
+  	    var promise = new Internal();
+  	    var state = getInternalPromiseState(promise);
+  	    this.promise = promise;
+  	    this.resolve = bind(internalResolve, state);
+  	    this.reject = bind(internalReject, state);
+  	  };
+
+  	  newPromiseCapabilityModule.f = newPromiseCapability = function (C) {
+  	    return C === PromiseConstructor || C === PromiseWrapper
+  	      ? new OwnPromiseCapability(C)
+  	      : newGenericPromiseCapability(C);
+  	  };
+
+  	  if (!IS_PURE && isCallable(NativePromiseConstructor) && NativePromisePrototype !== Object.prototype) {
+  	    nativeThen = NativePromisePrototype.then;
+
+  	    if (!NATIVE_PROMISE_SUBCLASSING) {
+  	      // make `Promise#then` return a polyfilled `Promise` for native promise-based APIs
+  	      defineBuiltIn(NativePromisePrototype, 'then', function then(onFulfilled, onRejected) {
+  	        var that = this;
+  	        return new PromiseConstructor(function (resolve, reject) {
+  	          call(nativeThen, that, resolve, reject);
+  	        }).then(onFulfilled, onRejected);
+  	      // https://github.com/zloirock/core-js/issues/640
+  	      }, { unsafe: true });
+  	    }
+
+  	    // make `.constructor === Promise` work for native promise-based APIs
+  	    try {
+  	      delete NativePromisePrototype.constructor;
+  	    } catch (error) { /* empty */ }
+
+  	    // make `instanceof Promise` work for native promise-based APIs
+  	    if (setPrototypeOf) {
+  	      setPrototypeOf(NativePromisePrototype, PromisePrototype);
+  	    }
+  	  }
+  	}
+
+  	// `Promise` constructor
+  	// https://tc39.es/ecma262/#sec-promise-executor
+  	$({ global: true, constructor: true, wrap: true, forced: FORCED_PROMISE_CONSTRUCTOR }, {
+  	  Promise: PromiseConstructor
+  	});
+
+  	PromiseWrapper = path.Promise;
+
+  	setToStringTag(PromiseConstructor, PROMISE, false, true);
+  	setSpecies(PROMISE);
+  	return es_promise_constructor;
+  }
+
+  var es_promise_all = {};
+
+  var iterators;
+  var hasRequiredIterators;
+
+  function requireIterators () {
+  	if (hasRequiredIterators) return iterators;
+  	hasRequiredIterators = 1;
+  	iterators = {};
+  	return iterators;
+  }
+
+  var isArrayIteratorMethod;
+  var hasRequiredIsArrayIteratorMethod;
+
+  function requireIsArrayIteratorMethod () {
+  	if (hasRequiredIsArrayIteratorMethod) return isArrayIteratorMethod;
+  	hasRequiredIsArrayIteratorMethod = 1;
+  	var wellKnownSymbol = requireWellKnownSymbol();
+  	var Iterators = requireIterators();
+
+  	var ITERATOR = wellKnownSymbol('iterator');
+  	var ArrayPrototype = Array.prototype;
+
+  	// check on default Array iterator
+  	isArrayIteratorMethod = function (it) {
+  	  return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it);
+  	};
+  	return isArrayIteratorMethod;
+  }
+
+  var getIteratorMethod;
+  var hasRequiredGetIteratorMethod;
+
+  function requireGetIteratorMethod () {
+  	if (hasRequiredGetIteratorMethod) return getIteratorMethod;
+  	hasRequiredGetIteratorMethod = 1;
+  	var classof = requireClassof();
+  	var getMethod = requireGetMethod();
+  	var isNullOrUndefined = requireIsNullOrUndefined();
+  	var Iterators = requireIterators();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var ITERATOR = wellKnownSymbol('iterator');
+
+  	getIteratorMethod = function (it) {
+  	  if (!isNullOrUndefined(it)) return getMethod(it, ITERATOR)
+  	    || getMethod(it, '@@iterator')
+  	    || Iterators[classof(it)];
+  	};
+  	return getIteratorMethod;
+  }
+
+  var getIterator;
+  var hasRequiredGetIterator;
+
+  function requireGetIterator () {
+  	if (hasRequiredGetIterator) return getIterator;
+  	hasRequiredGetIterator = 1;
+  	var call = requireFunctionCall();
+  	var aCallable = requireACallable();
+  	var anObject = requireAnObject();
+  	var tryToString = requireTryToString();
+  	var getIteratorMethod = requireGetIteratorMethod();
+
+  	var $TypeError = TypeError;
+
+  	getIterator = function (argument, usingIterator) {
+  	  var iteratorMethod = arguments.length < 2 ? getIteratorMethod(argument) : usingIterator;
+  	  if (aCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument));
+  	  throw new $TypeError(tryToString(argument) + ' is not iterable');
+  	};
+  	return getIterator;
+  }
+
+  var iteratorClose;
+  var hasRequiredIteratorClose;
+
+  function requireIteratorClose () {
+  	if (hasRequiredIteratorClose) return iteratorClose;
+  	hasRequiredIteratorClose = 1;
+  	var call = requireFunctionCall();
+  	var anObject = requireAnObject();
+  	var getMethod = requireGetMethod();
+
+  	iteratorClose = function (iterator, kind, value) {
+  	  var innerResult, innerError;
+  	  anObject(iterator);
+  	  try {
+  	    innerResult = getMethod(iterator, 'return');
+  	    if (!innerResult) {
+  	      if (kind === 'throw') throw value;
+  	      return value;
+  	    }
+  	    innerResult = call(innerResult, iterator);
+  	  } catch (error) {
+  	    innerError = true;
+  	    innerResult = error;
+  	  }
+  	  if (kind === 'throw') throw value;
+  	  if (innerError) throw innerResult;
+  	  anObject(innerResult);
+  	  return value;
+  	};
+  	return iteratorClose;
+  }
+
+  var iterate;
+  var hasRequiredIterate;
+
+  function requireIterate () {
+  	if (hasRequiredIterate) return iterate;
+  	hasRequiredIterate = 1;
+  	var bind = requireFunctionBindContext();
+  	var call = requireFunctionCall();
+  	var anObject = requireAnObject();
+  	var tryToString = requireTryToString();
+  	var isArrayIteratorMethod = requireIsArrayIteratorMethod();
+  	var lengthOfArrayLike = requireLengthOfArrayLike();
+  	var isPrototypeOf = requireObjectIsPrototypeOf();
+  	var getIterator = requireGetIterator();
+  	var getIteratorMethod = requireGetIteratorMethod();
+  	var iteratorClose = requireIteratorClose();
+
+  	var $TypeError = TypeError;
+
+  	var Result = function (stopped, result) {
+  	  this.stopped = stopped;
+  	  this.result = result;
+  	};
+
+  	var ResultPrototype = Result.prototype;
+
+  	iterate = function (iterable, unboundFunction, options) {
+  	  var that = options && options.that;
+  	  var AS_ENTRIES = !!(options && options.AS_ENTRIES);
+  	  var IS_RECORD = !!(options && options.IS_RECORD);
+  	  var IS_ITERATOR = !!(options && options.IS_ITERATOR);
+  	  var INTERRUPTED = !!(options && options.INTERRUPTED);
+  	  var fn = bind(unboundFunction, that);
+  	  var iterator, iterFn, index, length, result, next, step;
+
+  	  var stop = function (condition) {
+  	    var $iterator = iterator;
+  	    iterator = undefined;
+  	    if ($iterator) iteratorClose($iterator, 'normal');
+  	    return new Result(true, condition);
+  	  };
+
+  	  var callFn = function (value) {
+  	    if (AS_ENTRIES) {
+  	      anObject(value);
+  	      return INTERRUPTED ? fn(value[0], value[1], stop) : fn(value[0], value[1]);
+  	    } return INTERRUPTED ? fn(value, stop) : fn(value);
+  	  };
+
+  	  if (IS_RECORD) {
+  	    iterator = iterable.iterator;
+  	  } else if (IS_ITERATOR) {
+  	    iterator = iterable;
+  	  } else {
+  	    iterFn = getIteratorMethod(iterable);
+  	    if (!iterFn) throw new $TypeError(tryToString(iterable) + ' is not iterable');
+  	    // optimisation for array iterators
+  	    if (isArrayIteratorMethod(iterFn)) {
+  	      for (index = 0, length = lengthOfArrayLike(iterable); length > index; index++) {
+  	        result = callFn(iterable[index]);
+  	        if (result && isPrototypeOf(ResultPrototype, result)) return result;
+  	      } return new Result(false);
+  	    }
+  	    iterator = getIterator(iterable, iterFn);
+  	  }
+
+  	  next = IS_RECORD ? iterable.next : iterator.next;
+  	  while (!(step = call(next, iterator)).done) {
+  	    // `IteratorValue` errors should propagate without closing the iterator
+  	    var value = step.value;
+  	    try {
+  	      result = callFn(value);
+  	    } catch (error) {
+  	      if (iterator) iteratorClose(iterator, 'throw', error);
+  	      else throw error;
+  	    }
+  	    if (typeof result == 'object' && result && isPrototypeOf(ResultPrototype, result)) return result;
+  	  } return new Result(false);
+  	};
+  	return iterate;
+  }
+
+  var checkCorrectnessOfIteration;
+  var hasRequiredCheckCorrectnessOfIteration;
+
+  function requireCheckCorrectnessOfIteration () {
+  	if (hasRequiredCheckCorrectnessOfIteration) return checkCorrectnessOfIteration;
+  	hasRequiredCheckCorrectnessOfIteration = 1;
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var ITERATOR = wellKnownSymbol('iterator');
+  	var SAFE_CLOSING = false;
+
+  	try {
+  	  var called = 0;
+  	  var iteratorWithReturn = {
+  	    next: function () {
+  	      return { done: !!called++ };
+  	    },
+  	    'return': function () {
+  	      SAFE_CLOSING = true;
+  	    }
+  	  };
+  	  // eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
+  	  iteratorWithReturn[ITERATOR] = function () {
+  	    return this;
+  	  };
+  	  // eslint-disable-next-line es/no-array-from, no-throw-literal -- required for testing
+  	  Array.from(iteratorWithReturn, function () { throw 2; });
+  	} catch (error) { /* empty */ }
+
+  	checkCorrectnessOfIteration = function (exec, SKIP_CLOSING) {
+  	  try {
+  	    if (!SKIP_CLOSING && !SAFE_CLOSING) return false;
+  	  } catch (error) { return false; } // workaround of old WebKit + `eval` bug
+  	  var ITERATION_SUPPORT = false;
+  	  try {
+  	    var object = {};
+  	    // eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
+  	    object[ITERATOR] = function () {
+  	      return {
+  	        next: function () {
+  	          return { done: ITERATION_SUPPORT = true };
+  	        }
+  	      };
+  	    };
+  	    exec(object);
+  	  } catch (error) { /* empty */ }
+  	  return ITERATION_SUPPORT;
+  	};
+  	return checkCorrectnessOfIteration;
+  }
+
+  var promiseStaticsIncorrectIteration;
+  var hasRequiredPromiseStaticsIncorrectIteration;
+
+  function requirePromiseStaticsIncorrectIteration () {
+  	if (hasRequiredPromiseStaticsIncorrectIteration) return promiseStaticsIncorrectIteration;
+  	hasRequiredPromiseStaticsIncorrectIteration = 1;
+  	var NativePromiseConstructor = requirePromiseNativeConstructor();
+  	var checkCorrectnessOfIteration = requireCheckCorrectnessOfIteration();
+  	var FORCED_PROMISE_CONSTRUCTOR = requirePromiseConstructorDetection().CONSTRUCTOR;
+
+  	promiseStaticsIncorrectIteration = FORCED_PROMISE_CONSTRUCTOR || !checkCorrectnessOfIteration(function (iterable) {
+  	  NativePromiseConstructor.all(iterable).then(undefined, function () { /* empty */ });
+  	});
+  	return promiseStaticsIncorrectIteration;
+  }
+
+  var hasRequiredEs_promise_all;
+
+  function requireEs_promise_all () {
+  	if (hasRequiredEs_promise_all) return es_promise_all;
+  	hasRequiredEs_promise_all = 1;
+  	var $ = require_export();
+  	var call = requireFunctionCall();
+  	var aCallable = requireACallable();
+  	var newPromiseCapabilityModule = requireNewPromiseCapability();
+  	var perform = requirePerform();
+  	var iterate = requireIterate();
+  	var PROMISE_STATICS_INCORRECT_ITERATION = requirePromiseStaticsIncorrectIteration();
+
+  	// `Promise.all` method
+  	// https://tc39.es/ecma262/#sec-promise.all
+  	$({ target: 'Promise', stat: true, forced: PROMISE_STATICS_INCORRECT_ITERATION }, {
+  	  all: function all(iterable) {
+  	    var C = this;
+  	    var capability = newPromiseCapabilityModule.f(C);
+  	    var resolve = capability.resolve;
+  	    var reject = capability.reject;
+  	    var result = perform(function () {
+  	      var $promiseResolve = aCallable(C.resolve);
+  	      var values = [];
+  	      var counter = 0;
+  	      var remaining = 1;
+  	      iterate(iterable, function (promise) {
+  	        var index = counter++;
+  	        var alreadyCalled = false;
+  	        remaining++;
+  	        call($promiseResolve, C, promise).then(function (value) {
+  	          if (alreadyCalled) return;
+  	          alreadyCalled = true;
+  	          values[index] = value;
+  	          --remaining || resolve(values);
+  	        }, reject);
+  	      });
+  	      --remaining || resolve(values);
+  	    });
+  	    if (result.error) reject(result.value);
+  	    return capability.promise;
+  	  }
+  	});
+  	return es_promise_all;
+  }
+
+  var es_promise_catch = {};
+
+  var hasRequiredEs_promise_catch;
+
+  function requireEs_promise_catch () {
+  	if (hasRequiredEs_promise_catch) return es_promise_catch;
+  	hasRequiredEs_promise_catch = 1;
+  	var $ = require_export();
+  	var IS_PURE = requireIsPure();
+  	var FORCED_PROMISE_CONSTRUCTOR = requirePromiseConstructorDetection().CONSTRUCTOR;
+  	var NativePromiseConstructor = requirePromiseNativeConstructor();
+  	var getBuiltIn = requireGetBuiltIn();
+  	var isCallable = requireIsCallable();
+  	var defineBuiltIn = requireDefineBuiltIn();
+
+  	var NativePromisePrototype = NativePromiseConstructor && NativePromiseConstructor.prototype;
+
+  	// `Promise.prototype.catch` method
+  	// https://tc39.es/ecma262/#sec-promise.prototype.catch
+  	$({ target: 'Promise', proto: true, forced: FORCED_PROMISE_CONSTRUCTOR, real: true }, {
+  	  'catch': function (onRejected) {
+  	    return this.then(undefined, onRejected);
+  	  }
+  	});
+
+  	// makes sure that native promise-based APIs `Promise#catch` properly works with patched `Promise#then`
+  	if (!IS_PURE && isCallable(NativePromiseConstructor)) {
+  	  var method = getBuiltIn('Promise').prototype['catch'];
+  	  if (NativePromisePrototype['catch'] !== method) {
+  	    defineBuiltIn(NativePromisePrototype, 'catch', method, { unsafe: true });
+  	  }
+  	}
+  	return es_promise_catch;
+  }
+
+  var es_promise_race = {};
+
+  var hasRequiredEs_promise_race;
+
+  function requireEs_promise_race () {
+  	if (hasRequiredEs_promise_race) return es_promise_race;
+  	hasRequiredEs_promise_race = 1;
+  	var $ = require_export();
+  	var call = requireFunctionCall();
+  	var aCallable = requireACallable();
+  	var newPromiseCapabilityModule = requireNewPromiseCapability();
+  	var perform = requirePerform();
+  	var iterate = requireIterate();
+  	var PROMISE_STATICS_INCORRECT_ITERATION = requirePromiseStaticsIncorrectIteration();
+
+  	// `Promise.race` method
+  	// https://tc39.es/ecma262/#sec-promise.race
+  	$({ target: 'Promise', stat: true, forced: PROMISE_STATICS_INCORRECT_ITERATION }, {
+  	  race: function race(iterable) {
+  	    var C = this;
+  	    var capability = newPromiseCapabilityModule.f(C);
+  	    var reject = capability.reject;
+  	    var result = perform(function () {
+  	      var $promiseResolve = aCallable(C.resolve);
+  	      iterate(iterable, function (promise) {
+  	        call($promiseResolve, C, promise).then(capability.resolve, reject);
+  	      });
+  	    });
+  	    if (result.error) reject(result.value);
+  	    return capability.promise;
+  	  }
+  	});
+  	return es_promise_race;
+  }
+
+  var es_promise_reject = {};
+
+  var hasRequiredEs_promise_reject;
+
+  function requireEs_promise_reject () {
+  	if (hasRequiredEs_promise_reject) return es_promise_reject;
+  	hasRequiredEs_promise_reject = 1;
+  	var $ = require_export();
+  	var newPromiseCapabilityModule = requireNewPromiseCapability();
+  	var FORCED_PROMISE_CONSTRUCTOR = requirePromiseConstructorDetection().CONSTRUCTOR;
+
+  	// `Promise.reject` method
+  	// https://tc39.es/ecma262/#sec-promise.reject
+  	$({ target: 'Promise', stat: true, forced: FORCED_PROMISE_CONSTRUCTOR }, {
+  	  reject: function reject(r) {
+  	    var capability = newPromiseCapabilityModule.f(this);
+  	    var capabilityReject = capability.reject;
+  	    capabilityReject(r);
+  	    return capability.promise;
+  	  }
+  	});
+  	return es_promise_reject;
+  }
+
+  var es_promise_resolve = {};
+
+  var promiseResolve;
+  var hasRequiredPromiseResolve;
+
+  function requirePromiseResolve () {
+  	if (hasRequiredPromiseResolve) return promiseResolve;
+  	hasRequiredPromiseResolve = 1;
+  	var anObject = requireAnObject();
+  	var isObject = requireIsObject();
+  	var newPromiseCapability = requireNewPromiseCapability();
+
+  	promiseResolve = function (C, x) {
+  	  anObject(C);
+  	  if (isObject(x) && x.constructor === C) return x;
+  	  var promiseCapability = newPromiseCapability.f(C);
+  	  var resolve = promiseCapability.resolve;
+  	  resolve(x);
+  	  return promiseCapability.promise;
+  	};
+  	return promiseResolve;
+  }
+
+  var hasRequiredEs_promise_resolve;
+
+  function requireEs_promise_resolve () {
+  	if (hasRequiredEs_promise_resolve) return es_promise_resolve;
+  	hasRequiredEs_promise_resolve = 1;
+  	var $ = require_export();
+  	var getBuiltIn = requireGetBuiltIn();
+  	var IS_PURE = requireIsPure();
+  	var NativePromiseConstructor = requirePromiseNativeConstructor();
+  	var FORCED_PROMISE_CONSTRUCTOR = requirePromiseConstructorDetection().CONSTRUCTOR;
+  	var promiseResolve = requirePromiseResolve();
+
+  	var PromiseConstructorWrapper = getBuiltIn('Promise');
+  	var CHECK_WRAPPER = IS_PURE && !FORCED_PROMISE_CONSTRUCTOR;
+
+  	// `Promise.resolve` method
+  	// https://tc39.es/ecma262/#sec-promise.resolve
+  	$({ target: 'Promise', stat: true, forced: IS_PURE || FORCED_PROMISE_CONSTRUCTOR }, {
+  	  resolve: function resolve(x) {
+  	    return promiseResolve(CHECK_WRAPPER && this === PromiseConstructorWrapper ? NativePromiseConstructor : this, x);
+  	  }
+  	});
+  	return es_promise_resolve;
+  }
+
+  var hasRequiredEs_promise;
+
+  function requireEs_promise () {
+  	if (hasRequiredEs_promise) return es_promise;
+  	hasRequiredEs_promise = 1;
+  	// TODO: Remove this module from `core-js [at] 4` since it's split to modules listed below
+  	requireEs_promise_constructor();
+  	requireEs_promise_all();
+  	requireEs_promise_catch();
+  	requireEs_promise_race();
+  	requireEs_promise_reject();
+  	requireEs_promise_resolve();
+  	return es_promise;
+  }
+
+  requireEs_promise();
 
   var es_regexp_exec = {};
 
@@ -3260,25 +4743,6 @@
 
   var es_string_replace = {};
 
-  var functionApply;
-  var hasRequiredFunctionApply;
-
-  function requireFunctionApply () {
-  	if (hasRequiredFunctionApply) return functionApply;
-  	hasRequiredFunctionApply = 1;
-  	var NATIVE_BIND = requireFunctionBindNative();
-
-  	var FunctionPrototype = Function.prototype;
-  	var apply = FunctionPrototype.apply;
-  	var call = FunctionPrototype.call;
-
-  	// eslint-disable-next-line es/no-function-prototype-bind, es/no-reflect -- safe
-  	functionApply = typeof Reflect == 'object' && Reflect.apply || (NATIVE_BIND ? call.bind(apply) : function () {
-  	  return call.apply(apply, arguments);
-  	});
-  	return functionApply;
-  }
-
   var getSubstitution;
   var hasRequiredGetSubstitution;
 
@@ -3806,7 +5270,7 @@
   requireWeb_domCollections_forEach();
 
   /* eslint-disable no-use-before-define */
-  var Utils = $.fn.bootstrapTable.utils;
+  var Utils = BootstrapTable.utils;
   var searchControls = 'select, input:not([type="checkbox"]):not([type="radio"])';
   function getInputClass(that) {
     var isSelect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -3814,31 +5278,33 @@
     return that.options.iconSize ? Utils.sprintf('%s %s-%s', formControlClass, formControlClass, that.options.iconSize) : formControlClass;
   }
   function getOptionsFromSelectControl(selectControl) {
-    return selectControl[0].options;
+    return selectControl.options;
   }
   function getControlContainer(that) {
     if (that.options.filterControlContainer) {
-      return $("".concat(that.options.filterControlContainer));
+      return document.querySelector(that.options.filterControlContainer);
     }
     if (that.options.height && that._initialized) {
-      return that.$tableContainer.find('.fixed-table-header table thead');
+      return that.$tableContainer.querySelector('.fixed-table-header table thead');
     }
     return that.$header;
   }
   function isKeyAllowed(keyCode) {
-    return $.inArray(keyCode, [37, 38, 39, 40]) > -1;
+    return [37, 38, 39, 40].indexOf(keyCode) > -1;
   }
   function getSearchControls(that) {
-    return getControlContainer(that).find(searchControls);
+    var container = getControlContainer(that);
+    return container ? _toConsumableArray(container.querySelectorAll(searchControls)) : [];
   }
   function hideUnusedSelectOptions(selectControl, uniqueValues) {
     var options = getOptionsFromSelectControl(selectControl);
     for (var i = 0; i < options.length; i++) {
       if (options[i].value !== '') {
+        var opt = selectControl.querySelector(Utils.sprintf('option[value=\'%s\']', options[i].value));
         if (!uniqueValues.hasOwnProperty(options[i].value)) {
-          selectControl.find(Utils.sprintf('option[value=\'%s\']', options[i].value)).hide();
+          (opt === null || opt === void 0 ? void 0 : opt.style) && (opt.style.display = 'none');
         } else {
-          selectControl.find(Utils.sprintf('option[value=\'%s\']', options[i].value)).show();
+          (opt === null || opt === void 0 ? void 0 : opt.style) && (opt.style.display = '');
         }
       }
     }
@@ -3864,42 +5330,42 @@
     }
     var isSelected = shouldCompareText ? value === selected || text === selected : value === selected;
     var option = new Option(text, value, false, isSelected);
-    selectControl.get(0).add(option);
+    selectControl.add(option);
   }
   function sortSelectControl(selectControl, orderBy, options) {
-    var $selectControl = selectControl.get(0);
     if (orderBy === 'server') {
       return;
     }
     var tmpAry = new Array();
-    for (var i = 0; i < $selectControl.options.length; i++) {
+    for (var i = 0; i < selectControl.options.length; i++) {
       tmpAry[i] = new Array();
-      tmpAry[i][0] = $selectControl.options[i].text;
-      tmpAry[i][1] = $selectControl.options[i].value;
-      tmpAry[i][2] = $selectControl.options[i].selected;
+      tmpAry[i][0] = selectControl.options[i].text;
+      tmpAry[i][1] = selectControl.options[i].value;
+      tmpAry[i][2] = selectControl.options[i].selected;
     }
     tmpAry.sort(function (a, b) {
       return Utils.sort(a[0], b[0], orderBy === 'desc' ? -1 : 1, options);
     });
-    while ($selectControl.options.length > 0) {
-      $selectControl.options[0] = null;
+    while (selectControl.options.length > 0) {
+      selectControl.options[0] = null;
     }
     for (var _i = 0; _i < tmpAry.length; _i++) {
       var op = new Option(tmpAry[_i][0], tmpAry[_i][1], false, tmpAry[_i][2]);
-      $selectControl.add(op);
+      selectControl.add(op);
     }
   }
   function fixHeaderCSS(_ref) {
+    var _$tableHeader$querySe;
     var $tableHeader = _ref.$tableHeader;
-    $tableHeader.css('height', $tableHeader.find('table').outerHeight(true));
+    $tableHeader.style.height = "".concat(((_$tableHeader$querySe = $tableHeader.querySelector('table')) === null || _$tableHeader$querySe === void 0 ? void 0 : _$tableHeader$querySe.offsetHeight) || 0, "px");
   }
-  function getElementClass($element) {
-    return $element.attr('class').split(' ').filter(function (className) {
+  function getElementClass(element) {
+    return _toConsumableArray(element.classList).filter(function (className) {
       return className.startsWith('bootstrap-table-filter-control-');
     });
   }
   function getCursorPosition(el) {
-    if ($(el).is('input[type=search]')) {
+    if (el.matches('input[type=search]')) {
       var pos = 0;
       if ('selectionStart' in el) {
         pos = el.selectionStart;
@@ -3915,24 +5381,27 @@
     return -1;
   }
   function cacheValues(that) {
-    var searchControls = getSearchControls(that);
+    var controls = getSearchControls(that);
     that._valuesFilterControl = [];
-    searchControls.each(function () {
-      var $field = $(this);
-      var fieldClass = escapeID(getElementClass($field));
+    controls.forEach(function (el) {
+      var fieldClass = escapeID(getElementClass(el).join(' '));
+      var field;
       if (that.options.height && !that.options.filterControlContainer) {
-        $field = that.$tableContainer.find(".fixed-table-header .".concat(fieldClass));
+        field = that.$tableContainer.querySelector(".fixed-table-header .".concat(fieldClass));
       } else if (that.options.filterControlContainer) {
-        $field = $("".concat(that.options.filterControlContainer, " .").concat(fieldClass));
+        field = document.querySelector("".concat(that.options.filterControlContainer, " .").concat(fieldClass));
       } else {
-        $field = that.$el.find(".".concat(fieldClass));
+        field = that.$el.querySelector(".".concat(fieldClass));
       }
-      that._valuesFilterControl.push({
-        field: $field.closest('[data-field]').data('field'),
-        value: $field.val(),
-        position: getCursorPosition($field.get(0)),
-        hasFocus: $field.is(':focus')
-      });
+      if (field) {
+        var _field$closest;
+        that._valuesFilterControl.push({
+          field: (_field$closest = field.closest('[data-field]')) === null || _field$closest === void 0 ? void 0 : _field$closest.dataset.field,
+          value: field.value,
+          position: getCursorPosition(field),
+          hasFocus: field === document.activeElement
+        });
+      }
     });
   }
   function setCaretPosition(elem, caretPos) {
@@ -3953,13 +5422,15 @@
   function setValues(that) {
     var field = null;
     var result = [];
-    var searchControls = getSearchControls(that);
+    var controls = getSearchControls(that);
     if (that._valuesFilterControl.length > 0) {
       //  Callback to apply after settings fields values
       var callbacks = [];
-      searchControls.each(function (i, el) {
-        var $this = $(el);
-        field = $this.closest('[data-field]').data('field');
+
+      // eslint-disable-next-line no-unused-vars
+      controls.forEach(function (el, i) {
+        var _el$closest;
+        field = (_el$closest = el.closest('[data-field]')) === null || _el$closest === void 0 ? void 0 : _el$closest.dataset.field;
         result = that._valuesFilterControl.filter(function (valueObj) {
           return valueObj.field === field;
         });
@@ -3972,9 +5443,9 @@
                   element.focus();
                 }
                 if (Array.isArray(cacheElementInfo.value)) {
-                  var $element = $(element);
-                  $.each(cacheElementInfo.value, function (i, e) {
-                    $element.find(Utils.sprintf('option[value=\'%s\']', e)).prop('selected', true);
+                  cacheElementInfo.value.forEach(function (v) {
+                    var opt = element.querySelector(Utils.sprintf('option[value=\'%s\']', v));
+                    if (opt) opt.selected = true;
                   });
                 } else {
                   element.value = cacheElementInfo.value;
@@ -3982,7 +5453,7 @@
                 setCaretPosition(element, cacheElementInfo.position);
               };
               return closedCallback;
-            }($this.get(0), result[0]);
+            }(el, result[0]);
             callbacks.push(fieldToFocusCallback);
           }
         }
@@ -4002,12 +5473,13 @@
     var foundCookies = document.cookie.match(cookieRegex);
     var foundLocalStorage = localStorage;
     if (foundCookies) {
-      $.each(foundCookies, function (i, _cookie) {
+      // eslint-disable-next-line no-unused-vars
+      foundCookies.forEach(function (_cookie, i) {
         var cookie = _cookie;
         if (/./.test(cookie)) {
           cookie = cookie.split('.').pop();
         }
-        if ($.inArray(cookie, cookies) === -1) {
+        if (cookies.indexOf(cookie) === -1) {
           cookies.push(cookie);
         }
       });
@@ -4040,15 +5512,16 @@
     return filterData === undefined || filterData.toLowerCase() === 'column';
   }
   function hasSelectControlElement(selectControl) {
-    return selectControl && selectControl.length > 0;
+    return !!selectControl;
   }
   function initFilterSelectControls(that) {
     var data = that.options.data;
-    $.each(that.header.fields, function (j, field) {
+    that.header.fields.forEach(function (field, j) {
       var column = that.columns[that.fieldsColumnsIndex[field]];
-      var selectControl = getControlContainer(that).find("select.bootstrap-table-filter-control-".concat(escapeID(column.field)));
+      var container = getControlContainer(that);
+      var selectControl = container === null || container === void 0 ? void 0 : container.querySelector("select.bootstrap-table-filter-control-".concat(escapeID(column.field)));
       if (isColumnSearchableViaSelect(column) && isFilterDataNotGiven(column) && hasSelectControlElement(selectControl)) {
-        if (!selectControl[0].multiple && selectControl.get(selectControl.length - 1).options.length === 0) {
+        if (!selectControl.multiple && selectControl.options.length === 0) {
           // Added the default option, must use a non-breaking space(&nbsp;) to pass the W3C validator
           addOptionToSelectControl(selectControl, '', column.filterControlPlaceholder || ' ', column.filterDefault);
         }
@@ -4099,23 +5572,23 @@
   function createControls(that, header) {
     var addedFilterControl = false;
     var html;
-    $.each(that.columns, function (_, column) {
+    that.columns.forEach(function (column) {
       html = [];
-      if (!column.visible && !(that.options.filterControlContainer && $(".bootstrap-table-filter-control-".concat(escapeID(column.field))).length >= 1)) {
+      if (!column.visible && !(that.options.filterControlContainer && document.querySelector(".bootstrap-table-filter-control-".concat(escapeID(column.field))))) {
         return;
       }
       if (!column.filterControl && !that.options.filterControlContainer) {
         html.push('<div class="no-filter-control"></div>');
       } else if (that.options.filterControlContainer) {
         // Use a filter control container instead of th
-        var $filterControls = $(".bootstrap-table-filter-control-".concat(escapeID(column.field)));
-        $.each($filterControls, function (_, filterControl) {
-          var $filterControl = $(filterControl);
-          if (!$filterControl.is('[type=radio]')) {
+        var filterControls = _toConsumableArray(document.querySelectorAll(".bootstrap-table-filter-control-".concat(escapeID(column.field))));
+        filterControls.forEach(function (filterControl) {
+          if (!filterControl.matches('[type=radio]')) {
             var placeholder = column.filterControlPlaceholder || '';
-            $filterControl.attr('placeholder', placeholder).val(column.filterDefault);
+            filterControl.setAttribute('placeholder', placeholder);
+            filterControl.value = column.filterDefault;
           }
-          $filterControl.attr('data-field', column.field);
+          filterControl.dataset.field = column.field;
         });
         addedFilterControl = true;
       } else {
@@ -4137,12 +5610,13 @@
           that.filterColumnsPartial[column.field] = column.filterDefault;
         }
       }
-      $.each(header.find('th'), function (_, th) {
-        var $th = $(th);
-        if ($th.data('field') === column.field) {
-          $th.find('.filter-control').remove();
-          $th.find('.fht-cell').html(html.join(''));
-          return false;
+      header.querySelectorAll('th').forEach(function (th) {
+        if (th.dataset.field === column.field) {
+          var _th$querySelector;
+          (_th$querySelector = th.querySelector('.filter-control')) === null || _th$querySelector === void 0 || _th$querySelector.remove();
+          var fhtCell = th.querySelector('.fht-cell');
+          if (fhtCell) fhtCell.innerHTML = html.join('');
+          return;
         }
       });
       if (column.filterData && column.filterData.toLowerCase() !== 'column') {
@@ -4151,7 +5625,7 @@
         var selectControl;
         if (filterDataType) {
           filterDataSource = column.filterData.substring(column.filterData.indexOf(':') + 1, column.filterData.length);
-          selectControl = header.find(".bootstrap-table-filter-control-".concat(escapeID(column.field)));
+          selectControl = header.querySelector(".bootstrap-table-filter-control-".concat(escapeID(column.field)));
           addOptionToSelectControl(selectControl, '', column.filterControlPlaceholder, column.filterDefault, true);
           filterDataType(that, filterDataSource, selectControl, that.options.filterOrderBy, column.filterDefault);
         } else {
@@ -4160,102 +5634,113 @@
       }
     });
     if (addedFilterControl) {
-      header.off('keyup', 'input').on('keyup', 'input', function (_ref4, obj) {
-        var currentTarget = _ref4.currentTarget,
-          keyCode = _ref4.keyCode;
-        keyCode = obj ? obj.keyCode : keyCode;
-        if (that.options.searchOnEnterKey && keyCode !== 13) {
+      // Remove previous listeners
+      if (header._fcKeyupHandler) header.removeEventListener('keyup', header._fcKeyupHandler);
+      if (header._fcSelectHandler) header.removeEventListener('change', header._fcSelectHandler);
+      if (header._fcMouseupHandler) header.removeEventListener('mouseup', header._fcMouseupHandler);
+      if (header._fcRadioHandler) header.removeEventListener('change', header._fcRadioHandler);
+      header._fcKeyupHandler = function (e) {
+        if (!e.target.matches('input')) return;
+        var currentTarget = e.target;
+        var keyCode = e.keyCode;
+        var obj = e.detail ? {
+          keyCode: e.detail.keyCode
+        } : null;
+        var effectiveKeyCode = obj ? obj.keyCode : keyCode;
+        if (that.options.searchOnEnterKey && effectiveKeyCode !== 13) {
           return;
         }
-        if (isKeyAllowed(keyCode)) {
+        if (isKeyAllowed(effectiveKeyCode)) {
           return;
         }
-        var $currentTarget = $(currentTarget);
-        if ($currentTarget.is(':checkbox') || $currentTarget.is(':radio')) {
+        if (currentTarget.matches(':checkbox') || currentTarget.matches(':radio')) {
           return;
         }
         clearTimeout(currentTarget.timeoutId || 0);
         currentTarget.timeoutId = setTimeout(function () {
           that.onColumnSearch({
             currentTarget: currentTarget,
-            keyCode: keyCode
+            keyCode: effectiveKeyCode
           });
         }, that.options.searchTimeOut);
-      });
-      header.off('change', 'select').on('change', 'select', function (_ref5) {
-        var currentTarget = _ref5.currentTarget,
-          keyCode = _ref5.keyCode;
-        var $selectControl = $(currentTarget);
-        var value = $selectControl.val();
-        var normalizedValue = value === null ? $selectControl.prop('multiple') ? [] : null : value;
-        $selectControl.val(normalizedValue);
+      };
+      header._fcSelectHandler = function (e) {
+        if (!e.target.matches('select')) return;
+        var currentTarget = e.target;
+        var value = currentTarget.value;
+        var normalizedValue = value === null ? currentTarget.multiple ? [] : null : value;
+        currentTarget.value = normalizedValue;
         clearTimeout(currentTarget.timeoutId || 0);
         currentTarget.timeoutId = setTimeout(function () {
           that.onColumnSearch({
             currentTarget: currentTarget,
-            keyCode: keyCode
+            keyCode: e.keyCode
           });
         }, that.options.searchTimeOut);
-      });
-      header.off('mouseup', 'input:not([type=radio])').on('mouseup', 'input:not([type=radio])', function (_ref6) {
-        var currentTarget = _ref6.currentTarget,
-          keyCode = _ref6.keyCode;
-        var $input = $(currentTarget);
-        var oldValue = $input.val();
+      };
+      header._fcMouseupHandler = function (e) {
+        if (!e.target.matches('input:not([type=radio])')) return;
+        var currentTarget = e.target;
+        var oldValue = currentTarget.value;
         if (oldValue === '') {
           return;
         }
         setTimeout(function () {
-          var newValue = $input.val();
+          var newValue = currentTarget.value;
           if (newValue === '') {
             clearTimeout(currentTarget.timeoutId || 0);
             currentTarget.timeoutId = setTimeout(function () {
               that.onColumnSearch({
                 currentTarget: currentTarget,
-                keyCode: keyCode
+                keyCode: e.keyCode
               });
             }, that.options.searchTimeOut);
           }
         }, 1);
-      });
-      header.off('change', 'input[type=radio]').on('change', 'input[type=radio]', function (_ref7) {
-        var currentTarget = _ref7.currentTarget,
-          keyCode = _ref7.keyCode;
+      };
+      header._fcRadioHandler = function (e) {
+        if (!e.target.matches('input[type=radio]')) return;
+        var currentTarget = e.target;
         clearTimeout(currentTarget.timeoutId || 0);
         currentTarget.timeoutId = setTimeout(function () {
           that.onColumnSearch({
             currentTarget: currentTarget,
-            keyCode: keyCode
+            keyCode: e.keyCode
           });
         }, that.options.searchTimeOut);
-      });
+      };
+      header.addEventListener('keyup', header._fcKeyupHandler);
+      header.addEventListener('change', header._fcSelectHandler);
+      header.addEventListener('mouseup', header._fcMouseupHandler);
+      header.addEventListener('change', header._fcRadioHandler);
 
       // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date
-      if (header.find('.date-filter-control').length > 0) {
-        $.each(that.columns, function (i, _ref8) {
-          var filterDefault = _ref8.filterDefault,
-            filterControl = _ref8.filterControl,
-            field = _ref8.field,
-            filterDatepickerOptions = _ref8.filterDatepickerOptions;
+      if (header.querySelector('.date-filter-control')) {
+        that.columns.forEach(function (i, _ref4) {
+          var filterDefault = _ref4.filterDefault,
+            filterControl = _ref4.filterControl,
+            field = _ref4.field,
+            filterDatepickerOptions = _ref4.filterDatepickerOptions;
           if (filterControl !== undefined && filterControl.toLowerCase() === 'datepicker') {
-            var $datepicker = header.find(".date-filter-control.bootstrap-table-filter-control-".concat(escapeID(field)));
+            var datepicker = header.querySelector(".date-filter-control.bootstrap-table-filter-control-".concat(escapeID(field)));
+            if (!datepicker) return;
             if (filterDefault) {
-              $datepicker.value(filterDefault);
+              datepicker.value = filterDefault;
             }
             if (filterDatepickerOptions.min) {
-              $datepicker.attr('min', filterDatepickerOptions.min);
+              datepicker.setAttribute('min', filterDatepickerOptions.min);
             }
             if (filterDatepickerOptions.max) {
-              $datepicker.attr('max', filterDatepickerOptions.max);
+              datepicker.setAttribute('max', filterDatepickerOptions.max);
             }
             if (filterDatepickerOptions.step) {
-              $datepicker.attr('step', filterDatepickerOptions.step);
+              datepicker.setAttribute('step', filterDatepickerOptions.step);
             }
             if (filterDatepickerOptions.pattern) {
-              $datepicker.attr('pattern', filterDatepickerOptions.pattern);
+              datepicker.setAttribute('pattern', filterDatepickerOptions.pattern);
             }
-            $datepicker.on('change', function (_ref9) {
-              var currentTarget = _ref9.currentTarget;
+            datepicker.addEventListener('change', function (_ref5) {
+              var currentTarget = _ref5.currentTarget;
               clearTimeout(currentTarget.timeoutId || 0);
               currentTarget.timeoutId = setTimeout(function () {
                 that.onColumnSearch({
@@ -4270,10 +5755,14 @@
         that.triggerSearch();
       }
       if (!that.options.filterControlVisible) {
-        header.find('.filter-control, .no-filter-control').hide();
+        header.querySelectorAll('.filter-control, .no-filter-control').forEach(function (el) {
+          el.style.display = 'none';
+        });
       }
     } else {
-      header.find('.filter-control, .no-filter-control').hide();
+      header.querySelectorAll('.filter-control, .no-filter-control').forEach(function (el) {
+        el.style.display = 'none';
+      });
     }
     that.trigger('created-controls');
   }
@@ -4294,20 +5783,20 @@
     if (!that.options.height) {
       return;
     }
-    var fixedHeader = that.$tableContainer.find('.fixed-table-header table thead');
-    if (fixedHeader.length === 0) {
+    var fixedHeader = that.$tableContainer.querySelector('.fixed-table-header table thead');
+    if (!fixedHeader) {
       return;
     }
-    that.$header.children().find('th[data-field]').each(function (_, element) {
+    that.$header.querySelectorAll('th[data-field]').forEach(function (element) {
       if (element.classList[0] !== 'bs-checkbox') {
-        var $element = $(element);
-        var $field = $element.data('field');
-        var $fixedField = that.$tableContainer.find("th[data-field='".concat($field, "']")).not($element);
-        var input = $element.find('input');
-        var fixedInput = $fixedField.find('input');
-        if (input.length > 0 && fixedInput.length > 0) {
-          if (input.val() !== fixedInput.val()) {
-            input.val(fixedInput.val());
+        var field = element.dataset.field;
+        var fixedField = that.$tableContainer.querySelector("th[data-field='".concat(field, "']"));
+        if (!fixedField || fixedField === element) return;
+        var input = element.querySelector('input');
+        var fixedInput = fixedField.querySelector('input');
+        if (input && fixedInput) {
+          if (input.value !== fixedInput.value) {
+            input.value = fixedInput.value;
           }
         }
       }
@@ -4361,19 +5850,17 @@
       setValues(that);
     },
     url: function url(that, filterDataSource, selectControl, filterOrderBy, selected) {
-      $.ajax({
-        url: filterDataSource,
-        dataType: 'json',
-        success: function success(data) {
-          // eslint-disable-next-line guard-for-in
-          for (var key in data) {
-            addOptionToSelectControl(selectControl, key, data[key], selected);
-          }
-          if (that.options.sortSelectOptions) {
-            sortSelectControl(selectControl, filterOrderBy, that.options);
-          }
-          setValues(that);
+      fetch(filterDataSource).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        // eslint-disable-next-line guard-for-in
+        for (var key in data) {
+          addOptionToSelectControl(selectControl, key, data[key], selected);
         }
+        if (that.options.sortSelectOptions) {
+          sortSelectControl(selectControl, filterOrderBy, that.options);
+        }
+        setValues(that);
       });
     },
     json: function json(that, filterDataSource, selectControl, filterOrderBy, selected) {

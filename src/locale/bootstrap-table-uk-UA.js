@@ -3,7 +3,9 @@
  * Author: Vitaliy Timchenko <vitaliy.timchenko@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['uk-UA'] = $.fn.bootstrapTable.locales['uk'] = {
+
+
+BootstrapTable.locales['uk-UA'] = BootstrapTable.locales['uk'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['uk-UA'] = $.fn.bootstrapTable.locales['uk'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['uk-UA'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['uk-UA'])

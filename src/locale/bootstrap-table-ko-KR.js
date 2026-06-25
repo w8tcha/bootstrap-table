@@ -4,7 +4,9 @@
  * Revision: Abel Yeom (abel.yeom@gmail.com)
  */
 
-$.fn.bootstrapTable.locales['ko-KR'] = $.fn.bootstrapTable.locales['ko'] = {
+
+
+BootstrapTable.locales['ko-KR'] = BootstrapTable.locales['ko'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -189,4 +191,4 @@ $.fn.bootstrapTable.locales['ko-KR'] = $.fn.bootstrapTable.locales['ko'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ko-KR'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ko-KR'])

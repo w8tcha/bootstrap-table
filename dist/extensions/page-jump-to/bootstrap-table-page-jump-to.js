@@ -1,13 +1,16 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
     for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
     return n;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
   }
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -29,54 +32,6 @@
     return r && _defineProperties(e.prototype, r), Object.defineProperty(e, "prototype", {
       writable: false
     }), e;
-  }
-  function _createForOfIteratorHelper(r, e) {
-    var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-    if (!t) {
-      if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e) {
-        t && (r = t);
-        var n = 0,
-          F = function () {};
-        return {
-          s: F,
-          n: function () {
-            return n >= r.length ? {
-              done: true
-            } : {
-              done: false,
-              value: r[n++]
-            };
-          },
-          e: function (r) {
-            throw r;
-          },
-          f: F
-        };
-      }
-      throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-    }
-    var o,
-      a = true,
-      u = false;
-    return {
-      s: function () {
-        t = t.call(r);
-      },
-      n: function () {
-        var r = t.next();
-        return a = r.done, r;
-      },
-      e: function (r) {
-        u = true, o = r;
-      },
-      f: function () {
-        try {
-          a || null == t.return || t.return();
-        } finally {
-          if (u) throw o;
-        }
-      }
-    };
   }
   function _get() {
     return _get = "undefined" != typeof Reflect && Reflect.get ? Reflect.get.bind() : function (e, t, r) {
@@ -112,6 +67,12 @@
       return !!t;
     })();
   }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
   function _possibleConstructorReturn(t, e) {
     if (e && ("object" == typeof e || "function" == typeof e)) return e;
     if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
@@ -131,6 +92,9 @@
     return "function" == typeof p ? function (t) {
       return p.apply(e, t);
     } : p;
+  }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
   function _toPrimitive(t, r) {
     if ("object" != typeof t || !t) return t;
@@ -2015,7 +1979,7 @@
 
   requireEs_array_concat();
 
-  var es_array_find = {};
+  var es_array_flatMap = {};
 
   var functionUncurryThisClause;
   var hasRequiredFunctionUncurryThisClause;
@@ -2057,85 +2021,80 @@
   	return functionBindContext;
   }
 
-  var arrayIteration;
-  var hasRequiredArrayIteration;
+  var flattenIntoArray_1;
+  var hasRequiredFlattenIntoArray;
 
-  function requireArrayIteration () {
-  	if (hasRequiredArrayIteration) return arrayIteration;
-  	hasRequiredArrayIteration = 1;
+  function requireFlattenIntoArray () {
+  	if (hasRequiredFlattenIntoArray) return flattenIntoArray_1;
+  	hasRequiredFlattenIntoArray = 1;
+  	var isArray = requireIsArray();
+  	var lengthOfArrayLike = requireLengthOfArrayLike();
+  	var doesNotExceedSafeInteger = requireDoesNotExceedSafeInteger();
   	var bind = requireFunctionBindContext();
-  	var IndexedObject = requireIndexedObject();
+  	var createProperty = requireCreateProperty();
+
+  	// `FlattenIntoArray` abstract operation
+  	// https://tc39.es/ecma262/#sec-flattenintoarray
+  	var flattenIntoArray = function (target, original, source, sourceLen, start, depth, mapper, thisArg) {
+  	  var targetIndex = start;
+  	  var sourceIndex = 0;
+  	  var mapFn = mapper ? bind(mapper, thisArg) : false;
+  	  var element, elementLen;
+
+  	  while (sourceIndex < sourceLen) {
+  	    if (sourceIndex in source) {
+  	      element = mapFn ? mapFn(source[sourceIndex], sourceIndex, original) : source[sourceIndex];
+
+  	      if (depth > 0 && isArray(element)) {
+  	        elementLen = lengthOfArrayLike(element);
+  	        targetIndex = flattenIntoArray(target, original, element, elementLen, targetIndex, depth - 1) - 1;
+  	      } else {
+  	        doesNotExceedSafeInteger(targetIndex + 1);
+  	        createProperty(target, targetIndex, element);
+  	      }
+
+  	      targetIndex++;
+  	    }
+  	    sourceIndex++;
+  	  }
+  	  return targetIndex;
+  	};
+
+  	flattenIntoArray_1 = flattenIntoArray;
+  	return flattenIntoArray_1;
+  }
+
+  var hasRequiredEs_array_flatMap;
+
+  function requireEs_array_flatMap () {
+  	if (hasRequiredEs_array_flatMap) return es_array_flatMap;
+  	hasRequiredEs_array_flatMap = 1;
+  	var $ = require_export();
+  	var flattenIntoArray = requireFlattenIntoArray();
+  	var aCallable = requireACallable();
   	var toObject = requireToObject();
   	var lengthOfArrayLike = requireLengthOfArrayLike();
   	var arraySpeciesCreate = requireArraySpeciesCreate();
-  	var createProperty = requireCreateProperty();
 
-  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
-  	var createMethod = function (TYPE) {
-  	  var IS_MAP = TYPE === 1;
-  	  var IS_FILTER = TYPE === 2;
-  	  var IS_SOME = TYPE === 3;
-  	  var IS_EVERY = TYPE === 4;
-  	  var IS_FIND_INDEX = TYPE === 6;
-  	  var IS_FILTER_REJECT = TYPE === 7;
-  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
-  	  return function ($this, callbackfn, that) {
-  	    var O = toObject($this);
-  	    var self = IndexedObject(O);
-  	    var length = lengthOfArrayLike(self);
-  	    var boundFunction = bind(callbackfn, that);
-  	    var index = 0;
-  	    var resIndex = 0;
-  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
-  	    var value, result;
-  	    for (;length > index; index++) if (NO_HOLES || index in self) {
-  	      value = self[index];
-  	      result = boundFunction(value, index, O);
-  	      if (TYPE) {
-  	        if (IS_MAP) createProperty(target, index, result);    // map
-  	        else if (result) switch (TYPE) {
-  	          case 3: return true;                                // some
-  	          case 5: return value;                               // find
-  	          case 6: return index;                               // findIndex
-  	          case 2: createProperty(target, resIndex++, value);  // filter
-  	        } else switch (TYPE) {
-  	          case 4: return false;                               // every
-  	          case 7: createProperty(target, resIndex++, value);  // filterReject
-  	        }
-  	      }
-  	    }
-  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
-  	  };
-  	};
-
-  	arrayIteration = {
-  	  // `Array.prototype.forEach` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
-  	  forEach: createMethod(0),
-  	  // `Array.prototype.map` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.map
-  	  map: createMethod(1),
-  	  // `Array.prototype.filter` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
-  	  filter: createMethod(2),
-  	  // `Array.prototype.some` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.some
-  	  some: createMethod(3),
-  	  // `Array.prototype.every` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.every
-  	  every: createMethod(4),
-  	  // `Array.prototype.find` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.find
-  	  find: createMethod(5),
-  	  // `Array.prototype.findIndex` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
-  	  findIndex: createMethod(6),
-  	  // `Array.prototype.filterReject` method
-  	  // https://github.com/tc39/proposal-array-filtering
-  	  filterReject: createMethod(7)
-  	};
-  	return arrayIteration;
+  	// `Array.prototype.flatMap` method
+  	// https://tc39.es/ecma262/#sec-array.prototype.flatmap
+  	$({ target: 'Array', proto: true }, {
+  	  flatMap: function flatMap(callbackfn /* , thisArg */) {
+  	    var O = toObject(this);
+  	    var sourceLen = lengthOfArrayLike(O);
+  	    var A;
+  	    aCallable(callbackfn);
+  	    A = arraySpeciesCreate(O, 0);
+  	    flattenIntoArray(A, O, O, sourceLen, 0, 1, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	    return A;
+  	  }
+  	});
+  	return es_array_flatMap;
   }
+
+  requireEs_array_flatMap();
+
+  var es_array_unscopables_flatMap = {};
 
   var objectDefineProperties = {};
 
@@ -2319,36 +2278,21 @@
   	return addToUnscopables;
   }
 
-  var hasRequiredEs_array_find;
+  var hasRequiredEs_array_unscopables_flatMap;
 
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
+  function requireEs_array_unscopables_flatMap () {
+  	if (hasRequiredEs_array_unscopables_flatMap) return es_array_unscopables_flatMap;
+  	hasRequiredEs_array_unscopables_flatMap = 1;
+  	// this method was added to unscopables after implementation
+  	// in popular engines, so it's moved to a separate module
   	var addToUnscopables = requireAddToUnscopables();
 
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
   	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
+  	addToUnscopables('flatMap');
+  	return es_array_unscopables_flatMap;
   }
 
-  requireEs_array_find();
+  requireEs_array_unscopables_flatMap();
 
   var es_object_assign = {};
 
@@ -2475,82 +2419,290 @@
 
   requireEs_object_toString();
 
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
+  var arrayIteration;
+  var hasRequiredArrayIteration;
+
+  function requireArrayIteration () {
+  	if (hasRequiredArrayIteration) return arrayIteration;
+  	hasRequiredArrayIteration = 1;
+  	var bind = requireFunctionBindContext();
+  	var IndexedObject = requireIndexedObject();
+  	var toObject = requireToObject();
+  	var lengthOfArrayLike = requireLengthOfArrayLike();
+  	var arraySpeciesCreate = requireArraySpeciesCreate();
+  	var createProperty = requireCreateProperty();
+
+  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
+  	var createMethod = function (TYPE) {
+  	  var IS_MAP = TYPE === 1;
+  	  var IS_FILTER = TYPE === 2;
+  	  var IS_SOME = TYPE === 3;
+  	  var IS_EVERY = TYPE === 4;
+  	  var IS_FIND_INDEX = TYPE === 6;
+  	  var IS_FILTER_REJECT = TYPE === 7;
+  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
+  	  return function ($this, callbackfn, that) {
+  	    var O = toObject($this);
+  	    var self = IndexedObject(O);
+  	    var length = lengthOfArrayLike(self);
+  	    var boundFunction = bind(callbackfn, that);
+  	    var index = 0;
+  	    var resIndex = 0;
+  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
+  	    var value, result;
+  	    for (;length > index; index++) if (NO_HOLES || index in self) {
+  	      value = self[index];
+  	      result = boundFunction(value, index, O);
+  	      if (TYPE) {
+  	        if (IS_MAP) createProperty(target, index, result);    // map
+  	        else if (result) switch (TYPE) {
+  	          case 3: return true;                                // some
+  	          case 5: return value;                               // find
+  	          case 6: return index;                               // findIndex
+  	          case 2: createProperty(target, resIndex++, value);  // filter
+  	        } else switch (TYPE) {
+  	          case 4: return false;                               // every
+  	          case 7: createProperty(target, resIndex++, value);  // filterReject
+  	        }
+  	      }
+  	    }
+  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
+  	  };
+  	};
+
+  	arrayIteration = {
+  	  // `Array.prototype.forEach` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	  forEach: createMethod(0),
+  	  // `Array.prototype.map` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.map
+  	  map: createMethod(1),
+  	  // `Array.prototype.filter` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
+  	  filter: createMethod(2),
+  	  // `Array.prototype.some` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.some
+  	  some: createMethod(3),
+  	  // `Array.prototype.every` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.every
+  	  every: createMethod(4),
+  	  // `Array.prototype.find` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.find
+  	  find: createMethod(5),
+  	  // `Array.prototype.findIndex` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
+  	  findIndex: createMethod(6),
+  	  // `Array.prototype.filterReject` method
+  	  // https://github.com/tc39/proposal-array-filtering
+  	  filterReject: createMethod(7)
+  	};
+  	return arrayIteration;
+  }
+
+  var arrayMethodIsStrict;
+  var hasRequiredArrayMethodIsStrict;
+
+  function requireArrayMethodIsStrict () {
+  	if (hasRequiredArrayMethodIsStrict) return arrayMethodIsStrict;
+  	hasRequiredArrayMethodIsStrict = 1;
+  	var fails = requireFails();
+
+  	arrayMethodIsStrict = function (METHOD_NAME, argument) {
+  	  var method = [][METHOD_NAME];
+  	  return !!method && fails(function () {
+  	    // eslint-disable-next-line no-useless-call -- required for testing
+  	    method.call(null, argument || function () { return 1; }, 1);
+  	  });
+  	};
+  	return arrayMethodIsStrict;
+  }
+
+  var arrayForEach;
+  var hasRequiredArrayForEach;
+
+  function requireArrayForEach () {
+  	if (hasRequiredArrayForEach) return arrayForEach;
+  	hasRequiredArrayForEach = 1;
+  	var $forEach = requireArrayIteration().forEach;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+  	var STRICT_METHOD = arrayMethodIsStrict('forEach');
+
+  	// `Array.prototype.forEach` method implementation
+  	// https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	arrayForEach = !STRICT_METHOD ? function forEach(callbackfn /* , thisArg */) {
+  	  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	// eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	} : [].forEach;
+  	return arrayForEach;
+  }
+
+  var hasRequiredWeb_domCollections_forEach;
+
+  function requireWeb_domCollections_forEach () {
+  	if (hasRequiredWeb_domCollections_forEach) return web_domCollections_forEach;
+  	hasRequiredWeb_domCollections_forEach = 1;
+  	var globalThis = requireGlobalThis();
+  	var DOMIterables = requireDomIterables();
+  	var DOMTokenListPrototype = requireDomTokenListPrototype();
+  	var forEach = requireArrayForEach();
+  	var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+
+  	var handlePrototype = function (CollectionPrototype) {
+  	  // some Chrome versions have non-configurable methods on DOMTokenList
+  	  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+  	    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  	  } catch (error) {
+  	    CollectionPrototype.forEach = forEach;
+  	  }
+  	};
+
+  	for (var COLLECTION_NAME in DOMIterables) {
+  	  if (DOMIterables[COLLECTION_NAME]) {
+  	    handlePrototype(globalThis[COLLECTION_NAME] && globalThis[COLLECTION_NAME].prototype);
+  	  }
+  	}
+
+  	handlePrototype(DOMTokenListPrototype);
+  	return web_domCollections_forEach;
+  }
+
+  requireWeb_domCollections_forEach();
+
   /**
    * @author Jay <jwang@dizsoft.com>
    * @update zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.defaults, {
     showJumpTo: false,
     showJumpToByPages: 0
   });
-  Object.assign($.fn.bootstrapTable.locales, {
+  Object.assign(BootstrapTable.locales, {
     formatJumpTo: function formatJumpTo() {
       return 'GO';
     }
   });
-  Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales);
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  Object.assign(BootstrapTable.defaults, BootstrapTable.locales);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initPagination",
       value: function initPagination() {
         var _this = this;
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initPagination", this)(args);
+        _superPropGet(_default, "initPagination", this)(args);
         if (this.options.showJumpTo && this.totalPages >= this.options.showJumpToByPages) {
-          var $pageGroup = this.$pagination.find('> .pagination');
-          var $jumpTo = $pageGroup.find('.page-jump-to');
-          if (!$jumpTo.length) {
-            $jumpTo = $(Utils.sprintf(this.constants.html.inputGroup, "<input type=\"number\"\n            class=\"".concat(this.constants.classes.input).concat(Utils.sprintf(' %s%s', this.constants.classes.inputPrefix, this.options.iconSize), "\"\n            value=\"").concat(this.options.pageNumber, "\"\n            min=\"1\"\n            max=\"").concat(this.totalPages, "\">"), "<button class=\"".concat(this.constants.buttonsClass, "\" type=\"button\">\n          ").concat(this.options.formatJumpTo(), "\n          </button>"))).addClass('page-jump-to').appendTo($pageGroup);
-            var _iterator = _createForOfIteratorHelper($jumpTo),
-              _step;
-            try {
-              var _loop = function _loop() {
-                var el = _step.value;
-                var $input = $(el).find('input');
-                $(el).find('button').click(function () {
-                  _this.selectPage(+$input.val());
-                });
-                $input.keyup(function (e) {
-                  if ($input.val() === '') {
-                    return;
-                  }
-                  if (e.keyCode === 13) {
-                    _this.selectPage(+$input.val());
-                    return;
-                  }
-                  if (+$input.val() < +$input.attr('min')) {
-                    $input.val($input.attr('min'));
-                  } else if (+$input.val() > +$input.attr('max')) {
-                    $input.val($input.attr('max'));
-                  }
-                });
-                $input.blur(function () {
-                  if ($input.val() === '') {
-                    $input.val(_this.options.pageNumber);
-                  }
-                });
-              };
-              for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                _loop();
-              }
-            } catch (err) {
-              _iterator.e(err);
-            } finally {
-              _iterator.f();
+          var pageGroups = this.$pagination.flatMap(function (p) {
+            return _toConsumableArray(p.querySelectorAll(':scope > .pagination'));
+          });
+          pageGroups.forEach(function (pageGroup) {
+            if (pageGroup.querySelector('.page-jump-to')) {
+              return;
             }
-          }
+            var template = document.createElement('template');
+            template.innerHTML = Utils.sprintf(_this.constants.html.inputGroup, "<input type=\"number\"\n            class=\"".concat(_this.constants.classes.input).concat(Utils.sprintf(' %s%s', _this.constants.classes.inputPrefix, _this.options.iconSize), "\"\n            value=\"").concat(_this.options.pageNumber, "\"\n            min=\"1\"\n            max=\"").concat(_this.totalPages, "\">"), "<button class=\"".concat(_this.constants.buttonsClass, "\" type=\"button\">\n          ").concat(_this.options.formatJumpTo(), "\n          </button>"));
+            var jumpTo = template.content.firstElementChild;
+            jumpTo.classList.add('page-jump-to');
+            pageGroup.appendChild(jumpTo);
+            var input = jumpTo.querySelector('input');
+            jumpTo.querySelector('button').addEventListener('click', function () {
+              _this.selectPage(+input.value);
+            });
+            input.addEventListener('keyup', function (e) {
+              if (input.value === '') {
+                return;
+              }
+              if (e.keyCode === 13) {
+                _this.selectPage(+input.value);
+                return;
+              }
+              if (+input.value < +input.getAttribute('min')) {
+                input.value = input.getAttribute('min');
+              } else if (+input.value > +input.getAttribute('max')) {
+                input.value = input.getAttribute('max');
+              }
+            });
+            input.addEventListener('blur', function () {
+              if (input.value === '') {
+                input.value = _this.options.pageNumber;
+              }
+            });
+          });
         }
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

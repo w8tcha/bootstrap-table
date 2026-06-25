@@ -1,8 +1,5 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+(function (BootstrapTable) {
+	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1975,7 +1972,7 @@
 	 * Author: Phillip Kruger <phillip.kruger@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['af-ZA'] = $.fn.bootstrapTable.locales['af'] = {
+	BootstrapTable.locales['af-ZA'] = BootstrapTable.locales['af'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Voeg \'n vlak by';
 	  },
@@ -2115,14 +2112,14 @@
 	    return 'Wys kaartaansig';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['af-ZA']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['af-ZA']);
 
 	/**
 	 * Bootstrap Table Arabic translation
 	 * Author: Othman Ali Modaes<othman2004_ye@yahoo.com>
 	 */
 
-	$.fn.bootstrapTable.locales['ar-SA'] = $.fn.bootstrapTable.locales['ar'] = {
+	BootstrapTable.locales['ar-SA'] = BootstrapTable.locales['ar'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2262,14 +2259,14 @@
 	    return 'إظهار كبطاقات';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ar-SA']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ar-SA']);
 
 	/**
 	 * Bootstrap Table Bulgarian translation
 	 * Author: Mikhail Kalatchev <kalatchev[at]gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['bg-BG'] = $.fn.bootstrapTable.locales['bg'] = {
+	BootstrapTable.locales['bg-BG'] = BootstrapTable.locales['bg'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2409,7 +2406,7 @@
 	    return 'Показване на изглед карта';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['bg-BG']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['bg-BG']);
 
 	/**
 	 * Bootstrap Table Catalan translation
@@ -2418,7 +2415,7 @@
 	 *          Joan Puigcerver<joapuiib@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['ca-ES'] = $.fn.bootstrapTable.locales['ca'] = {
+	BootstrapTable.locales['ca-ES'] = BootstrapTable.locales['ca'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2558,7 +2555,7 @@
 	    return 'Mostra vista de tarjeta';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ca-ES']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ca-ES']);
 
 	/**
 	 * Bootstrap Table Czech translation
@@ -2566,7 +2563,7 @@
 	 * Author: Jakub Svestka <svestka1999@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['cs-CZ'] = $.fn.bootstrapTable.locales['cs'] = {
+	BootstrapTable.locales['cs-CZ'] = BootstrapTable.locales['cs'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2706,14 +2703,14 @@
 	    return 'Zobrazit karty';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['cs-CZ']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['cs-CZ']);
 
 	/**
 	 * Bootstrap Table danish translation
 	 * Author: Your Name Jan Borup Coyle, github@coyle.dk
 	 */
 
-	$.fn.bootstrapTable.locales['da-DK'] = $.fn.bootstrapTable.locales['da'] = {
+	BootstrapTable.locales['da-DK'] = BootstrapTable.locales['da'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2853,14 +2850,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['da-DK']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['da-DK']);
 
 	/**
 	* Bootstrap Table German translation
 	* Author: Paul Mohr - Sopamo<p.mohr@sopamo.de>
 	*/
 
-	$.fn.bootstrapTable.locales['de-DE'] = $.fn.bootstrapTable.locales['de'] = {
+	BootstrapTable.locales['de-DE'] = BootstrapTable.locales['de'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Ebene hinzufügen';
 	  },
@@ -3000,14 +2997,14 @@
 	    return 'Normale Ansicht';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['de-DE']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['de-DE']);
 
 	/**
 	 * Bootstrap Table Greek translation
 	 * Author: giannisdallas
 	 */
 
-	$.fn.bootstrapTable.locales['el-GR'] = $.fn.bootstrapTable.locales['el'] = {
+	BootstrapTable.locales['el-GR'] = BootstrapTable.locales['el'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -3147,14 +3144,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['el-GR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['el-GR']);
 
 	/**
 	 * Bootstrap Table English translation
 	 * Author: Zhixin Wen<wenzhixin2010@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['en-US'] = $.fn.bootstrapTable.locales['en'] = {
+	BootstrapTable.locales['en-US'] = BootstrapTable.locales['en'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -3294,7 +3291,7 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['en-US']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['en-US']);
 
 	/**
 	 * Bootstrap Table Spanish (Argentina) translation
@@ -3302,7 +3299,7 @@
 	 * Edited by: DarkThinking (https://github.com/DarkThinking)
 	 */
 
-	$.fn.bootstrapTable.locales['es-AR'] = {
+	BootstrapTable.locales['es-AR'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -3442,7 +3439,7 @@
 	    return 'Mostrar vista de carta';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-AR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-AR']);
 
 	/**
 	 * Traducción de librería Bootstrap Table a Español (Chile)
@@ -3450,7 +3447,7 @@
 	 * email brianalvarezazocar@gmail.com
 	 */
 
-	$.fn.bootstrapTable.locales['es-CL'] = {
+	BootstrapTable.locales['es-CL'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -3590,7 +3587,7 @@
 	    return 'Mostrar vista de carta';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-CL']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-CL']);
 
 	/**
 	 * Bootstrap Table Spanish (Costa Rica) translation
@@ -3598,7 +3595,7 @@
 	 * Review: Jei (@jeijei4) (20/Oct/2022)
 	 */
 
-	$.fn.bootstrapTable.locales['es-CR'] = {
+	BootstrapTable.locales['es-CR'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -3738,7 +3735,7 @@
 	    return 'Mostrar vista en tarjetas';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-CR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-CR']);
 
 	/**
 	 * Bootstrap Table Spanish Spain translation
@@ -3746,7 +3743,7 @@
 	 * Update: @misteregis <misteregis@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['es-ES'] = $.fn.bootstrapTable.locales['es'] = {
+	BootstrapTable.locales['es-ES'] = BootstrapTable.locales['es'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Agregar nivel';
 	  },
@@ -3887,7 +3884,7 @@
 	    return 'Mostrar vista de carta';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-ES']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-ES']);
 
 	/**
 	 * Bootstrap Table Spanish (México) translation (Obtenido de traducción de Argentina)
@@ -3897,7 +3894,7 @@
 	 * Revisión: Ricardo González (rickygzz85@gmail.com) (20/Oct/2021)
 	 */
 
-	$.fn.bootstrapTable.locales['es-MX'] = {
+	BootstrapTable.locales['es-MX'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -4037,14 +4034,14 @@
 	    return 'Mostrar vista';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-MX']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-MX']);
 
 	/**
 	 * Bootstrap Table Spanish (Nicaragua) translation
 	 * Author: Dennis Hernández
 	 */
 
-	$.fn.bootstrapTable.locales['es-NI'] = {
+	BootstrapTable.locales['es-NI'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -4184,14 +4181,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-NI']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-NI']);
 
 	/**
 	 * Bootstrap Table Spanish (España) translation
 	 * Author: Antonio Pérez <anpegar@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['es-SP'] = {
+	BootstrapTable.locales['es-SP'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -4331,14 +4328,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-SP']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-SP']);
 
 	/**
 	 * Bootstrap Table Estonian translation
 	 * Author: kristjan@logist.it>
 	 */
 
-	$.fn.bootstrapTable.locales['et-EE'] = $.fn.bootstrapTable.locales['et'] = {
+	BootstrapTable.locales['et-EE'] = BootstrapTable.locales['et'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -4478,14 +4475,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['et-EE']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['et-EE']);
 
 	/**
 	 * Bootstrap Table Basque (Basque Country) translation
 	 * Author: Iker Ibarguren Berasaluze<ikerib@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['eu-EU'] = $.fn.bootstrapTable.locales['eu'] = {
+	BootstrapTable.locales['eu-EU'] = BootstrapTable.locales['eu'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -4625,14 +4622,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['eu-EU']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['eu-EU']);
 
 	/**
 	 * Bootstrap Table Persian translation
 	 * Author: MJ Vakili <mjv.1989@Gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['fa-IR'] = $.fn.bootstrapTable.locales['fa'] = {
+	BootstrapTable.locales['fa-IR'] = BootstrapTable.locales['fa'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -4772,14 +4769,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fa-IR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fa-IR']);
 
 	/**
 	 * Bootstrap Table Finnish translations
 	 * Author: Minna Lehtomäki <minna.j.lehtomaki@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['fi-FI'] = $.fn.bootstrapTable.locales['fi'] = {
+	BootstrapTable.locales['fi-FI'] = BootstrapTable.locales['fi'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -4919,7 +4916,7 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fi-FI']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fi-FI']);
 
 	/**
 	 * Bootstrap Table French (Belgium) translation
@@ -4927,7 +4924,7 @@
 	 *         Nevets82 <Nevets82@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['fr-BE'] = {
+	BootstrapTable.locales['fr-BE'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Ajouter un niveau';
 	  },
@@ -5067,14 +5064,14 @@
 	    return 'Afficher la vue en cartes';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fr-BE']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fr-BE']);
 
 	/**
 	 * Bootstrap Table French (Suisse) translation
 	 * Author: Nevets82 <Nevets82@gmail.com>
 	*/
 
-	$.fn.bootstrapTable.locales['fr-CH'] = {
+	BootstrapTable.locales['fr-CH'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Ajouter un niveau';
 	  },
@@ -5214,7 +5211,7 @@
 	    return 'Afficher la vue en cartes';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fr-CH']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fr-CH']);
 
 	/**
 	 * Bootstrap Table French (France) translation
@@ -5223,7 +5220,7 @@
 	 *         Nevets82 <Nevets82@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['fr-FR'] = $.fn.bootstrapTable.locales['fr'] = {
+	BootstrapTable.locales['fr-FR'] = BootstrapTable.locales['fr'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Ajouter un niveau';
 	  },
@@ -5363,7 +5360,7 @@
 	    return 'Afficher la vue en cartes';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fr-FR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fr-FR']);
 
 	/**
 	 * Bootstrap Table French (Luxembourg) translation
@@ -5371,7 +5368,7 @@
 	 * Editor: David Morais Ferreira (https://github.com/DavidMoraisFerreira/)
 	 */
 
-	$.fn.bootstrapTable.locales['fr-LU'] = {
+	BootstrapTable.locales['fr-LU'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Ajouter un niveau';
 	  },
@@ -5511,14 +5508,14 @@
 	    return 'Afficher la vue en cartes';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fr-LU']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fr-LU']);
 
 	/**
 	 * Bootstrap Table Hebrew translation
 	 * Author: legshooter
 	 */
 
-	$.fn.bootstrapTable.locales['he-IL'] = $.fn.bootstrapTable.locales['he'] = {
+	BootstrapTable.locales['he-IL'] = BootstrapTable.locales['he'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -5658,14 +5655,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['he-IL']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['he-IL']);
 
 	/**
 	 * Bootstrap Table Hindi translation
 	 * Author: Saurabh Sharma <saurabhsharma2u@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['hi-IN'] = {
+	BootstrapTable.locales['hi-IN'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -5805,7 +5802,7 @@
 	    return 'कार्ड दृश्य दिखाएं';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['hi-IN']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['hi-IN']);
 
 	/**
 	 * Bootstrap Table Croatian translation
@@ -5813,7 +5810,7 @@
 	 * Author: Petra Štrbenac (petra.strbenac@gmail.com)
 	 */
 
-	$.fn.bootstrapTable.locales['hr-HR'] = $.fn.bootstrapTable.locales['hr'] = {
+	BootstrapTable.locales['hr-HR'] = BootstrapTable.locales['hr'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -5953,14 +5950,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['hr-HR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['hr-HR']);
 
 	/**
 	 * Bootstrap Table Hungarian translation
 	 * Author: Nagy Gergely <info@nagygergely.eu>
 	 */
 
-	$.fn.bootstrapTable.locales['hu-HU'] = $.fn.bootstrapTable.locales['hu'] = {
+	BootstrapTable.locales['hu-HU'] = BootstrapTable.locales['hu'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -6100,14 +6097,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['hu-HU']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['hu-HU']);
 
 	/**
 	 * Bootstrap Table Indonesian translation
 	 * Author: Andre Gardiner<andre@sirdre.com>
 	 */
 
-	$.fn.bootstrapTable.locales['id-ID'] = $.fn.bootstrapTable.locales['id'] = {
+	BootstrapTable.locales['id-ID'] = BootstrapTable.locales['id'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Menambahkan level';
 	  },
@@ -6247,7 +6244,7 @@
 	    return 'Menampilkan tampilan peta';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['id-ID']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['id-ID']);
 
 	/**
 	 * Bootstrap Table Italian translation
@@ -6256,7 +6253,7 @@
 	 * Author: Alessio Felicioni <alessio.felicioni@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['it-IT'] = $.fn.bootstrapTable.locales['it'] = {
+	BootstrapTable.locales['it-IT'] = BootstrapTable.locales['it'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -6396,14 +6393,14 @@
 	    return 'Mostra visuale a scheda';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['it-IT']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['it-IT']);
 
 	/**
 	 * Bootstrap Table Japanese translation
 	 * Author: Azamshul Azizy <azamshul@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['ja-JP'] = $.fn.bootstrapTable.locales['ja'] = {
+	BootstrapTable.locales['ja-JP'] = BootstrapTable.locales['ja'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -6543,14 +6540,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ja-JP']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ja-JP']);
 
 	/**
 	 * Bootstrap Table Georgian translation
 	 * Author: Levan Lotuashvili <l.lotuashvili@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['ka-GE'] = $.fn.bootstrapTable.locales['ka'] = {
+	BootstrapTable.locales['ka-GE'] = BootstrapTable.locales['ka'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -6690,7 +6687,7 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ka-GE']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ka-GE']);
 
 	/**
 	 * Bootstrap Table Korean translation
@@ -6698,7 +6695,7 @@
 	 * Revision: Abel Yeom (abel.yeom@gmail.com)
 	 */
 
-	$.fn.bootstrapTable.locales['ko-KR'] = $.fn.bootstrapTable.locales['ko'] = {
+	BootstrapTable.locales['ko-KR'] = BootstrapTable.locales['ko'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -6838,14 +6835,14 @@
 	    return '카드뷰 보기';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ko-KR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ko-KR']);
 
 	/**
 	 * Bootstrap Table Luxembourgish translation
 	 * Author: David Morais Ferreira (https://github.com/DavidMoraisFerreira)
 	 */
 
-	$.fn.bootstrapTable.locales['lb-LU'] = $.fn.bootstrapTable.locales['lb'] = {
+	BootstrapTable.locales['lb-LU'] = BootstrapTable.locales['lb'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -6985,14 +6982,14 @@
 	    return 'Kaartenusiicht uweisen';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['lb-LU']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['lb-LU']);
 
 	/**
 	 * Bootstrap Table Lithuanian translation
 	 * Author: swift2512 <slamstapastis@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['lt-LT'] = $.fn.bootstrapTable.locales['lt'] = {
+	BootstrapTable.locales['lt-LT'] = BootstrapTable.locales['lt'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -7132,14 +7129,14 @@
 	    return 'Rodyti kortelių rodinį';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['lt-LT']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['lt-LT']);
 
 	/**
 	 * Bootstrap Table Malay translation
 	 * Author: Azamshul Azizy <azamshul@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['ms-MY'] = $.fn.bootstrapTable.locales['ms'] = {
+	BootstrapTable.locales['ms-MY'] = BootstrapTable.locales['ms'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -7279,14 +7276,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ms-MY']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ms-MY']);
 
 	/**
 	 * Bootstrap Table norwegian translation
 	 * Author: Jim Nordbø, jim@nordb.no
 	 */
 
-	$.fn.bootstrapTable.locales['nb-NO'] = $.fn.bootstrapTable.locales['nb'] = {
+	BootstrapTable.locales['nb-NO'] = BootstrapTable.locales['nb'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -7426,14 +7423,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['nb-NO']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['nb-NO']);
 
 	/**
 	 * Bootstrap Table Dutch (België) translation
 	 * Author: Nevets82 <Nevets82@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['nl-BE'] = {
+	BootstrapTable.locales['nl-BE'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Niveau toevoegen';
 	  },
@@ -7573,7 +7570,7 @@
 	    return 'Toon kaartweergave';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['nl-BE']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['nl-BE']);
 
 	/**
 	 * Bootstrap Table Dutch (Nederland) translation
@@ -7581,7 +7578,7 @@
 	 *         Nevets82 <Nevets82@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['nl-NL'] = $.fn.bootstrapTable.locales['nl'] = {
+	BootstrapTable.locales['nl-NL'] = BootstrapTable.locales['nl'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Niveau toevoegen';
 	  },
@@ -7721,7 +7718,7 @@
 	    return 'Toon kaartweergave';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['nl-NL']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['nl-NL']);
 
 	/**
 	 * Bootstrap Table Polish translation
@@ -7729,7 +7726,7 @@
 	 * Update: kerogos <kerog @ wp pl>
 	 */
 
-	$.fn.bootstrapTable.locales['pl-PL'] = $.fn.bootstrapTable.locales['pl'] = {
+	BootstrapTable.locales['pl-PL'] = BootstrapTable.locales['pl'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -7869,7 +7866,7 @@
 	    return 'Pokaż układ karty';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['pl-PL']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['pl-PL']);
 
 	/**
 	 * Bootstrap Table Brazilian Portuguese Translation
@@ -7880,7 +7877,7 @@
 	 * Update: @misteregis <misteregis@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['pt-BR'] = $.fn.bootstrapTable.locales['br'] = {
+	BootstrapTable.locales['pt-BR'] = BootstrapTable.locales['br'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Adicionar nível';
 	  },
@@ -8021,7 +8018,7 @@
 	    return 'Mostrar visualização de cartão';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['pt-BR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['pt-BR']);
 
 	/**
 	 * Bootstrap Table Portuguese Portugal Translation
@@ -8029,7 +8026,7 @@
 	 * Update: @misteregis <misteregis@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['pt-PT'] = $.fn.bootstrapTable.locales['pt'] = {
+	BootstrapTable.locales['pt-PT'] = BootstrapTable.locales['pt'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Adicionar nível';
 	  },
@@ -8170,14 +8167,14 @@
 	    return 'Mostrar vista em forma de cartão';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['pt-PT']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['pt-PT']);
 
 	/**
 	 * Bootstrap Table Romanian translation
 	 * Author: cristake <cristianiosif@me.com>
 	 */
 
-	$.fn.bootstrapTable.locales['ro-RO'] = $.fn.bootstrapTable.locales['ro'] = {
+	BootstrapTable.locales['ro-RO'] = BootstrapTable.locales['ro'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -8317,14 +8314,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ro-RO']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ro-RO']);
 
 	/**
 	 * Bootstrap Table Russian translation
 	 * Author: Dunaevsky Maxim <dunmaksim@yandex.ru>
 	 */
 
-	$.fn.bootstrapTable.locales['ru-RU'] = $.fn.bootstrapTable.locales['ru'] = {
+	BootstrapTable.locales['ru-RU'] = BootstrapTable.locales['ru'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -8464,14 +8461,14 @@
 	    return 'Показать записи в виде карточек';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ru-RU']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ru-RU']);
 
 	/**
 	 * Bootstrap Table Slovak translation
 	 * Author: Jozef Dúc<jozef.d13@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['sk-SK'] = $.fn.bootstrapTable.locales['sk'] = {
+	BootstrapTable.locales['sk-SK'] = BootstrapTable.locales['sk'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -8611,14 +8608,14 @@
 	    return 'Zobraziť kartové zobrazenie';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['sk-SK']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['sk-SK']);
 
 	/**
 	 * Bootstrap Table Slovenian translation
 	 * Author: Ales Hotko <ales.hotko@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['sl-SI'] = $.fn.bootstrapTable.locales['sl'] = {
+	BootstrapTable.locales['sl-SI'] = BootstrapTable.locales['sl'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -8758,14 +8755,14 @@
 	    return 'Prikaži kartični pogled';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['sl-SI']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['sl-SI']);
 
 	/**
 	 * Bootstrap Table Serbian Cyrilic RS translation
 	 * Author: Vladimir Kanazir (vladimir@kanazir.com)
 	 */
 
-	$.fn.bootstrapTable.locales['sr-Cyrl-RS'] = $.fn.bootstrapTable.locales['sr'] = {
+	BootstrapTable.locales['sr-Cyrl-RS'] = BootstrapTable.locales['sr'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -8905,14 +8902,14 @@
 	    return 'Прикажи картице';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['sr-Cyrl-RS']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['sr-Cyrl-RS']);
 
 	/**
 	 * Bootstrap Table Serbian Latin RS translation
 	 * Author: Vladimir Kanazir (vladimir@kanazir.com)
 	 */
 
-	$.fn.bootstrapTable.locales['sr-Latn-RS'] = {
+	BootstrapTable.locales['sr-Latn-RS'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -9052,14 +9049,14 @@
 	    return 'Prikaži kartice';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['sr-Latn-RS']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['sr-Latn-RS']);
 
 	/**
 	 * Bootstrap Table Swedish translation
 	 * Author: C Bratt <bratt@inix.se>
 	 */
 
-	$.fn.bootstrapTable.locales['sv-SE'] = $.fn.bootstrapTable.locales['sv'] = {
+	BootstrapTable.locales['sv-SE'] = BootstrapTable.locales['sv'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -9199,14 +9196,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['sv-SE']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['sv-SE']);
 
 	/**
 	 * Bootstrap Table Thai translation
 	 * Author: Monchai S.<monchais@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['th-TH'] = $.fn.bootstrapTable.locales['th'] = {
+	BootstrapTable.locales['th-TH'] = BootstrapTable.locales['th'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -9346,7 +9343,7 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['th-TH']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['th-TH']);
 
 	/**
 	 * Bootstrap Table Turkish translation
@@ -9355,7 +9352,7 @@
 	 * Update From: Sait KURT <bilgi@ientegre.com> <https://github.com/xDeSwa>
 	 */
 
-	$.fn.bootstrapTable.locales['tr-TR'] = $.fn.bootstrapTable.locales['tr'] = {
+	BootstrapTable.locales['tr-TR'] = BootstrapTable.locales['tr'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -9495,14 +9492,14 @@
 	    return 'Kart Görünümünü Göster';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['tr-TR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['tr-TR']);
 
 	/**
 	 * Bootstrap Table Ukrainian translation
 	 * Author: Vitaliy Timchenko <vitaliy.timchenko@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['uk-UA'] = $.fn.bootstrapTable.locales['uk'] = {
+	BootstrapTable.locales['uk-UA'] = BootstrapTable.locales['uk'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -9642,14 +9639,14 @@
 	    return 'Відобразити у форматі карток';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['uk-UA']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['uk-UA']);
 
 	/**
 	 * Bootstrap Table Urdu translation
 	 * Author: Malik <me@malikrizwan.com>
 	 */
 
-	$.fn.bootstrapTable.locales['ur-PK'] = $.fn.bootstrapTable.locales['ur'] = {
+	BootstrapTable.locales['ur-PK'] = BootstrapTable.locales['ur'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -9789,14 +9786,14 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ur-PK']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ur-PK']);
 
 	/**
 	 * Bootstrap Table Uzbek translation
 	 * Author: Nabijon Masharipov <mnabijonz@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['uz-Latn-UZ'] = $.fn.bootstrapTable.locales['uz'] = {
+	BootstrapTable.locales['uz-Latn-UZ'] = BootstrapTable.locales['uz'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -9936,7 +9933,7 @@
 	    return 'Show card view';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['uz-Latn-UZ']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['uz-Latn-UZ']);
 
 	/**
 	 * Bootstrap Table Vietnamese translation
@@ -9944,7 +9941,7 @@
 	 * Revision: Le Ngo Duc Manh <myt@nnsvn.me> (07/Mar/2024)
 	 */
 
-	$.fn.bootstrapTable.locales['vi-VN'] = $.fn.bootstrapTable.locales['vi'] = {
+	BootstrapTable.locales['vi-VN'] = BootstrapTable.locales['vi'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -10084,14 +10081,14 @@
 	    return 'Hiển thị các thẻ';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['vi-VN']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['vi-VN']);
 
 	/**
 	 * Bootstrap Table Chinese translation
 	 * Author: Zhixin Wen<wenzhixin2010@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['zh-CN'] = $.fn.bootstrapTable.locales['zh'] = {
+	BootstrapTable.locales['zh-CN'] = BootstrapTable.locales['zh'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return '增加层级';
 	  },
@@ -10231,14 +10228,14 @@
 	    return '显示卡片视图';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['zh-CN']);
 
 	/**
 	 * Bootstrap Table Chinese translation
 	 * Author: Zhixin Wen<wenzhixin2010@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['zh-TW'] = {
+	BootstrapTable.locales['zh-TW'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return '增加層級';
 	  },
@@ -10378,6 +10375,6 @@
 	    return '顯示卡片視圖';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-TW']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['zh-TW']);
 
-}));
+})(BootstrapTable);

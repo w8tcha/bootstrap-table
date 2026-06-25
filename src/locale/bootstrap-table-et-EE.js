@@ -3,7 +3,9 @@
  * Author: kristjan@logist.it>
  */
 
-$.fn.bootstrapTable.locales['et-EE'] = $.fn.bootstrapTable.locales['et'] = {
+
+
+BootstrapTable.locales['et-EE'] = BootstrapTable.locales['et'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['et-EE'] = $.fn.bootstrapTable.locales['et'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['et-EE'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['et-EE'])

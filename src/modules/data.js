@@ -81,17 +81,18 @@ export default {
     if (!silent) {
       this.showLoading()
     }
-    const request = Utils.extend({}, Utils.calculateObjectValue(null, this.options.ajaxOptions), {
+
+    const ajaxOptions = Utils.calculateObjectValue(null, this.options.ajaxOptions) || {}
+    const request = Utils.extend({}, ajaxOptions, {
       type: this.options.method,
       url: this.options.url,
       data: this.options.contentType === 'application/json' && this.options.method === 'post' ?
         JSON.stringify(data) : data,
-      cache: this.options.cache,
       contentType: this.options.contentType,
       dataType: this.options.dataType,
-      success: (_res, textStatus, jqXHR) => {
+      success: (_res, textStatus, response) => {
         const res = Utils.calculateObjectValue(this.options,
-          this.options.responseHandler, [_res, jqXHR], _res)
+          this.options.responseHandler, [_res, response], _res)
 
         if (
           this.options.sidePagination === 'client' &&
@@ -101,7 +102,7 @@ export default {
         }
 
         this.load(res)
-        this.trigger('load-success', res, jqXHR && jqXHR.status, jqXHR)
+        this.trigger('load-success', res, response && response.status, response)
         if (!silent) {
           this.hideLoading()
         }
@@ -115,13 +116,7 @@ export default {
           this.updatePagination()
         }
       },
-      error: jqXHR => {
-        // abort ajax by multiple request
-        if (jqXHR && jqXHR.status === 0 && this._xhrAbort) {
-          this._xhrAbort = false
-          return
-        }
-
+      error: response => {
         let data = []
 
         if (this.options.sidePagination === 'server') {
@@ -130,7 +125,7 @@ export default {
           data[this.options.dataField] = []
         }
         this.load(data)
-        this.trigger('load-error', jqXHR && jqXHR.status, jqXHR)
+        this.trigger('load-error', response && response.status, response)
         if (!silent) {
           this.hideLoading()
         }
@@ -140,11 +135,55 @@ export default {
     if (this.options.ajax) {
       Utils.calculateObjectValue(this, this.options.ajax, [request], null)
     } else {
-      if (this._xhr && this._xhr.readyState !== 4) {
-        this._xhrAbort = true
-        this._xhr.abort()
+      // Abort previous in-flight request
+      if (this._abortController) {
+        this._abortController.abort()
+        this._abortController = null
       }
-      this._xhr = $.ajax(request)
+
+      this._abortController = new AbortController()
+      const ctrl = this._abortController
+      const method = (request.type || 'GET').toUpperCase()
+      let url = request.url
+      let body
+
+      const headers = {}
+
+      if (request.contentType) {
+        headers['Content-Type'] = request.contentType
+      }
+
+      if (method === 'GET') {
+        if (request.data && typeof request.data === 'object') {
+          const searchParams = new URLSearchParams()
+
+          for (const [k, v] of Object.entries(request.data)) {
+            searchParams.append(k, typeof v === 'object' ? JSON.stringify(v) : v)
+          }
+          url += (url.includes('?') ? '&' : '?') + searchParams.toString()
+        }
+      } else if (request.data) {
+        body = typeof request.data === 'string' ? request.data : JSON.stringify(request.data)
+      }
+
+      fetch(url, { method, headers, body, signal: ctrl.signal })
+        .then(response => {
+          this._abortController = null
+          if (!response.ok) {
+            return request.error(response)
+          }
+          const ct = response.headers.get('content-type') || ''
+          const parseBody = request.dataType === 'json' || ct.includes('json') ?
+            response.json() :
+            response.text()
+
+          return parseBody.then(res => request.success(res, 'success', response))
+        })
+        .catch(err => {
+          if (err?.name !== 'AbortError') {
+            request.error(err)
+          }
+        })
     }
 
     return data
@@ -218,10 +257,14 @@ export default {
 
       if (this.options.sortClass !== undefined) {
         setTimeout(() => {
-          this.$el.removeClass(this.options.sortClass)
-          const index = this.$header.find(`[data-field="${this.options.sortName}"]`).index()
+          this.$el.classList.remove(this.options.sortClass)
+          const th = this.$header.querySelector(`[data-field="${this.options.sortName}"]`)
+          const colIndex = th ? Array.from(th.parentElement?.children || []).indexOf(th) : -1
 
-          this.$el.find(`tr td:nth-child(${index + 1})`).addClass(this.options.sortClass)
+          if (colIndex !== -1) {
+            this.$el.querySelectorAll(`tr td:nth-child(${colIndex + 1})`)
+              .forEach(td => td.classList.add(this.options.sortClass))
+          }
         }, 250)
       }
     } else if (this.options.sortReset) {
@@ -230,15 +273,16 @@ export default {
   },
 
   onSort ({ type, currentTarget }) {
-    const $this = type === 'keypress' ? $(currentTarget) : $(currentTarget).parent()
-    const $this_ = this.$header.find('th').eq($this.index())
+    const thEl = type === 'keypress' ? currentTarget : currentTarget.parentElement
+    const field = thEl.dataset.field
+    const headers = [this.$header, this.$header_].filter(Boolean)
 
-    this.$header.add(this.$header_).find('span.order').remove()
+    headers.forEach(h => h.querySelectorAll('span.order').forEach(s => s.remove()))
 
-    if (this.options.sortName === $this.data('field')) {
+    if (this.options.sortName === field) {
       const currentSortOrder = this.options.sortOrder
-      const initialSortOrder = this.columns[this.fieldsColumnsIndex[$this.data('field')]].sortOrder ||
-        this.columns[this.fieldsColumnsIndex[$this.data('field')]].order
+      const col = this.columns[this.fieldsColumnsIndex[field]]
+      const initialSortOrder = col?.sortOrder || col?.order
 
       if (currentSortOrder === undefined) {
         this.options.sortOrder = 'asc'
@@ -252,16 +296,23 @@ export default {
         this.options.sortName = undefined
       }
     } else {
-      this.options.sortName = $this.data('field')
+      this.options.sortName = field
       if (this.options.rememberOrder) {
-        this.options.sortOrder = $this.data('order') === 'asc' ? 'desc' : 'asc'
+        this.options.sortOrder = thEl.dataset.order === 'asc' ? 'desc' : 'asc'
       } else {
-        this.options.sortOrder = this.columns[this.fieldsColumnsIndex[$this.data('field')]].sortOrder ||
-          this.columns[this.fieldsColumnsIndex[$this.data('field')]].order
+        const col = this.columns[this.fieldsColumnsIndex[field]]
+
+        this.options.sortOrder = col?.sortOrder || col?.order
       }
     }
 
-    $this.add($this_).data('order', this.options.sortOrder)
+    const orderVal = this.options.sortOrder ?? ''
+
+    headers.forEach(h => {
+      const th = h.querySelector(`th[data-field="${field}"]`)
+
+      if (th) th.dataset.order = orderVal
+    })
 
     // Assign the correct sortable arrow
     this.resetCaret()
@@ -581,9 +632,23 @@ export default {
 
     fieldIndex += Utils.getDetailViewIndexOffset(this.options)
 
-    this.$body.find(`>tr[data-index=${index}]`)
-      .find(`>td:eq(${fieldIndex})`)
-      .replaceWith($(rowHtml).find(`>td:eq(${fieldIndex})`))
+    const rowEl = this.$body.querySelector(`:scope > tr[data-index="${index}"]`)
+
+    if (!rowEl) return
+
+    const targetTd = rowEl.querySelectorAll(':scope > td')[fieldIndex]
+
+    if (!targetTd) return
+
+    const div = document.createElement('div')
+
+    div.innerHTML = rowHtml
+    const newRow = div.querySelector('tr')
+    const newTd = newRow?.querySelectorAll(':scope > td')[fieldIndex]
+
+    if (newTd && targetTd.parentNode) {
+      targetTd.parentNode.replaceChild(newTd, targetTd)
+    }
 
     this.initBodyEvent()
     this.initFooter()

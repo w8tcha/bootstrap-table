@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -2194,7 +2194,7 @@
 
   requireEs_array_filter();
 
-  var es_array_find = {};
+  var es_array_includes = {};
 
   var objectDefineProperties = {};
 
@@ -2377,39 +2377,6 @@
   	};
   	return addToUnscopables;
   }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_array_includes = {};
 
   var hasRequiredEs_array_includes;
 
@@ -3841,7 +3808,8 @@
    * @author: Dennis Hernández
    * @update zhixin wen <wenzhixin2010@gmail.com>
    */
-  var Utils = $.fn.bootstrapTable.utils;
+
+  var Utils = BootstrapTable.utils;
   var UtilsCookie = {
     cookieIds: {
       sortOrder: 'bs.table.sortOrder',
@@ -3973,14 +3941,15 @@
           };
           var filterContainer = header;
           if (that.options.filterControlContainer) {
-            filterContainer = $("".concat(that.options.filterControlContainer));
+            filterContainer = document.querySelector(that.options.filterControlContainer);
           }
-          filterContainer.find(searchControls).each(function () {
-            var field = $(this).closest('[data-field]').data('field');
+          filterContainer.querySelectorAll(searchControls).forEach(function (el) {
+            var _el$closest;
+            var field = (_el$closest = el.closest('[data-field]')) === null || _el$closest === void 0 ? void 0 : _el$closest.dataset.field;
             var filteredCookies = parsedCookieFilters.filter(function (cookie) {
               return cookie.field === field;
             });
-            applyCookieFilters(this, filteredCookies);
+            applyCookieFilters(el, filteredCookies);
           });
           that.initColumnSearch(cachedFilters);
           that._filterControlValuesLoaded = true;
@@ -3989,7 +3958,7 @@
       }, 250);
     }
   };
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     cookie: false,
     cookieExpire: '2h',
     cookiePath: null,
@@ -4012,19 +3981,19 @@
       removeItem: undefined
     }
   });
-  $.fn.bootstrapTable.methods.push('getCookies');
-  $.fn.bootstrapTable.methods.push('deleteCookie');
-  Object.assign($.fn.bootstrapTable.utils, {
+  BootstrapTable.methods.push('getCookies');
+  BootstrapTable.methods.push('deleteCookie');
+  Object.assign(BootstrapTable.utils, {
     setCookie: UtilsCookie.setCookie,
     getCookie: UtilsCookie.getCookie
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "init",
       value: function init() {
         var _this = this;
@@ -4053,9 +4022,13 @@
           // FilterControl logic
           this._filterControls = [];
           this._filterControlValuesLoaded = false;
-          this.options.cookiesEnabled = typeof this.options.cookiesEnabled === 'string' ? this.options.cookiesEnabled.replace('[', '').replace(']', '').replace(/'/g, '').replace(/ /g, '').split(',') : this.options.cookiesEnabled;
+          this.options.cookiesEnabled = typeof this.options.cookiesEnabled === 'string' ? Utils.parseStringArray(this.options.cookiesEnabled) : this.options.cookiesEnabled;
           if (this.options.filterControl) {
-            this.$el.on('column-search.bs.table', function (e, field, text) {
+            this.$el.addEventListener('column-search.bs.table', function (e) {
+              var _ref = e.detail || [],
+                _ref2 = _slicedToArray(_ref, 2),
+                field = _ref2[0],
+                text = _ref2[1];
               var isNewField = true;
               for (var i = 0; i < _this._filterControls.length; i++) {
                 if (_this._filterControls[i].field === field) {
@@ -4071,10 +4044,13 @@
                 });
               }
               UtilsCookie.setCookie(_this, UtilsCookie.cookieIds.filterControl, JSON.stringify(_this._filterControls));
-            }).on('created-controls.bs.table', UtilsCookie.initCookieFilters(this));
+            });
+            this.$el.addEventListener('created-controls.bs.table', function () {
+              return UtilsCookie.initCookieFilters(_this);
+            });
           }
         }
-        _superPropGet(_class, "init", this)([]);
+        _superPropGet(_default, "init", this)([]);
       }
     }, {
       key: "initServer",
@@ -4088,7 +4064,7 @@
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initServer", this)(args);
+        _superPropGet(_default, "initServer", this)(args);
       }
     }, {
       key: "initTable",
@@ -4096,7 +4072,7 @@
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "initTable", this)(args);
+        _superPropGet(_default, "initTable", this)(args);
         this.initCookie();
       }
     }, {
@@ -4105,7 +4081,7 @@
         for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
           args[_key3] = arguments[_key3];
         }
-        _superPropGet(_class, "onSort", this)(args);
+        _superPropGet(_default, "onSort", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4125,7 +4101,7 @@
         for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
           args[_key4] = arguments[_key4];
         }
-        _superPropGet(_class, "onMultipleSort", this)(args);
+        _superPropGet(_default, "onMultipleSort", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4145,7 +4121,7 @@
         for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
           args[_key5] = arguments[_key5];
         }
-        _superPropGet(_class, "onPageNumber", this)(args);
+        _superPropGet(_default, "onPageNumber", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4157,7 +4133,7 @@
         for (var _len6 = arguments.length, args = new Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
           args[_key6] = arguments[_key6];
         }
-        _superPropGet(_class, "onPageListChange", this)(args);
+        _superPropGet(_default, "onPageListChange", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4170,7 +4146,7 @@
         for (var _len7 = arguments.length, args = new Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
           args[_key7] = arguments[_key7];
         }
-        _superPropGet(_class, "onPagePre", this)(args);
+        _superPropGet(_default, "onPagePre", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4182,7 +4158,7 @@
         for (var _len8 = arguments.length, args = new Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
           args[_key8] = arguments[_key8];
         }
-        _superPropGet(_class, "onPageNext", this)(args);
+        _superPropGet(_default, "onPageNext", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4194,7 +4170,7 @@
         for (var _len9 = arguments.length, args = new Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
           args[_key9] = arguments[_key9];
         }
-        _superPropGet(_class, "_toggleColumns", this)(args);
+        _superPropGet(_default, "_toggleColumns", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4211,7 +4187,7 @@
         for (var _len0 = arguments.length, args = new Array(_len0), _key0 = 0; _key0 < _len0; _key0++) {
           args[_key0] = arguments[_key0];
         }
-        _superPropGet(_class, "_toggleAllColumns", this)(args);
+        _superPropGet(_default, "_toggleAllColumns", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4225,19 +4201,19 @@
     }, {
       key: "toggleView",
       value: function toggleView() {
-        _superPropGet(_class, "toggleView", this)([]);
+        _superPropGet(_default, "toggleView", this)([]);
         UtilsCookie.setCookie(this, UtilsCookie.cookieIds.cardView, this.options.cardView);
       }
     }, {
       key: "toggleCustomView",
       value: function toggleCustomView() {
-        _superPropGet(_class, "toggleCustomView", this)([]);
+        _superPropGet(_default, "toggleCustomView", this)([]);
         UtilsCookie.setCookie(this, UtilsCookie.cookieIds.customView, this.customViewDefaultView);
       }
     }, {
       key: "selectPage",
       value: function selectPage(page) {
-        _superPropGet(_class, "selectPage", this)([page]);
+        _superPropGet(_default, "selectPage", this)([page]);
         if (!this.options.cookie) {
           return;
         }
@@ -4246,7 +4222,7 @@
     }, {
       key: "onSearch",
       value: function onSearch(event) {
-        _superPropGet(_class, "onSearch", this)([event, arguments.length > 1 ? arguments[1] : true]);
+        _superPropGet(_default, "onSearch", this)([event, arguments.length > 1 ? arguments[1] : true]);
         if (!this.options.cookie) {
           return;
         }
@@ -4264,7 +4240,7 @@
         for (var _len1 = arguments.length, args = new Array(_len1), _key1 = 0; _key1 < _len1; _key1++) {
           args[_key1] = arguments[_key1];
         }
-        _superPropGet(_class, "initHeader", this)(args);
+        _superPropGet(_default, "initHeader", this)(args);
       }
     }, {
       key: "persistReorderColumnsState",
@@ -4277,7 +4253,7 @@
         for (var _len10 = arguments.length, args = new Array(_len10), _key10 = 0; _key10 < _len10; _key10++) {
           args[_key10] = arguments[_key10];
         }
-        _superPropGet(_class, "filterBy", this)(args);
+        _superPropGet(_default, "filterBy", this)(args);
         if (!this.options.cookie) {
           return;
         }
@@ -4455,6 +4431,8 @@
         }
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

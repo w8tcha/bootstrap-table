@@ -51,18 +51,28 @@ export default {
     const opts = this.options
     let html
     let timeoutId
-    let $keepOpen
     let switchableCount = 0
 
-    if (this.$toolbar.find('.bs-bars').children().length) {
-      $('body').append($(opts.toolbar))
+    if (this.$toolbar.querySelector('.bs-bars')?.children.length) {
+      const toolbarEl = typeof opts.toolbar === 'string' ?
+        document.querySelector(opts.toolbar) :
+        opts.toolbar instanceof Element ? opts.toolbar : null
+
+      if (toolbarEl) document.body.appendChild(toolbarEl)
     }
-    this.$toolbar.html('')
+    this.$toolbar.innerHTML = ''
 
     if (typeof opts.toolbar === 'string' || typeof opts.toolbar === 'object') {
-      $(Utils.sprintf('<div class="bs-bars %s-%s"></div>', this.constants.classes.pull, opts.toolbarAlign))
-        .appendTo(this.$toolbar)
-        .append($(opts.toolbar))
+      const bsBarsDiv = document.createElement('div')
+
+      bsBarsDiv.className = `bs-bars ${this.constants.classes.pull}-${opts.toolbarAlign}`
+
+      const toolbarContent = typeof opts.toolbar === 'string' ?
+        document.querySelector(opts.toolbar) :
+        opts.toolbar instanceof Element ? opts.toolbar : null
+
+      if (toolbarContent) bsBarsDiv.appendChild(toolbarContent)
+      this.$toolbar.appendChild(bsBarsDiv)
     }
 
     // showColumns, showToggle, showRefresh
@@ -236,18 +246,21 @@ export default {
     if (this.showToolbar || html.length > 2) {
       if (html.some(item => Utils.isDomNode(item))) {
         // When there are DOM nodes, build the structure manually
-        // Build wrapper element once from the opening div string
-        const wrapper = $(html[0])
+        const template = document.createElement('template')
+
+        template.innerHTML = html[0] + html[html.length - 1]
+        const wrapper = template.content.firstChild
 
         // Skip html[0] (opening div) and html[html.length-1] (closing div)
-        // Append each button item into the wrapper
         for (const item of html.slice(1, -1)) {
-          wrapper.append(...Utils.htmlToNodes(item))
+          for (const node of Utils.htmlToNodes(item)) {
+            wrapper.appendChild(node)
+          }
         }
 
-        this.$toolbar.append(wrapper)
+        this.$toolbar.appendChild(wrapper)
       } else {
-        this.$toolbar.append(html.join(''))
+        this.$toolbar.insertAdjacentHTML('beforeend', html.join(''))
       }
     }
 
@@ -255,87 +268,95 @@ export default {
       if (buttonConfig.hasOwnProperty('event')) {
         if (typeof buttonConfig.event === 'function' || typeof buttonConfig.event === 'string') {
           const event = typeof buttonConfig.event === 'string' ? window[buttonConfig.event] : buttonConfig.event
+          const btn = this.$toolbar.querySelector(`button[name="${buttonName}"]`)
 
-          this.$toolbar.find(`button[name="${buttonName}"]`)
-            .off('click')
-            .on('click', () => event.call(this))
+          if (btn) btn.addEventListener('click', () => event.call(this))
           continue
         }
 
         for (const [eventType, eventFunction] of Object.entries(buttonConfig.event)) {
           const event = typeof eventFunction === 'string' ? window[eventFunction] : eventFunction
+          const btn = this.$toolbar.querySelector(`button[name="${buttonName}"]`)
 
-          this.$toolbar.find(`button[name="${buttonName}"]`)
-            .off(eventType)
-            .on(eventType, () => event.call(this))
+          if (btn) btn.addEventListener(eventType, () => event.call(this))
         }
       }
     }
 
     if (opts.showColumns) {
-      $keepOpen = this.$toolbar.find('.keep-open')
-      const $checkboxes = $keepOpen.find('input[type="checkbox"]:not(".toggle-all")')
-      const $toggleAll = $keepOpen.find('input[type="checkbox"].toggle-all')
+      const keepOpen = this.$toolbar.querySelector('.keep-open')
+      const checkboxes = keepOpen ?
+        Array.from(keepOpen.querySelectorAll('input[type="checkbox"]:not(.toggle-all)')) :
+        []
+      const toggleAllEl = keepOpen?.querySelector('input[type="checkbox"].toggle-all')
 
       if (switchableCount <= opts.minimumCountColumns) {
-        $keepOpen.find('input').prop('disabled', true)
+        keepOpen?.querySelectorAll('input').forEach(el => {
+          el.disabled = true
+        })
       }
 
-      $keepOpen.find('li, label').off('click').on('click', e => {
-        e.stopImmediatePropagation()
+      keepOpen?.querySelectorAll('li, label').forEach(el => {
+        el.addEventListener('click', e => e.stopImmediatePropagation())
       })
 
-      $checkboxes.off('click').on('click', ({ currentTarget }) => {
-        const $this = $(currentTarget)
-
-        this._toggleColumns([$this.data('field')], $this.prop('checked'), false)
-        this.trigger('column-switch', $this.data('field'), $this.prop('checked'))
-        $toggleAll.prop('checked', $checkboxes.filter(':checked').length === this.columns.filter(column => !this.isSelectionColumn(column)).length)
+      checkboxes.forEach(cb => {
+        cb.addEventListener('click', ({ currentTarget }) => {
+          this._toggleColumns([currentTarget.dataset.field], currentTarget.checked, false)
+          this.trigger('column-switch', currentTarget.dataset.field, currentTarget.checked)
+          if (toggleAllEl) {
+            toggleAllEl.checked = checkboxes.filter(c => c.checked).length ===
+              this.columns.filter(column => !this.isSelectionColumn(column)).length
+          }
+        })
       })
 
-      $toggleAll.off('click').on('click', ({ currentTarget }) => {
-        this._toggleAllColumns($(currentTarget).prop('checked'))
-        this.trigger('column-switch-all', $(currentTarget).prop('checked'))
+      toggleAllEl?.addEventListener('click', ({ currentTarget }) => {
+        this._toggleAllColumns(currentTarget.checked)
+        this.trigger('column-switch-all', currentTarget.checked)
       })
 
       if (opts.showColumnsSearch) {
-        const $columnsSearch = $keepOpen.find('[name="columnsSearch"]')
-        const $listItems = $keepOpen.find('.dropdown-item-marker')
+        const columnsSearchEl = keepOpen?.querySelector('[name="columnsSearch"]')
+        const listItems = keepOpen ? Array.from(keepOpen.querySelectorAll('.dropdown-item-marker')) : []
 
-        $columnsSearch.on('keyup paste change', ({ currentTarget }) => {
-          const $this = $(currentTarget)
-          const searchValue = $this.val().toLowerCase()
+        columnsSearchEl?.addEventListener('input', ({ currentTarget }) => {
+          const searchValue = currentTarget.value.toLowerCase()
 
-          $listItems.show()
-          $checkboxes.each((i, el) => {
-            const $checkbox = $(el)
-            const $listItem = $checkbox.parents('.dropdown-item-marker')
-            const text = $listItem.text().toLowerCase()
+          listItems.forEach(el => {
+            el.style.display = ''
+          })
+          checkboxes.forEach(cb => {
+            const listItem = cb.closest('.dropdown-item-marker')
 
-            if (!text.includes(searchValue)) {
-              $listItem.hide()
+            if (listItem && !listItem.textContent.toLowerCase().includes(searchValue)) {
+              listItem.style.display = 'none'
             }
           })
         })
       }
     }
-    const handleInputEvent = $searchInput => {
-      const eventTriggers = $searchInput.is('select') ? 'change' : 'keyup drop blur mouseup'
 
-      $searchInput.off(eventTriggers).on(eventTriggers, event => {
-        if (opts.searchOnEnterKey && event.keyCode !== 13) {
-          return
-        }
+    const handleInputEvent = searchInput => {
+      if (!searchInput) return
+      const events = searchInput.tagName === 'SELECT' ? ['change'] : ['keyup', 'drop', 'blur', 'mouseup']
 
-        if ([37, 38, 39, 40].includes(event.keyCode)) {
-          return
-        }
+      for (const evt of events) {
+        searchInput.addEventListener(evt, event => {
+          if (opts.searchOnEnterKey && event.keyCode !== 13) {
+            return
+          }
 
-        clearTimeout(timeoutId) // doesn't matter if it's 0
-        timeoutId = setTimeout(() => {
-          this.onSearch({ currentTarget: event.currentTarget })
-        }, opts.searchTimeOut)
-      })
+          if ([37, 38, 39, 40].includes(event.keyCode)) {
+            return
+          }
+
+          clearTimeout(timeoutId) // doesn't matter if it's 0
+          timeoutId = setTimeout(() => {
+            this.onSearch({ currentTarget: event.currentTarget })
+          }, opts.searchTimeOut)
+        })
+      }
     }
 
     // Fix #4516: this.showSearchClearButton is for extensions
@@ -375,12 +396,13 @@ export default {
         </div>
       `, searchInputFinalHtml))
 
-      this.$toolbar.append(html.join(''))
+      this.$toolbar.insertAdjacentHTML('beforeend', html.join(''))
       const searchInput = Utils.getSearchInput(this)
-      const $searchInput = $(searchInput)
 
       if (opts.showSearchButton) {
-        this.$toolbar.find('.search button[name=search]').off('click').on('click', () => {
+        const searchBtn = this.$toolbar.querySelector('.search button[name="search"]')
+
+        searchBtn?.addEventListener('click', () => {
           clearTimeout(timeoutId) // doesn't matter if it's 0
           timeoutId = setTimeout(() => {
             this.onSearch({ currentTarget: searchInput })
@@ -388,19 +410,19 @@ export default {
         })
 
         if (opts.searchOnEnterKey) {
-          handleInputEvent($searchInput)
+          handleInputEvent(searchInput)
         }
       } else {
-        handleInputEvent($searchInput)
+        handleInputEvent(searchInput)
       }
 
       if (opts.showSearchClearButton) {
-        this.$toolbar.find('.search button[name=clearSearch]').click(() => {
-          this.resetSearch()
-        })
+        const clearBtn = this.$toolbar.querySelector('.search button[name="clearSearch"]')
+
+        clearBtn?.addEventListener('click', () => this.resetSearch())
       }
     } else if (typeof opts.searchSelector === 'string') {
-      handleInputEvent($(Utils.getSearchInput(this)))
+      handleInputEvent(Utils.getSearchInput(this))
     }
   },
 
@@ -427,19 +449,20 @@ export default {
 
     const icon = this.options.showButtonIcons ? this.options.cardView ? this.options.icons.toggleOn : this.options.icons.toggleOff : ''
     const text = this.options.cardView ? this.options.formatToggleOff() : this.options.formatToggleOn()
+    const btn = this.$toolbar.querySelector('button[name="toggle"]')
 
-    this.$toolbar.find('button[name="toggle"]')
-      .html(`${Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix,
-        icon)} ${this.options.showButtonText ? text : ''}`)
-      .attr('aria-label', text)
-      .attr(this.options.buttonsAttributeTitle, text)
+    if (btn) {
+      btn.innerHTML = `${Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, icon)} ${this.options.showButtonText ? text : ''}`
+      btn.setAttribute('aria-label', text)
+      btn.setAttribute(this.options.buttonsAttributeTitle, text)
+    }
 
     this.initBody()
     this.trigger('toggle', this.options.cardView)
   },
 
   toggleFullscreen () {
-    this.$el.closest('.bootstrap-table').toggleClass('fullscreen')
+    this.$el.closest('.bootstrap-table')?.classList.toggle('fullscreen')
     this.resetView()
   }
 }

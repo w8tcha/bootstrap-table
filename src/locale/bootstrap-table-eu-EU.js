@@ -3,7 +3,9 @@
  * Author: Iker Ibarguren Berasaluze<ikerib@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['eu-EU'] = $.fn.bootstrapTable.locales['eu'] = {
+
+
+BootstrapTable.locales['eu-EU'] = BootstrapTable.locales['eu'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['eu-EU'] = $.fn.bootstrapTable.locales['eu'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['eu-EU'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['eu-EU'])

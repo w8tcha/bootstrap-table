@@ -4,7 +4,9 @@
  * Author: Petra Štrbenac (petra.strbenac@gmail.com)
  */
 
-$.fn.bootstrapTable.locales['hr-HR'] = $.fn.bootstrapTable.locales['hr'] = {
+
+
+BootstrapTable.locales['hr-HR'] = BootstrapTable.locales['hr'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -189,4 +191,4 @@ $.fn.bootstrapTable.locales['hr-HR'] = $.fn.bootstrapTable.locales['hr'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['hr-HR'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['hr-HR'])

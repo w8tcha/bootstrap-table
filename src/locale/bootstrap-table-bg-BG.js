@@ -3,7 +3,9 @@
  * Author: Mikhail Kalatchev <kalatchev[at]gmail.com>
  */
 
-$.fn.bootstrapTable.locales['bg-BG'] = $.fn.bootstrapTable.locales['bg'] = {
+
+
+BootstrapTable.locales['bg-BG'] = BootstrapTable.locales['bg'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['bg-BG'] = $.fn.bootstrapTable.locales['bg'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['bg-BG'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['bg-BG'])

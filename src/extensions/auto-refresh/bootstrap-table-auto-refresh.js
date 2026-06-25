@@ -4,9 +4,11 @@
  * @update: zhixin wen <wenzhixin2010@gmail.com>
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Object.assign(BootstrapTable.defaults, {
   autoRefresh: false,
   showAutoRefresh: true,
   autoRefreshInterval: 60,
@@ -15,7 +17,7 @@ Object.assign($.fn.bootstrapTable.defaults, {
   autoRefreshFunction: null
 })
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'autoRefresh', {
+Utils.assignIcons(BootstrapTable.icons, 'autoRefresh', {
   glyphicon: 'glyphicon-time icon-time',
   fa: 'fa-clock',
   bi: 'bi-clock',
@@ -23,15 +25,15 @@ Utils.assignIcons($.fn.bootstrapTable.icons, 'autoRefresh', {
   'material-icons': 'access_time'
 })
 
-Object.assign($.fn.bootstrapTable.locales, {
+Object.assign(BootstrapTable.locales, {
   formatAutoRefresh () {
     return 'Auto Refresh'
   }
 })
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales)
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales)
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   init (...args) {
     super.init(...args)
 
@@ -67,14 +69,14 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
   toggleAutoRefresh () {
     if (this.options.autoRefresh) {
+      const btn = this.$toolbar.querySelector(':scope > .columns [name="autoRefresh"]')
+
       if (this.options.autoRefreshStatus) {
         clearInterval(this.options.autoRefreshFunction)
-        this.$toolbar.find('>.columns [name="autoRefresh"]')
-          .removeClass(this.constants.classes.buttonActive)
+        btn?.classList.remove(this.constants.classes.buttonActive)
       } else {
         this.setupRefreshInterval()
-        this.$toolbar.find('>.columns [name="autoRefresh"]')
-          .addClass(this.constants.classes.buttonActive)
+        btn?.classList.add(this.constants.classes.buttonActive)
       }
       this.options.autoRefreshStatus = !this.options.autoRefreshStatus
     }

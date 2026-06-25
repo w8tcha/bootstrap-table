@@ -1,8 +1,5 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+(function (BootstrapTable) {
+	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1977,7 +1974,7 @@
 	 * Author: Alessio Felicioni <alessio.felicioni@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['it-IT'] = $.fn.bootstrapTable.locales['it'] = {
+	BootstrapTable.locales['it-IT'] = BootstrapTable.locales['it'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2117,6 +2114,6 @@
 	    return 'Mostra visuale a scheda';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['it-IT']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['it-IT']);
 
-}));
+})(BootstrapTable);

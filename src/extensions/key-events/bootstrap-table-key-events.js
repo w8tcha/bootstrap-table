@@ -3,13 +3,15 @@
  * @update zhixin wen <wenzhixin2010@gmail.com>
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Object.assign(BootstrapTable.defaults, {
   keyEvents: false
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
 
   init (...args) {
     super.init(...args)
@@ -20,13 +22,17 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   initKeyEvents () {
-    $(document).off('keydown').on('keydown', e => {
-      const search = Utils.getSearchInput(this)
-      const $refresh = this.$toolbar.find('button[name="refresh"]')
-      const $toggle = this.$toolbar.find('button[name="toggle"]')
-      const $paginationSwitch = this.$toolbar.find('button[name="paginationSwitch"]')
+    if (this._keydownHandler) {
+      document.removeEventListener('keydown', this._keydownHandler)
+    }
 
-      if (document.activeElement === search || !$.contains(document.activeElement, this.$toolbar.get(0))) {
+    this._keydownHandler = e => {
+      const search = Utils.getSearchInput(this)
+      const refresh = this.$toolbar.querySelector('button[name="refresh"]')
+      const toggle = this.$toolbar.querySelector('button[name="toggle"]')
+      const paginationSwitch = this.$toolbar.querySelector('button[name="paginationSwitch"]')
+
+      if (document.activeElement === search || !document.activeElement?.contains(this.$toolbar)) {
         return true
       }
 
@@ -35,25 +41,25 @@ $.BootstrapTable = class extends $.BootstrapTable {
           if (!this.options.search) {
             return
           }
-          $(search).focus()
+          search?.focus()
           return false
         case 82: // r
           if (!this.options.showRefresh) {
             return
           }
-          $refresh.click()
+          refresh?.click()
           return false
         case 84: // t
           if (!this.options.showToggle) {
             return
           }
-          $toggle.click()
+          toggle?.click()
           return false
         case 80: // p
           if (!this.options.showPaginationSwitch) {
             return
           }
-          $paginationSwitch.click()
+          paginationSwitch?.click()
           return false
         case 37: // left
           if (!this.options.pagination) {
@@ -70,6 +76,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
         default:
           break
       }
-    })
+    }
+
+    document.addEventListener('keydown', this._keydownHandler)
   }
 }

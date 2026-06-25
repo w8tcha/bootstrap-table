@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -2078,8 +2078,8 @@
    *
    **/
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.defaults, {
     usePipeline: false,
     pipelineSize: 1000,
     // eslint-disable-next-line no-unused-vars
@@ -2091,18 +2091,18 @@
       return false;
     }
   });
-  Object.assign($.fn.bootstrapTable.events, {
+  Object.assign(BootstrapTable.events, {
     'cached-data-hit.bs.table': 'onCachedDataHit',
     'cached-data-reset.bs.table': 'onCachedDataReset'
   });
-  $.fn.bootstrapTable.methods.push('resetPipelineCache');
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  BootstrapTable.methods.push('resetPipelineCache');
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "init",
       value:
       // needs to be called before initServer
@@ -2113,7 +2113,7 @@
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "init", this, 3)(args);
+        _superPropGet(_default, "init", this, 3)(args);
       }
     }, {
       key: "initPipeline",
@@ -2134,7 +2134,7 @@
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "onSearch", this, 3)(args);
+        _superPropGet(_default, "onSearch", this, 3)(args);
       }
 
       // force a cache reset on sort
@@ -2147,18 +2147,18 @@
         for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
           args[_key3] = arguments[_key3];
         }
-        _superPropGet(_class, "onSort", this, 3)(args);
+        _superPropGet(_default, "onSort", this, 3)(args);
       }
 
       // rebuild cache window on page size change
     }, {
       key: "onPageListChange",
       value: function onPageListChange(event) {
-        var target = $(event.currentTarget);
-        var newPageSize = parseInt(target.text(), 10);
+        var target = event.currentTarget;
+        var newPageSize = parseInt(target.textContent, 10);
         this.options.pipelineSize = this.calculatePipelineSize(this.options.pipelineSize, newPageSize);
         this.resetCache = true;
-        _superPropGet(_class, "onPageListChange", this, 3)([event]);
+        _superPropGet(_default, "onPageListChange", this, 3)([event]);
       }
 
       // calculate pipeline size by rounding up to
@@ -2222,7 +2222,7 @@
       value: function initServer(silent, query) {
         var _this = this;
         if (!this.options.usePipeline) {
-          return _superPropGet(_class, "initServer", this, 3)([silent, query]);
+          return _superPropGet(_default, "initServer", this, 3)([silent, query]);
         }
         var useAjax = true;
         var params = {};
@@ -2241,10 +2241,6 @@
 
             // case 1: reset cache but stay within current window (e.g. column sort)
             // case 2: move outside of the current window (e.g. search or paging)
-            //  since each cache window is aligned with the current page size
-            //  checking if params.offset is outside the current window is sufficient.
-            //  need to re-query for preceding or succeeding cache window
-            //  also handle case
             if (this.resetCache || params.offset < w.lower || params.offset > w.upper) {
               useAjax = true;
               this.setCurrWindow(params.offset);
@@ -2282,8 +2278,8 @@
         }
         if (!this.pipelineResponseHandler) {
           this.pipelineResponseHandler = this.options.responseHandler;
-          this.options.responseHandler = function (_res, jqXHR) {
-            var res = Utils.calculateObjectValue(_this.options, _this.pipelineResponseHandler, [_res, jqXHR], _res);
+          this.options.responseHandler = function (_res, response) {
+            var res = Utils.calculateObjectValue(_this.options, _this.pipelineResponseHandler, [_res, response], _res);
 
             // store entire request in cache
             _this.cacheRequestJSON = Utils.extend(true, {}, res);
@@ -2300,7 +2296,7 @@
             return res;
           };
         }
-        return _superPropGet(_class, "initServer", this, 3)([silent, _objectSpread2(_objectSpread2({}, query), params)]);
+        return _superPropGet(_default, "initServer", this, 3)([silent, _objectSpread2(_objectSpread2({}, query), params)]);
       }
     }, {
       key: "destroy",
@@ -2310,7 +2306,7 @@
         for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
           args[_key4] = arguments[_key4];
         }
-        _superPropGet(_class, "destroy", this, 3)(args);
+        _superPropGet(_default, "destroy", this, 3)(args);
       }
 
       // Public method to reset the pipeline cache
@@ -2320,6 +2316,8 @@
         this.resetCache = true;
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

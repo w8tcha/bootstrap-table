@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -2206,7 +2206,7 @@
 
   requireEs_array_filter();
 
-  var es_array_find = {};
+  var es_array_includes = {};
 
   var objectDefineProperties = {};
 
@@ -2389,39 +2389,6 @@
   	};
   	return addToUnscopables;
   }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_array_includes = {};
 
   var hasRequiredEs_array_includes;
 
@@ -3409,6 +3376,120 @@
 
   requireEs_string_trim();
 
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
+  var arrayForEach;
+  var hasRequiredArrayForEach;
+
+  function requireArrayForEach () {
+  	if (hasRequiredArrayForEach) return arrayForEach;
+  	hasRequiredArrayForEach = 1;
+  	var $forEach = requireArrayIteration().forEach;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+  	var STRICT_METHOD = arrayMethodIsStrict('forEach');
+
+  	// `Array.prototype.forEach` method implementation
+  	// https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	arrayForEach = !STRICT_METHOD ? function forEach(callbackfn /* , thisArg */) {
+  	  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	// eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	} : [].forEach;
+  	return arrayForEach;
+  }
+
+  var hasRequiredWeb_domCollections_forEach;
+
+  function requireWeb_domCollections_forEach () {
+  	if (hasRequiredWeb_domCollections_forEach) return web_domCollections_forEach;
+  	hasRequiredWeb_domCollections_forEach = 1;
+  	var globalThis = requireGlobalThis();
+  	var DOMIterables = requireDomIterables();
+  	var DOMTokenListPrototype = requireDomTokenListPrototype();
+  	var forEach = requireArrayForEach();
+  	var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+
+  	var handlePrototype = function (CollectionPrototype) {
+  	  // some Chrome versions have non-configurable methods on DOMTokenList
+  	  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+  	    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  	  } catch (error) {
+  	    CollectionPrototype.forEach = forEach;
+  	  }
+  	};
+
+  	for (var COLLECTION_NAME in DOMIterables) {
+  	  if (DOMIterables[COLLECTION_NAME]) {
+  	    handlePrototype(globalThis[COLLECTION_NAME] && globalThis[COLLECTION_NAME].prototype);
+  	  }
+  	}
+
+  	handlePrototype(DOMTokenListPrototype);
+  	return web_domCollections_forEach;
+  }
+
+  requireWeb_domCollections_forEach();
+
   /**
    * @author: aperez <aperez@datadec.es>
    * @version: v2.0.0
@@ -3417,7 +3498,7 @@
    * @update zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
+  var Utils = BootstrapTable.utils;
   var theme = {
     bootstrap3: {
       classes: {},
@@ -3463,8 +3544,8 @@
         modal: "\n        <div class=\"ui modal\" id=\"avdSearchModal_%s\">\n          <i class=\"close icon toolbar-modal-close\"></i>\n          <div class=\"header toolbar-modal-title\"\"></div>\n          <div class=\"image content ui form toolbar-modal-body\"></div>\n          <div class=\"actions toolbar-modal-footer\">\n            <div class=\"ui black deny button button-%s toolbar-modal-close\"></div>\n          </div>\n        </div>\n      "
       }
     }
-  }[$.fn.bootstrapTable.theme];
-  Object.assign($.fn.bootstrapTable.defaults, {
+  }[BootstrapTable.theme];
+  Object.assign(BootstrapTable.defaults, {
     advancedSearch: false,
     idForm: 'advancedSearch',
     actionForm: '',
@@ -3474,16 +3555,16 @@
       return false;
     }
   });
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'advancedSearchIcon', {
+  Utils.assignIcons(BootstrapTable.icons, 'advancedSearchIcon', {
     glyphicon: 'glyphicon-chevron-down',
     fa: 'fa-chevron-down',
     bi: 'bi-chevron-down',
     'material-icons': 'expand_more'
   });
-  Object.assign($.fn.bootstrapTable.events, {
+  Object.assign(BootstrapTable.events, {
     'column-advanced-search.bs.table': 'onColumnAdvancedSearch'
   });
-  Object.assign($.fn.bootstrapTable.locales, {
+  Object.assign(BootstrapTable.locales, {
     formatAdvancedSearch: function formatAdvancedSearch() {
       return 'Advanced search';
     },
@@ -3491,14 +3572,14 @@
       return 'Close';
     }
   });
-  Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales);
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  Object.assign(BootstrapTable.defaults, BootstrapTable.locales);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initToolbar",
       value: function initToolbar() {
         this.showToolbar = this.showToolbar || this.options.search && this.options.advancedSearch && this.options.idTable;
@@ -3518,18 +3599,22 @@
             this.filterColumnsPartial = {};
           }
         }
-        _superPropGet(_class, "initToolbar", this)([]);
+        _superPropGet(_default, "initToolbar", this)([]);
       }
     }, {
       key: "showAdvancedSearch",
       value: function showAdvancedSearch() {
         var _this = this;
-        this.$toolbarModal = $("#avdSearchModal_".concat(this.options.idTable));
-        if (this.$toolbarModal.length <= 0) {
-          $('body').append(Utils.sprintf(theme.html.modal, this.options.idTable, this.options.buttonsClass));
-          this.$toolbarModal = $("#avdSearchModal_".concat(this.options.idTable));
-          this.$toolbarModal.find('.toolbar-modal-close').off('click').on('click', function () {
-            return _this.hideToolbarModal();
+        this.$toolbarModal = document.querySelector("#avdSearchModal_".concat(this.options.idTable));
+        if (!this.$toolbarModal) {
+          var template = document.createElement('template');
+          template.innerHTML = Utils.sprintf(theme.html.modal, this.options.idTable, this.options.buttonsClass).trim();
+          document.body.appendChild(template.content.firstElementChild);
+          this.$toolbarModal = document.querySelector("#avdSearchModal_".concat(this.options.idTable));
+          this.$toolbarModal.querySelectorAll('.toolbar-modal-close').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              return _this.hideToolbarModal();
+            });
           });
         }
         this.initToolbarModalBody();
@@ -3539,53 +3624,77 @@
       key: "initToolbarModalBody",
       value: function initToolbarModalBody() {
         var _this2 = this;
-        this.$toolbarModal.find('.toolbar-modal-title').html(this.options.formatAdvancedSearch());
-        this.$toolbarModal.find('.toolbar-modal-footer .toolbar-modal-close').html(this.options.formatAdvancedCloseButton());
-        this.$toolbarModal.find('.toolbar-modal-body').html(this.createToolbarForm()).off('keyup blur', 'input').on('keyup blur', 'input', function (e) {
-          _this2.onColumnAdvancedSearch(e);
-        });
+        var titleEl = this.$toolbarModal.querySelector('.toolbar-modal-title');
+        if (titleEl) titleEl.innerHTML = this.options.formatAdvancedSearch();
+        var footerClose = this.$toolbarModal.querySelector('.toolbar-modal-footer .toolbar-modal-close');
+        if (footerClose) footerClose.innerHTML = this.options.formatAdvancedCloseButton();
+        var body = this.$toolbarModal.querySelector('.toolbar-modal-body');
+        body.innerHTML = this.createToolbarForm();
+        if (this._toolbarBodyHandler) {
+          body.removeEventListener('keyup', this._toolbarBodyHandler);
+          body.removeEventListener('focusout', this._toolbarBodyHandler);
+        }
+        this._toolbarBodyHandler = function (e) {
+          if (e.target.tagName === 'INPUT') {
+            _this2.onColumnAdvancedSearch(e);
+          }
+        };
+        body.addEventListener('keyup', this._toolbarBodyHandler);
+        body.addEventListener('focusout', this._toolbarBodyHandler);
       }
     }, {
       key: "showToolbarModal",
       value: function showToolbarModal() {
-        var theme = $.fn.bootstrapTable.theme;
-        if (['bootstrap3', 'bootstrap4'].includes(theme)) {
-          this.$toolbarModal.modal();
-        } else if (theme === 'bootstrap5') {
+        var currentTheme = BootstrapTable.theme;
+        if (['bootstrap3', 'bootstrap4'].includes(currentTheme)) {
+          if (typeof window.$ !== 'undefined') {
+            $(this.$toolbarModal).modal();
+          }
+        } else if (currentTheme === 'bootstrap5') {
           if (!this.toolbarModal) {
-            this.toolbarModal = new window.bootstrap.Modal(this.$toolbarModal[0], {});
+            this.toolbarModal = new window.bootstrap.Modal(this.$toolbarModal, {});
           }
           this.toolbarModal.show();
-        } else if (theme === 'bulma') {
-          this.$toolbarModal.toggleClass('is-active');
-        } else if (theme === 'foundation') {
+        } else if (currentTheme === 'bulma') {
+          this.$toolbarModal.classList.toggle('is-active');
+        } else if (currentTheme === 'foundation') {
           if (!this.toolbarModal) {
             this.toolbarModal = new window.Foundation.Reveal(this.$toolbarModal);
           }
           this.toolbarModal.open();
-        } else if (theme === 'materialize') {
-          this.$toolbarModal.modal().modal('open');
-        } else if (theme === 'semantic') {
-          this.$toolbarModal.modal('show');
+        } else if (currentTheme === 'materialize') {
+          if (typeof window.$ !== 'undefined') {
+            $(this.$toolbarModal).modal().modal('open');
+          }
+        } else if (currentTheme === 'semantic') {
+          if (typeof window.$ !== 'undefined') {
+            $(this.$toolbarModal).modal('show');
+          }
         }
       }
     }, {
       key: "hideToolbarModal",
       value: function hideToolbarModal() {
-        var theme = $.fn.bootstrapTable.theme;
-        if (['bootstrap3', 'bootstrap4'].includes(theme)) {
-          this.$toolbarModal.modal('hide');
-        } else if (theme === 'bootstrap5') {
+        var currentTheme = BootstrapTable.theme;
+        if (['bootstrap3', 'bootstrap4'].includes(currentTheme)) {
+          if (typeof window.$ !== 'undefined') {
+            $(this.$toolbarModal).modal('hide');
+          }
+        } else if (currentTheme === 'bootstrap5') {
           this.toolbarModal.hide();
-        } else if (theme === 'bulma') {
-          $('html').toggleClass('is-clipped');
-          this.$toolbarModal.toggleClass('is-active');
-        } else if (theme === 'foundation') {
+        } else if (currentTheme === 'bulma') {
+          document.documentElement.classList.toggle('is-clipped');
+          this.$toolbarModal.classList.toggle('is-active');
+        } else if (currentTheme === 'foundation') {
           this.toolbarModal.close();
-        } else if (theme === 'materialize') {
-          this.$toolbarModal.modal('open');
-        } else if (theme === 'semantic') {
-          this.$toolbarModal.modal('close');
+        } else if (currentTheme === 'materialize') {
+          if (typeof window.$ !== 'undefined') {
+            $(this.$toolbarModal).modal('open');
+          }
+        } else if (currentTheme === 'semantic') {
+          if (typeof window.$ !== 'undefined') {
+            $(this.$toolbarModal).modal('close');
+          }
         }
         if (this.options.sidePagination === 'server') {
           this.options.pageNumber = 1;
@@ -3603,7 +3712,9 @@
           for (_iterator.s(); !(_step = _iterator.n()).done;) {
             var column = _step.value;
             if (!column.checkbox && column.visible && column.searchable) {
-              var title = $('<div/>').html(column.title).text().trim();
+              var tmp = document.createElement('div');
+              tmp.innerHTML = column.title;
+              var title = tmp.textContent.trim();
               var value = this.filterColumnsPartial[column.field] || '';
               html.push("\n          <div class=\"form-group row ".concat(theme.classes.formGroup || '', "\">\n            <label class=\"col-sm-4 control-label\">").concat(title, "</label>\n            <div class=\"col-sm-6\">\n              <input type=\"text\" class=\"form-control ").concat(this.constants.classes.input, "\"\n                name=\"").concat(column.field, "\" placeholder=\"").concat(title, "\" value=\"").concat(value, "\">\n            </div>\n          </div>\n        "));
             }
@@ -3620,7 +3731,7 @@
       key: "initSearch",
       value: function initSearch() {
         var _this3 = this;
-        _superPropGet(_class, "initSearch", this)([]);
+        _superPropGet(_default, "initSearch", this)([]);
         if (!this.options.advancedSearch || this.options.sidePagination === 'server') {
           return;
         }
@@ -3635,8 +3746,9 @@
             var index = _this3.header.fields.indexOf(key);
             value = Utils.calculateObjectValue(_this3.header, _this3.header.formatters[index], [value, item, i], value);
             if (_this3.header.formatters[index]) {
-              // search innerText
-              value = $('<div>').html(value).text();
+              var tmp = document.createElement('div');
+              tmp.innerHTML = value;
+              value = tmp.textContent;
             }
             if (!(index !== -1 && (typeof value === 'string' || typeof value === 'number') && "".concat(value).toLowerCase().includes(val))) {
               return false;
@@ -3649,8 +3761,8 @@
     }, {
       key: "onColumnAdvancedSearch",
       value: function onColumnAdvancedSearch(e) {
-        var text = $(e.currentTarget).val().trim();
-        var field = $(e.currentTarget).attr('name');
+        var text = e.currentTarget.value.trim();
+        var field = e.currentTarget.getAttribute('name');
         if (text) {
           this.filterColumnsPartial[field] = text;
         } else {
@@ -3664,6 +3776,8 @@
         }
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

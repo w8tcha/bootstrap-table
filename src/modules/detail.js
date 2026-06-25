@@ -2,9 +2,9 @@ import Utils from '../utils/index.js'
 
 export default {
   toggleDetailView (index, _columnDetailFormatter) {
-    const $tr = this.$body.find(Utils.sprintf('> tr[data-index="%s"]', index))
+    const tr = this.$body.querySelector(`:scope > tr[data-index="${index}"]`)
 
-    if ($tr.next().is('tr.detail-view')) {
+    if (tr?.nextElementSibling?.classList.contains('detail-view')) {
       this.collapseRow(index)
     } else {
       this.expandRow(index, _columnDetailFormatter)
@@ -15,28 +15,42 @@ export default {
 
   expandRow (index, _columnDetailFormatter) {
     const row = this.data[index]
-    const $tr = this.$body.find(Utils.sprintf('> tr[data-index="%s"][data-has-detail-view]', index))
+    const tr = this.$body.querySelector(`:scope > tr[data-index="${index}"][data-has-detail-view]`)
+
+    if (!tr) return
 
     if (this.options.detailViewIcon) {
-      $tr.find('a.detail-icon').html(Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, this.options.icons.detailClose))
+      const iconEl = tr.querySelector('a.detail-icon')
+
+      if (iconEl) {
+        iconEl.innerHTML = Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, this.options.icons.detailClose)
+      }
     }
 
-    if ($tr.next().is('tr.detail-view')) {
+    if (tr.nextElementSibling?.classList.contains('detail-view')) {
       return
     }
 
-    $tr.after(Utils.sprintf('<tr class="detail-view"><td colspan="%s"></td></tr>', $tr.children('td').length))
+    const colCount = tr.querySelectorAll(':scope > td').length
+    const detailTr = document.createElement('tr')
 
-    const $element = $tr.next().find('td')
+    detailTr.className = 'detail-view'
+    detailTr.innerHTML = `<td colspan="${colCount}"></td>`
+    tr.after(detailTr)
 
+    const tdEl = detailTr.querySelector('td')
     const detailFormatter = _columnDetailFormatter || this.options.detailFormatter
-    const content = Utils.calculateObjectValue(this.options, detailFormatter, [index, row, $element], '')
+    const content = Utils.calculateObjectValue(this.options, detailFormatter, [index, row, tdEl], '')
 
-    if ($element.length === 1) {
-      $element.append(content)
+    if (content !== undefined && content !== '') {
+      if (typeof content === 'string') {
+        tdEl.insertAdjacentHTML('beforeend', content)
+      } else if (content instanceof Node) {
+        tdEl.appendChild(content)
+      }
     }
 
-    this.trigger('expand-row', index, row, $element)
+    this.trigger('expand-row', index, row, tdEl)
   },
 
   expandRowByUniqueId (uniqueId) {
@@ -51,18 +65,26 @@ export default {
 
   collapseRow (index) {
     const row = this.data[index]
-    const $tr = this.$body.find(Utils.sprintf('> tr[data-index="%s"][data-has-detail-view]', index))
+    const tr = this.$body.querySelector(`:scope > tr[data-index="${index}"][data-has-detail-view]`)
 
-    if (!$tr.next().is('tr.detail-view')) {
+    if (!tr) return
+
+    const nextTr = tr.nextElementSibling
+
+    if (!nextTr?.classList.contains('detail-view')) {
       return
     }
 
     if (this.options.detailViewIcon) {
-      $tr.find('a.detail-icon').html(Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, this.options.icons.detailOpen))
+      const iconEl = tr.querySelector('a.detail-icon')
+
+      if (iconEl) {
+        iconEl.innerHTML = Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, this.options.icons.detailOpen)
+      }
     }
 
-    this.trigger('collapse-row', index, row, $tr.next())
-    $tr.next().remove()
+    this.trigger('collapse-row', index, row, nextTr)
+    nextTr.remove()
   },
 
   collapseRowByUniqueId (uniqueId) {
@@ -76,18 +98,12 @@ export default {
   },
 
   expandAllRows () {
-    const trs = this.$body.find('> tr[data-index][data-has-detail-view]')
-
-    for (let i = 0; i < trs.length; i++) {
-      this.expandRow($(trs[i]).data('index'))
-    }
+    this.$body.querySelectorAll(':scope > tr[data-index][data-has-detail-view]')
+      .forEach(tr => this.expandRow(+tr.dataset.index))
   },
 
   collapseAllRows () {
-    const trs = this.$body.find('> tr[data-index][data-has-detail-view]')
-
-    for (let i = 0; i < trs.length; i++) {
-      this.collapseRow($(trs[i]).data('index'))
-    }
+    this.$body.querySelectorAll(':scope > tr[data-index][data-has-detail-view]')
+      .forEach(tr => this.collapseRow(+tr.dataset.index))
   }
 }

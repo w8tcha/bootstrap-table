@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -11,6 +11,9 @@
   }
   function _arrayWithHoles(r) {
     if (Array.isArray(r)) return r;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
   }
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -115,6 +118,9 @@
       return !!t;
     })();
   }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
   function _iterableToArrayLimit(r, l) {
     var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
     if (null != t) {
@@ -142,6 +148,9 @@
   function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
   function _possibleConstructorReturn(t, e) {
     if (e && ("object" == typeof e || "function" == typeof e)) return e;
     if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
@@ -164,6 +173,9 @@
     return 2 & r && "function" == typeof p ? function (t) {
       return p.apply(e, t);
     } : p;
+  }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
   function _toPrimitive(t, r) {
     if ("object" != typeof t || !t) return t;
@@ -3443,53 +3455,170 @@
 
   requireEs_string_replace();
 
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
+  var arrayForEach;
+  var hasRequiredArrayForEach;
+
+  function requireArrayForEach () {
+  	if (hasRequiredArrayForEach) return arrayForEach;
+  	hasRequiredArrayForEach = 1;
+  	var $forEach = requireArrayIteration().forEach;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+  	var STRICT_METHOD = arrayMethodIsStrict('forEach');
+
+  	// `Array.prototype.forEach` method implementation
+  	// https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	arrayForEach = !STRICT_METHOD ? function forEach(callbackfn /* , thisArg */) {
+  	  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	// eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	} : [].forEach;
+  	return arrayForEach;
+  }
+
+  var hasRequiredWeb_domCollections_forEach;
+
+  function requireWeb_domCollections_forEach () {
+  	if (hasRequiredWeb_domCollections_forEach) return web_domCollections_forEach;
+  	hasRequiredWeb_domCollections_forEach = 1;
+  	var globalThis = requireGlobalThis();
+  	var DOMIterables = requireDomIterables();
+  	var DOMTokenListPrototype = requireDomTokenListPrototype();
+  	var forEach = requireArrayForEach();
+  	var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+
+  	var handlePrototype = function (CollectionPrototype) {
+  	  // some Chrome versions have non-configurable methods on DOMTokenList
+  	  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+  	    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  	  } catch (error) {
+  	    CollectionPrototype.forEach = forEach;
+  	  }
+  	};
+
+  	for (var COLLECTION_NAME in DOMIterables) {
+  	  if (DOMIterables[COLLECTION_NAME]) {
+  	    handlePrototype(globalThis[COLLECTION_NAME] && globalThis[COLLECTION_NAME].prototype);
+  	  }
+  	}
+
+  	handlePrototype(DOMTokenListPrototype);
+  	return web_domCollections_forEach;
+  }
+
+  requireWeb_domCollections_forEach();
+
   /* eslint-disable no-unused-vars */
   /**
    * @author zhixin wen <wenzhixin2010@gmail.com>
    * extensions: https://github.com/vitalets/x-editable
+   *
+   * Note: this extension depends on the x-editable jQuery plugin.
+   * jQuery must be available and the plugin loaded for this to work.
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.defaults, {
     editable: true,
     onEditableInit: function onEditableInit() {
       return false;
     },
-    onEditableSave: function onEditableSave(field, row, rowIndex, oldValue, $el) {
+    onEditableSave: function onEditableSave(field, row, rowIndex, oldValue, el) {
       return false;
     },
-    onEditableShown: function onEditableShown(field, row, $el, editable) {
+    onEditableShown: function onEditableShown(field, row, el, editable) {
       return false;
     },
-    onEditableHidden: function onEditableHidden(field, row, $el, reason) {
+    onEditableHidden: function onEditableHidden(field, row, el, reason) {
       return false;
     }
   });
-  Object.assign($.fn.bootstrapTable.columnDefaults, {
+  Object.assign(BootstrapTable.columnDefaults, {
     alwaysUseFormatter: false
   });
-  Object.assign($.fn.bootstrapTable.events, {
+  Object.assign(BootstrapTable.events, {
     'editable-init.bs.table': 'onEditableInit',
     'editable-save.bs.table': 'onEditableSave',
     'editable-shown.bs.table': 'onEditableShown',
     'editable-hidden.bs.table': 'onEditableHidden'
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initTable",
       value: function initTable() {
         var _this = this;
-        _superPropGet(_class, "initTable", this, 3)([]);
+        _superPropGet(_default, "initTable", this, 3)([]);
         if (!this.options.editable) {
           return;
         }
         this.editedCells = [];
-        $.each(this.columns, function (i, column) {
+        this.columns.forEach(function (column, i) {
           if (!column.editable) {
             return;
           }
@@ -3505,7 +3634,12 @@
             }
           };
           var formatterIsSet = column.formatter ? true : false;
-          $.each(_this.options, processDataOptions);
+          Object.entries(_this.options).forEach(function (_ref) {
+            var _ref2 = _slicedToArray(_ref, 2),
+              key = _ref2[0],
+              value = _ref2[1];
+            return processDataOptions(key, value);
+          });
           column.formatter = column.formatter || function (value) {
             return value;
           };
@@ -3515,18 +3649,26 @@
             result = typeof result === 'undefined' || result === null ? _this.options.undefinedText : result;
             if (_this.options.uniqueId !== undefined && !column.alwaysUseFormatter) {
               var uniqueId = Utils.getItemField(row, _this.options.uniqueId, false);
-              if ($.inArray(column.field + uniqueId, _this.editedCells) !== -1) {
+              if (_this.editedCells.indexOf(column.field + uniqueId) !== -1) {
                 result = value;
               }
             }
-            $.each(column, processDataOptions);
+            Object.entries(column).forEach(function (_ref3) {
+              var _ref4 = _slicedToArray(_ref3, 2),
+                key = _ref4[0],
+                value = _ref4[1];
+              return processDataOptions(key, value);
+            });
             var editableOpts = Utils.calculateObjectValue(column, column.editable, [index, row], {});
-            var noEditFormatter = editableOpts.hasOwnProperty('noEditFormatter') && editableOpts.noEditFormatter(value, row, index, field);
+            var noEditFormatter = Object.prototype.hasOwnProperty.call(editableOpts, 'noEditFormatter') && editableOpts.noEditFormatter(value, row, index, field);
             if (noEditFormatter) {
               return noEditFormatter;
             }
             var editableDataMarkup = '';
-            $.each(editableOptions, function (key, value) {
+            Object.entries(editableOptions).forEach(function (_ref5) {
+              var _ref6 = _slicedToArray(_ref5, 2),
+                key = _ref6[0],
+                value = _ref6[1];
               editableDataMarkup += " ".concat(key, "=\"").concat(value, "\"");
             });
             return "<a href=\"javascript:void(0)\"\n          data-name=\"".concat(column.field, "\"\n          data-pk=\"").concat(row[_this.options.idField], "\"\n          data-value=\"").concat(value || '', "\"\n          ").concat(editableDataMarkup, ">").concat(formatterIsSet ? result : '', "</a>"); // expand all data-editable-XXX
@@ -3537,69 +3679,74 @@
       key: "initBody",
       value: function initBody(fixedScroll) {
         var _this2 = this;
-        _superPropGet(_class, "initBody", this, 3)([fixedScroll]);
+        _superPropGet(_default, "initBody", this, 3)([fixedScroll]);
         if (!this.options.editable) {
           return;
         }
-        $.each(this.columns, function (i, column) {
+        this.columns.forEach(function (column, i) {
           if (!column.editable) {
             return;
           }
           var data = _this2.getData({
             escape: true
           });
-          var $field = _this2.$body.find("a[data-name=\"".concat(column.field, "\"]"));
-          $field.each(function (i, element) {
-            var $element = $(element);
-            var $tr = $element.closest('tr');
-            var index = $tr.data('index');
+          var fields = _toConsumableArray(_this2.$body.querySelectorAll("a[data-name=\"".concat(column.field, "\"]")));
+          fields.forEach(function (element, i) {
+            var tr = element.closest('tr');
+            var index = +tr.dataset.index;
             var row = data[index];
-            var editableOpts = Utils.calculateObjectValue(column, column.editable, [index, row, $element], {});
-            $element.editable(editableOpts);
-          });
-          $field.off('save').on('save', function (_ref, _ref2) {
-            var currentTarget = _ref.currentTarget;
-            var submitValue = _ref2.submitValue;
-            var $this = $(currentTarget);
-            var data = _this2.getData();
-            var rowIndex = $this.parents('tr[data-index]').data('index');
-            var row = data[rowIndex];
-            var oldValue = row[column.field];
-            if (_this2.options.uniqueId !== undefined && !column.alwaysUseFormatter) {
-              var uniqueId = Utils.getItemField(row, _this2.options.uniqueId, false);
-              if ($.inArray(column.field + uniqueId, _this2.editedCells) === -1) {
-                _this2.editedCells.push(column.field + uniqueId);
-              }
+            var editableOpts = Utils.calculateObjectValue(column, column.editable, [index, row, element], {});
+
+            // x-editable requires jQuery
+            if (typeof window.$ !== 'undefined') {
+              $(element).editable(editableOpts);
             }
-            submitValue = Utils.escapeHTML(submitValue);
-            $this.data('value', submitValue);
-            row[column.field] = submitValue;
-            _this2.trigger('editable-save', column.field, row, rowIndex, oldValue, $this);
-            _this2.initBody();
           });
-          $field.off('shown').on('shown', function (_ref3, editable) {
-            var currentTarget = _ref3.currentTarget;
-            var $this = $(currentTarget);
-            var data = _this2.getData();
-            var rowIndex = $this.parents('tr[data-index]').data('index');
-            var row = data[rowIndex];
-            _this2.trigger('editable-shown', column.field, row, $this, editable);
-          });
-          $field.off('hidden').on('hidden', function (_ref4, reason) {
-            var currentTarget = _ref4.currentTarget;
-            var $this = $(currentTarget);
-            var data = _this2.getData();
-            var rowIndex = $this.parents('tr[data-index]').data('index');
-            var row = data[rowIndex];
-            _this2.trigger('editable-hidden', column.field, row, $this, reason);
-          });
+
+          // x-editable events require jQuery
+          if (typeof window.$ !== 'undefined') {
+            var $fields = $(_this2.$body).find("a[data-name=\"".concat(column.field, "\"]"));
+            $fields.off('save').on('save', function (_ref7, _ref8) {
+              var currentTarget = _ref7.currentTarget;
+              var submitValue = _ref8.submitValue;
+              var data = _this2.getData();
+              var rowIndex = currentTarget.closest('tr[data-index]') ? +currentTarget.closest('tr[data-index]').dataset.index : -1;
+              var row = data[rowIndex];
+              var oldValue = row[column.field];
+              if (_this2.options.uniqueId !== undefined && !column.alwaysUseFormatter) {
+                var uniqueId = Utils.getItemField(row, _this2.options.uniqueId, false);
+                if (_this2.editedCells.indexOf(column.field + uniqueId) === -1) {
+                  _this2.editedCells.push(column.field + uniqueId);
+                }
+              }
+              submitValue = Utils.escapeHTML(submitValue);
+              currentTarget.dataset.value = submitValue;
+              row[column.field] = submitValue;
+              _this2.trigger('editable-save', column.field, row, rowIndex, oldValue, currentTarget);
+              _this2.initBody();
+            });
+            $fields.off('shown').on('shown', function (_ref9, editable) {
+              var currentTarget = _ref9.currentTarget;
+              var data = _this2.getData();
+              var rowIndex = currentTarget.closest('tr[data-index]') ? +currentTarget.closest('tr[data-index]').dataset.index : -1;
+              var row = data[rowIndex];
+              _this2.trigger('editable-shown', column.field, row, currentTarget, editable);
+            });
+            $fields.off('hidden').on('hidden', function (_ref0, reason) {
+              var currentTarget = _ref0.currentTarget;
+              var data = _this2.getData();
+              var rowIndex = currentTarget.closest('tr[data-index]') ? +currentTarget.closest('tr[data-index]').dataset.index : -1;
+              var row = data[rowIndex];
+              _this2.trigger('editable-hidden', column.field, row, currentTarget, reason);
+            });
+          }
         });
         this.trigger('editable-init');
       }
     }, {
       key: "getData",
       value: function getData(params) {
-        var data = _superPropGet(_class, "getData", this, 3)([params]);
+        var data = _superPropGet(_default, "getData", this, 3)([params]);
         if (params && params.escape) {
           var _iterator = _createForOfIteratorHelper(data),
             _step;
@@ -3622,6 +3769,8 @@
         return data;
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

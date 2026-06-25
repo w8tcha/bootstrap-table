@@ -3,7 +3,9 @@
  * Author: Zhixin Wen<wenzhixin2010@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['zh-CN'] = $.fn.bootstrapTable.locales['zh'] = {
+
+
+BootstrapTable.locales['zh-CN'] = BootstrapTable.locales['zh'] = {
   formatAddLevel () {
     return '增加层级'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['zh-CN'] = $.fn.bootstrapTable.locales['zh'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['zh-CN'])

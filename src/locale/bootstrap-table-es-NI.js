@@ -3,7 +3,9 @@
  * Author: Dennis Hernández
  */
 
-$.fn.bootstrapTable.locales['es-NI'] = {
+
+
+BootstrapTable.locales['es-NI'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['es-NI'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-NI'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-NI'])

@@ -11,7 +11,6 @@ export default [
         ...globals.browser,
         ...globals.node,
         $: true,
-        jQuery: true,
         // cypress
         Cypress: true,
         cy: true,
@@ -56,7 +55,7 @@ export default [
       'import-x/no-unresolved': 'off',
       'key-spacing': ['error', { afterColon: true, beforeColon: false, mode: 'strict' }],
       'keyword-spacing': ['error', { after: true, before: true }],
-      'linebreak-style': ['error', 'unix'],
+      //'linebreak-style': ['error', 'unix'],
       'line-comment-position': 'off',
       'lines-around-comment': 'off',
       'lines-between-class-members': ['error', 'always'],

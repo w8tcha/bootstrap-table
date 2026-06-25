@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -2483,7 +2483,7 @@
       timeout = setTimeout(later, wait);
     };
   };
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     mobileResponsive: false,
     minWidth: 562,
     minHeight: undefined,
@@ -2492,20 +2492,20 @@
     checkOnInit: true,
     columnsHidden: []
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "init",
       value: function init() {
         var _this = this;
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "init", this)(args);
+        _superPropGet(_default, "init", this)(args);
         if (!this.options.mobileResponsive || !this.options.minWidth) {
           return;
         }
@@ -2514,15 +2514,15 @@
           this.options.minWidth = 100;
         }
         var old = {
-          width: $(window).width(),
-          height: $(window).height()
+          width: window.innerWidth,
+          height: window.innerHeight
         };
-        $(window).on('resize orientationchange', debounce(function () {
+        var resizeHandler = debounce(function () {
           // reset view if height has only changed by at least the threshold.
-          var width = $(window).width();
-          var height = $(window).height();
-          var $activeElement = $(document.activeElement);
-          if ($activeElement.length && ['INPUT', 'SELECT', 'TEXTAREA'].includes($activeElement.prop('nodeName'))) {
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          var activeEl = document.activeElement;
+          if (activeEl && ['INPUT', 'SELECT', 'TEXTAREA'].includes(activeEl.nodeName)) {
             return;
           }
           if (Math.abs(old.height - height) > _this.options.heightThreshold || old.width !== width) {
@@ -2532,10 +2532,12 @@
               height: height
             };
           }
-        }, 200));
+        }, 200);
+        window.addEventListener('resize', resizeHandler);
+        window.addEventListener('orientationchange', resizeHandler);
         if (this.options.checkOnInit) {
-          var width = $(window).width();
-          var height = $(window).height();
+          var width = window.innerWidth;
+          var height = window.innerHeight;
           this.changeView(width, height);
           old = {
             width: width,
@@ -2594,6 +2596,8 @@
         this.resetView();
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

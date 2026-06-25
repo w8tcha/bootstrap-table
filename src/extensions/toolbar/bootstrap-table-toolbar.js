@@ -6,7 +6,9 @@
  * @update zhixin wen <wenzhixin2010@gmail.com>
  */
 
-const Utils = $.fn.bootstrapTable.utils
+
+
+const Utils = BootstrapTable.utils
 
 const theme = {
   bootstrap3: {
@@ -146,9 +148,9 @@ const theme = {
       `
     }
   }
-}[$.fn.bootstrapTable.theme]
+}[BootstrapTable.theme]
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   advancedSearch: false,
   idForm: 'advancedSearch',
   actionForm: '',
@@ -159,18 +161,18 @@ Object.assign($.fn.bootstrapTable.defaults, {
   }
 })
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'advancedSearchIcon', {
+Utils.assignIcons(BootstrapTable.icons, 'advancedSearchIcon', {
   glyphicon: 'glyphicon-chevron-down',
   fa: 'fa-chevron-down',
   bi: 'bi-chevron-down',
   'material-icons': 'expand_more'
 })
 
-Object.assign($.fn.bootstrapTable.events, {
+Object.assign(BootstrapTable.events, {
   'column-advanced-search.bs.table': 'onColumnAdvancedSearch'
 })
 
-Object.assign($.fn.bootstrapTable.locales, {
+Object.assign(BootstrapTable.locales, {
   formatAdvancedSearch () {
     return 'Advanced search'
   },
@@ -179,9 +181,9 @@ Object.assign($.fn.bootstrapTable.locales, {
   }
 })
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales)
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales)
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initToolbar () {
     this.showToolbar = this.showToolbar ||
       this.options.search &&
@@ -210,16 +212,19 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   showAdvancedSearch () {
-    this.$toolbarModal = $(`#avdSearchModal_${this.options.idTable}`)
+    this.$toolbarModal = document.querySelector(`#avdSearchModal_${this.options.idTable}`)
 
-    if (this.$toolbarModal.length <= 0) {
-      $('body').append(Utils.sprintf(theme.html.modal,
-        this.options.idTable, this.options.buttonsClass))
+    if (!this.$toolbarModal) {
+      const template = document.createElement('template')
 
-      this.$toolbarModal = $(`#avdSearchModal_${this.options.idTable}`)
-      this.$toolbarModal.find('.toolbar-modal-close')
-        .off('click')
-        .on('click', () => this.hideToolbarModal())
+      template.innerHTML = Utils.sprintf(theme.html.modal,
+        this.options.idTable, this.options.buttonsClass).trim()
+      document.body.appendChild(template.content.firstElementChild)
+
+      this.$toolbarModal = document.querySelector(`#avdSearchModal_${this.options.idTable}`)
+      this.$toolbarModal.querySelectorAll('.toolbar-modal-close').forEach(btn => {
+        btn.addEventListener('click', () => this.hideToolbarModal())
+      })
     }
 
     this.initToolbarModalBody()
@@ -227,58 +232,83 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   initToolbarModalBody () {
-    this.$toolbarModal.find('.toolbar-modal-title')
-      .html(this.options.formatAdvancedSearch())
-    this.$toolbarModal.find('.toolbar-modal-footer .toolbar-modal-close')
-      .html(this.options.formatAdvancedCloseButton())
+    const titleEl = this.$toolbarModal.querySelector('.toolbar-modal-title')
 
-    this.$toolbarModal.find('.toolbar-modal-body')
-      .html(this.createToolbarForm())
-      .off('keyup blur', 'input').on('keyup blur', 'input', e => {
+    if (titleEl) titleEl.innerHTML = this.options.formatAdvancedSearch()
+
+    const footerClose = this.$toolbarModal.querySelector('.toolbar-modal-footer .toolbar-modal-close')
+
+    if (footerClose) footerClose.innerHTML = this.options.formatAdvancedCloseButton()
+
+    const body = this.$toolbarModal.querySelector('.toolbar-modal-body')
+
+    body.innerHTML = this.createToolbarForm()
+
+    if (this._toolbarBodyHandler) {
+      body.removeEventListener('keyup', this._toolbarBodyHandler)
+      body.removeEventListener('focusout', this._toolbarBodyHandler)
+    }
+    this._toolbarBodyHandler = e => {
+      if (e.target.tagName === 'INPUT') {
         this.onColumnAdvancedSearch(e)
-      })
+      }
+    }
+    body.addEventListener('keyup', this._toolbarBodyHandler)
+    body.addEventListener('focusout', this._toolbarBodyHandler)
   }
 
   showToolbarModal () {
-    const theme = $.fn.bootstrapTable.theme
+    const currentTheme = BootstrapTable.theme
 
-    if (['bootstrap3', 'bootstrap4'].includes(theme)) {
-      this.$toolbarModal.modal()
-    } else if (theme === 'bootstrap5') {
+    if (['bootstrap3', 'bootstrap4'].includes(currentTheme)) {
+      if (typeof window.$ !== 'undefined') {
+        $(this.$toolbarModal).modal()
+      }
+    } else if (currentTheme === 'bootstrap5') {
       if (!this.toolbarModal) {
-        this.toolbarModal = new window.bootstrap.Modal(this.$toolbarModal[0], {})
+        this.toolbarModal = new window.bootstrap.Modal(this.$toolbarModal, {})
       }
       this.toolbarModal.show()
-    } else if (theme === 'bulma') {
-      this.$toolbarModal.toggleClass('is-active')
-    } else if (theme === 'foundation') {
+    } else if (currentTheme === 'bulma') {
+      this.$toolbarModal.classList.toggle('is-active')
+    } else if (currentTheme === 'foundation') {
       if (!this.toolbarModal) {
         this.toolbarModal = new window.Foundation.Reveal(this.$toolbarModal)
       }
       this.toolbarModal.open()
-    } else if (theme === 'materialize') {
-      this.$toolbarModal.modal().modal('open')
-    } else if (theme === 'semantic') {
-      this.$toolbarModal.modal('show')
+    } else if (currentTheme === 'materialize') {
+      if (typeof window.$ !== 'undefined') {
+        $(this.$toolbarModal).modal().modal('open')
+      }
+    } else if (currentTheme === 'semantic') {
+      if (typeof window.$ !== 'undefined') {
+        $(this.$toolbarModal).modal('show')
+      }
     }
   }
 
   hideToolbarModal () {
-    const theme = $.fn.bootstrapTable.theme
+    const currentTheme = BootstrapTable.theme
 
-    if (['bootstrap3', 'bootstrap4'].includes(theme)) {
-      this.$toolbarModal.modal('hide')
-    } else if (theme === 'bootstrap5') {
+    if (['bootstrap3', 'bootstrap4'].includes(currentTheme)) {
+      if (typeof window.$ !== 'undefined') {
+        $(this.$toolbarModal).modal('hide')
+      }
+    } else if (currentTheme === 'bootstrap5') {
       this.toolbarModal.hide()
-    } else if (theme === 'bulma') {
-      $('html').toggleClass('is-clipped')
-      this.$toolbarModal.toggleClass('is-active')
-    } else if (theme === 'foundation') {
+    } else if (currentTheme === 'bulma') {
+      document.documentElement.classList.toggle('is-clipped')
+      this.$toolbarModal.classList.toggle('is-active')
+    } else if (currentTheme === 'foundation') {
       this.toolbarModal.close()
-    } else if (theme === 'materialize') {
-      this.$toolbarModal.modal('open')
-    } else if (theme === 'semantic') {
-      this.$toolbarModal.modal('close')
+    } else if (currentTheme === 'materialize') {
+      if (typeof window.$ !== 'undefined') {
+        $(this.$toolbarModal).modal('open')
+      }
+    } else if (currentTheme === 'semantic') {
+      if (typeof window.$ !== 'undefined') {
+        $(this.$toolbarModal).modal('close')
+      }
     }
 
     if (this.options.sidePagination === 'server') {
@@ -295,7 +325,10 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
     for (const column of this.columns) {
       if (!column.checkbox && column.visible && column.searchable) {
-        const title = $('<div/>').html(column.title).text().trim()
+        const tmp = document.createElement('div')
+
+        tmp.innerHTML = column.title
+        const title = tmp.textContent.trim()
         const value = this.filterColumnsPartial[column.field] || ''
 
         html.push(`
@@ -333,8 +366,10 @@ $.BootstrapTable = class extends $.BootstrapTable {
         value = Utils.calculateObjectValue(this.header,
           this.header.formatters[index], [value, item, i], value)
         if (this.header.formatters[index]) {
-          // search innerText
-          value = $('<div>').html(value).text()
+          const tmp = document.createElement('div')
+
+          tmp.innerHTML = value
+          value = tmp.textContent
         }
 
         if (
@@ -351,8 +386,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   onColumnAdvancedSearch (e) {
-    const text = $(e.currentTarget).val().trim()
-    const field = $(e.currentTarget).attr('name')
+    const text = e.currentTarget.value.trim()
+    const field = e.currentTarget.getAttribute('name')
 
     if (text) {
       this.filterColumnsPartial[field] = text

@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -2040,6 +2040,58 @@
 
   requireEs_array_filter();
 
+  var es_array_indexOf = {};
+
+  var arrayMethodIsStrict;
+  var hasRequiredArrayMethodIsStrict;
+
+  function requireArrayMethodIsStrict () {
+  	if (hasRequiredArrayMethodIsStrict) return arrayMethodIsStrict;
+  	hasRequiredArrayMethodIsStrict = 1;
+  	var fails = requireFails();
+
+  	arrayMethodIsStrict = function (METHOD_NAME, argument) {
+  	  var method = [][METHOD_NAME];
+  	  return !!method && fails(function () {
+  	    // eslint-disable-next-line no-useless-call -- required for testing
+  	    method.call(null, argument || function () { return 1; }, 1);
+  	  });
+  	};
+  	return arrayMethodIsStrict;
+  }
+
+  var hasRequiredEs_array_indexOf;
+
+  function requireEs_array_indexOf () {
+  	if (hasRequiredEs_array_indexOf) return es_array_indexOf;
+  	hasRequiredEs_array_indexOf = 1;
+  	/* eslint-disable es/no-array-prototype-indexof -- required for testing */
+  	var $ = require_export();
+  	var uncurryThis = requireFunctionUncurryThisClause();
+  	var $indexOf = requireArrayIncludes().indexOf;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+  	var nativeIndexOf = uncurryThis([].indexOf);
+
+  	var NEGATIVE_ZERO = !!nativeIndexOf && 1 / nativeIndexOf([1], 1, -0) < 0;
+  	var FORCED = NEGATIVE_ZERO || !arrayMethodIsStrict('indexOf');
+
+  	// `Array.prototype.indexOf` method
+  	// https://tc39.es/ecma262/#sec-array.prototype.indexof
+  	$({ target: 'Array', proto: true, forced: FORCED }, {
+  	  indexOf: function indexOf(searchElement /* , fromIndex = 0 */) {
+  	    var fromIndex = arguments.length > 1 ? arguments[1] : undefined;
+  	    return NEGATIVE_ZERO
+  	      // convert -0 to +0
+  	      ? nativeIndexOf(this, searchElement, fromIndex) || 0
+  	      : $indexOf(this, searchElement, fromIndex);
+  	  }
+  	});
+  	return es_array_indexOf;
+  }
+
+  requireEs_array_indexOf();
+
   var es_object_assign = {};
 
   var objectKeys;
@@ -2188,28 +2240,28 @@
    * @update: zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.defaults, {
     treeEnable: false,
     treeShowField: null,
     idField: 'id',
     parentIdField: 'pid',
     rootParentId: null
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "init",
       value: function init() {
         this._rowStyle = this.options.rowStyle;
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "init", this, 3)(args);
+        _superPropGet(_default, "init", this, 3)(args);
       }
     }, {
       key: "initHeader",
@@ -2217,7 +2269,7 @@
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "initHeader", this, 3)(args);
+        _superPropGet(_default, "initHeader", this, 3)(args);
         var treeShowField = this.options.treeShowField;
         if (treeShowField) {
           var _iterator = _createForOfIteratorHelper(this.header.fields),
@@ -2246,7 +2298,7 @@
         for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
           args[_key3] = arguments[_key3];
         }
-        _superPropGet(_class, "initBody", this, 3)(args);
+        _superPropGet(_default, "initBody", this, 3)(args);
       }
     }, {
       key: "initTr",
@@ -2255,7 +2307,7 @@
         var nodes = data.filter(function (it) {
           return item[_this.options.idField] === it[_this.options.parentIdField];
         });
-        parentDom.append(_superPropGet(_class, "initRow", this, 3)([item, idx, data, parentDom]));
+        parentDom.append(_superPropGet(_default, "initRow", this, 3)([item, idx, data, parentDom]));
 
         // init sub node
         var len = nodes.length - 1;
@@ -2275,7 +2327,7 @@
             res.classes = [res.classes || '', "treegrid-".concat(id), "treegrid-parent-".concat(pid)].join(' ');
             return res;
           };
-          this.initTr(node, $.inArray(node, data), data, parentDom);
+          this.initTr(node, data.indexOf(node), data, parentDom);
         }
       }
     }, {
@@ -2299,7 +2351,7 @@
           }
           return false;
         }
-        return _superPropGet(_class, "initRow", this, 3)([item, idx, data, parentDom]);
+        return _superPropGet(_default, "initRow", this, 3)([item, idx, data, parentDom]);
       }
     }, {
       key: "destroy",
@@ -2307,10 +2359,12 @@
         for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
           args[_key4] = arguments[_key4];
         }
-        _superPropGet(_class, "destroy", this, 3)(args);
+        _superPropGet(_default, "destroy", this, 3)(args);
         this.options.rowStyle = this._rowStyle;
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

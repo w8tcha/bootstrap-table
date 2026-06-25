@@ -29,17 +29,11 @@ const files = globSync('src/**/*.js', {
     'src/vue/**'
   ]
 })
-const external = ['jquery']
-const globals = {
-  jquery: 'jQuery'
-}
+
 const config = []
-const plugins = [
-  inject({
-    include: '**/*.js',
-    exclude: 'node_modules/**',
-    $: 'jquery'
-  }),
+
+// Plugin shared by all bundles
+const basePlugins = [
   nodeResolve(),
   commonjs(),
   babel({
@@ -54,8 +48,18 @@ const plugins = [
   removeCoreJsAtSymbol()
 ]
 
+// Inject BootstrapTable for extension/locale/theme files (everything except the main file)
+const injectPlugin = inject({
+  include: ['src/extensions/**/*.js', 'src/locale/**/*.js', 'src/themes/**/*.js'],
+  exclude: 'node_modules/**',
+  BootstrapTable: 'bootstrap-table'
+})
+
+const externalDeps = ['bootstrap-table']
+const globals = { 'bootstrap-table': 'BootstrapTable' }
+
 if (process.env.NODE_ENV === 'production') {
-  plugins.push(terser({
+  basePlugins.push(terser({
     output: {
       comments () {
         return false
@@ -65,22 +69,54 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 for (const file of files) {
-  let out = `dist/${file.replace('src/', '')}`
+  const normalizedFile = file.replace(/\\/g, '/')
+  let out = `dist/${normalizedFile.replace('src/', '')}`
 
   if (process.env.NODE_ENV === 'production') {
     out = out.replace(/.js$/, '.min.js')
   }
-  config.push({
-    input: file,
-    output: {
-      name: 'BootstrapTable',
-      file: out,
-      format: 'umd',
-      globals
-    },
-    external,
-    plugins
-  })
+
+  const isMainFile = normalizedFile === 'src/bootstrap-table.js'
+  const isLocaleFile = normalizedFile.startsWith('src/locale/')
+
+  if (isMainFile) {
+    // Main file: UMD, no external deps, no inject
+    config.push({
+      input: file,
+      output: {
+        name: 'BootstrapTable',
+        file: out,
+        format: 'umd'
+      },
+      external: [],
+      plugins: [...basePlugins]
+    })
+  } else if (isLocaleFile) {
+    // Locale files: IIFE, no global assignment (side-effect only)
+    config.push({
+      input: file,
+      output: {
+        file: out,
+        format: 'iife',
+        globals
+      },
+      external: externalDeps,
+      plugins: [injectPlugin, ...basePlugins]
+    })
+  } else {
+    // Extension / theme files: UMD, BootstrapTable as external, export extended class
+    config.push({
+      input: file,
+      output: {
+        name: 'BootstrapTable',
+        file: out,
+        format: 'umd',
+        globals
+      },
+      external: externalDeps,
+      plugins: [injectPlugin, ...basePlugins]
+    })
+  }
 }
 
 let out = 'dist/bootstrap-table-locale-all.js'
@@ -88,18 +124,20 @@ let out = 'dist/bootstrap-table-locale-all.js'
 if (process.env.NODE_ENV === 'production') {
   out = out.replace(/.js$/, '.min.js')
 }
+
+// Locale-all bundle: IIFE (side-effect only, no global assignment)
 config.push({
   input: 'src/locale/**/*.js',
   output: {
-    name: 'BootstrapTable',
     file: out,
-    format: 'umd',
+    format: 'iife',
     globals
   },
-  external,
+  external: externalDeps,
   plugins: [
+    injectPlugin,
     multiEntry(),
-    ...plugins
+    ...basePlugins
   ]
 })
 

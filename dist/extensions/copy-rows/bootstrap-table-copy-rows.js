@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -156,7 +156,7 @@
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-  var es_array_find = {};
+  var es_object_assign = {};
 
   var globalThis_1;
   var hasRequiredGlobalThis;
@@ -1672,6 +1672,264 @@
   	return _export;
   }
 
+  var objectKeys;
+  var hasRequiredObjectKeys;
+
+  function requireObjectKeys () {
+  	if (hasRequiredObjectKeys) return objectKeys;
+  	hasRequiredObjectKeys = 1;
+  	var internalObjectKeys = requireObjectKeysInternal();
+  	var enumBugKeys = requireEnumBugKeys();
+
+  	// `Object.keys` method
+  	// https://tc39.es/ecma262/#sec-object.keys
+  	// eslint-disable-next-line es/no-object-keys -- safe
+  	objectKeys = Object.keys || function keys(O) {
+  	  return internalObjectKeys(O, enumBugKeys);
+  	};
+  	return objectKeys;
+  }
+
+  var objectAssign;
+  var hasRequiredObjectAssign;
+
+  function requireObjectAssign () {
+  	if (hasRequiredObjectAssign) return objectAssign;
+  	hasRequiredObjectAssign = 1;
+  	var DESCRIPTORS = requireDescriptors();
+  	var uncurryThis = requireFunctionUncurryThis();
+  	var call = requireFunctionCall();
+  	var fails = requireFails();
+  	var objectKeys = requireObjectKeys();
+  	var getOwnPropertySymbolsModule = requireObjectGetOwnPropertySymbols();
+  	var propertyIsEnumerableModule = requireObjectPropertyIsEnumerable();
+  	var toObject = requireToObject();
+  	var IndexedObject = requireIndexedObject();
+
+  	// eslint-disable-next-line es/no-object-assign -- safe
+  	var $assign = Object.assign;
+  	// eslint-disable-next-line es/no-object-defineproperty -- required for testing
+  	var defineProperty = Object.defineProperty;
+  	var concat = uncurryThis([].concat);
+
+  	// `Object.assign` method
+  	// https://tc39.es/ecma262/#sec-object.assign
+  	objectAssign = !$assign || fails(function () {
+  	  // should have correct order of operations (Edge bug)
+  	  if (DESCRIPTORS && $assign({ b: 1 }, $assign(defineProperty({}, 'a', {
+  	    enumerable: true,
+  	    get: function () {
+  	      defineProperty(this, 'b', {
+  	        value: 3,
+  	        enumerable: false
+  	      });
+  	    }
+  	  }), { b: 2 })).b !== 1) return true;
+  	  // should work with symbols and should have deterministic property order (V8 bug)
+  	  var A = {};
+  	  var B = {};
+  	  // eslint-disable-next-line es/no-symbol -- safe
+  	  var symbol = Symbol('assign detection');
+  	  var alphabet = 'abcdefghijklmnopqrst';
+  	  A[symbol] = 7;
+  	  // eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	  alphabet.split('').forEach(function (chr) { B[chr] = chr; });
+  	  return $assign({}, A)[symbol] !== 7 || objectKeys($assign({}, B)).join('') !== alphabet;
+  	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars -- required for `.length`
+  	  var T = toObject(target);
+  	  var argumentsLength = arguments.length;
+  	  var index = 1;
+  	  var getOwnPropertySymbols = getOwnPropertySymbolsModule.f;
+  	  var propertyIsEnumerable = propertyIsEnumerableModule.f;
+  	  while (argumentsLength > index) {
+  	    var S = IndexedObject(arguments[index++]);
+  	    var keys = getOwnPropertySymbols ? concat(objectKeys(S), getOwnPropertySymbols(S)) : objectKeys(S);
+  	    var length = keys.length;
+  	    var j = 0;
+  	    var key;
+  	    while (length > j) {
+  	      key = keys[j++];
+  	      if (!DESCRIPTORS || call(propertyIsEnumerable, S, key)) T[key] = S[key];
+  	    }
+  	  } return T;
+  	} : $assign;
+  	return objectAssign;
+  }
+
+  var hasRequiredEs_object_assign;
+
+  function requireEs_object_assign () {
+  	if (hasRequiredEs_object_assign) return es_object_assign;
+  	hasRequiredEs_object_assign = 1;
+  	var $ = require_export();
+  	var assign = requireObjectAssign();
+
+  	// `Object.assign` method
+  	// https://tc39.es/ecma262/#sec-object.assign
+  	// eslint-disable-next-line es/no-object-assign -- required for testing
+  	$({ target: 'Object', stat: true, arity: 2, forced: Object.assign !== assign }, {
+  	  assign: assign
+  	});
+  	return es_object_assign;
+  }
+
+  requireEs_object_assign();
+
+  var es_object_toString = {};
+
+  var toStringTagSupport;
+  var hasRequiredToStringTagSupport;
+
+  function requireToStringTagSupport () {
+  	if (hasRequiredToStringTagSupport) return toStringTagSupport;
+  	hasRequiredToStringTagSupport = 1;
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+  	var test = {};
+  	// eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
+  	test[TO_STRING_TAG] = 'z';
+
+  	toStringTagSupport = String(test) === '[object z]';
+  	return toStringTagSupport;
+  }
+
+  var classof;
+  var hasRequiredClassof;
+
+  function requireClassof () {
+  	if (hasRequiredClassof) return classof;
+  	hasRequiredClassof = 1;
+  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
+  	var isCallable = requireIsCallable();
+  	var classofRaw = requireClassofRaw();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+  	var $Object = Object;
+
+  	// ES3 wrong here
+  	var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) === 'Arguments';
+
+  	// fallback for IE11 Script Access Denied error
+  	var tryGet = function (it, key) {
+  	  try {
+  	    return it[key];
+  	  } catch (error) { /* empty */ }
+  	};
+
+  	// getting tag from ES6+ `Object.prototype.toString`
+  	classof = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
+  	  var O, tag, result;
+  	  return it === undefined ? 'Undefined' : it === null ? 'Null'
+  	    // @@toStringTag case
+  	    : typeof (tag = tryGet(O = $Object(it), TO_STRING_TAG)) == 'string' ? tag
+  	    // builtinTag case
+  	    : CORRECT_ARGUMENTS ? classofRaw(O)
+  	    // ES3 arguments fallback
+  	    : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result;
+  	};
+  	return classof;
+  }
+
+  var objectToString;
+  var hasRequiredObjectToString;
+
+  function requireObjectToString () {
+  	if (hasRequiredObjectToString) return objectToString;
+  	hasRequiredObjectToString = 1;
+  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
+  	var classof = requireClassof();
+
+  	// `Object.prototype.toString` method implementation
+  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
+  	objectToString = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
+  	  return '[object ' + classof(this) + ']';
+  	};
+  	return objectToString;
+  }
+
+  var hasRequiredEs_object_toString;
+
+  function requireEs_object_toString () {
+  	if (hasRequiredEs_object_toString) return es_object_toString;
+  	hasRequiredEs_object_toString = 1;
+  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
+  	var defineBuiltIn = requireDefineBuiltIn();
+  	var toString = requireObjectToString();
+
+  	// `Object.prototype.toString` method
+  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
+  	if (!TO_STRING_TAG_SUPPORT) {
+  	  defineBuiltIn(Object.prototype, 'toString', toString, { unsafe: true });
+  	}
+  	return es_object_toString;
+  }
+
+  requireEs_object_toString();
+
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
   var functionUncurryThisClause;
   var hasRequiredFunctionUncurryThisClause;
 
@@ -1727,61 +1985,6 @@
   	  return classof(argument) === 'Array';
   	};
   	return isArray;
-  }
-
-  var toStringTagSupport;
-  var hasRequiredToStringTagSupport;
-
-  function requireToStringTagSupport () {
-  	if (hasRequiredToStringTagSupport) return toStringTagSupport;
-  	hasRequiredToStringTagSupport = 1;
-  	var wellKnownSymbol = requireWellKnownSymbol();
-
-  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-  	var test = {};
-  	// eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
-  	test[TO_STRING_TAG] = 'z';
-
-  	toStringTagSupport = String(test) === '[object z]';
-  	return toStringTagSupport;
-  }
-
-  var classof;
-  var hasRequiredClassof;
-
-  function requireClassof () {
-  	if (hasRequiredClassof) return classof;
-  	hasRequiredClassof = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var isCallable = requireIsCallable();
-  	var classofRaw = requireClassofRaw();
-  	var wellKnownSymbol = requireWellKnownSymbol();
-
-  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-  	var $Object = Object;
-
-  	// ES3 wrong here
-  	var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) === 'Arguments';
-
-  	// fallback for IE11 Script Access Denied error
-  	var tryGet = function (it, key) {
-  	  try {
-  	    return it[key];
-  	  } catch (error) { /* empty */ }
-  	};
-
-  	// getting tag from ES6+ `Object.prototype.toString`
-  	classof = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
-  	  var O, tag, result;
-  	  return it === undefined ? 'Undefined' : it === null ? 'Null'
-  	    // @@toStringTag case
-  	    : typeof (tag = tryGet(O = $Object(it), TO_STRING_TAG)) == 'string' ? tag
-  	    // builtinTag case
-  	    : CORRECT_ARGUMENTS ? classofRaw(O)
-  	    // ES3 arguments fallback
-  	    : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result;
-  	};
-  	return classof;
   }
 
   var isConstructor;
@@ -1988,406 +2191,6 @@
   	return arrayIteration;
   }
 
-  var objectDefineProperties = {};
-
-  var objectKeys;
-  var hasRequiredObjectKeys;
-
-  function requireObjectKeys () {
-  	if (hasRequiredObjectKeys) return objectKeys;
-  	hasRequiredObjectKeys = 1;
-  	var internalObjectKeys = requireObjectKeysInternal();
-  	var enumBugKeys = requireEnumBugKeys();
-
-  	// `Object.keys` method
-  	// https://tc39.es/ecma262/#sec-object.keys
-  	// eslint-disable-next-line es/no-object-keys -- safe
-  	objectKeys = Object.keys || function keys(O) {
-  	  return internalObjectKeys(O, enumBugKeys);
-  	};
-  	return objectKeys;
-  }
-
-  var hasRequiredObjectDefineProperties;
-
-  function requireObjectDefineProperties () {
-  	if (hasRequiredObjectDefineProperties) return objectDefineProperties;
-  	hasRequiredObjectDefineProperties = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var V8_PROTOTYPE_DEFINE_BUG = requireV8PrototypeDefineBug();
-  	var definePropertyModule = requireObjectDefineProperty();
-  	var anObject = requireAnObject();
-  	var toIndexedObject = requireToIndexedObject();
-  	var objectKeys = requireObjectKeys();
-
-  	// `Object.defineProperties` method
-  	// https://tc39.es/ecma262/#sec-object.defineproperties
-  	// eslint-disable-next-line es/no-object-defineproperties -- safe
-  	objectDefineProperties.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : function defineProperties(O, Properties) {
-  	  anObject(O);
-  	  var props = toIndexedObject(Properties);
-  	  var keys = objectKeys(Properties);
-  	  var length = keys.length;
-  	  var index = 0;
-  	  var key;
-  	  while (length > index) definePropertyModule.f(O, key = keys[index++], props[key]);
-  	  return O;
-  	};
-  	return objectDefineProperties;
-  }
-
-  var html;
-  var hasRequiredHtml;
-
-  function requireHtml () {
-  	if (hasRequiredHtml) return html;
-  	hasRequiredHtml = 1;
-  	var getBuiltIn = requireGetBuiltIn();
-
-  	html = getBuiltIn('document', 'documentElement');
-  	return html;
-  }
-
-  var objectCreate;
-  var hasRequiredObjectCreate;
-
-  function requireObjectCreate () {
-  	if (hasRequiredObjectCreate) return objectCreate;
-  	hasRequiredObjectCreate = 1;
-  	/* global ActiveXObject -- old IE, WSH */
-  	var anObject = requireAnObject();
-  	var definePropertiesModule = requireObjectDefineProperties();
-  	var enumBugKeys = requireEnumBugKeys();
-  	var hiddenKeys = requireHiddenKeys();
-  	var html = requireHtml();
-  	var documentCreateElement = requireDocumentCreateElement();
-  	var sharedKey = requireSharedKey();
-
-  	var GT = '>';
-  	var LT = '<';
-  	var PROTOTYPE = 'prototype';
-  	var SCRIPT = 'script';
-  	var IE_PROTO = sharedKey('IE_PROTO');
-
-  	var EmptyConstructor = function () { /* empty */ };
-
-  	var scriptTag = function (content) {
-  	  return LT + SCRIPT + GT + content + LT + '/' + SCRIPT + GT;
-  	};
-
-  	// Create object with fake `null` prototype: use ActiveX Object with cleared prototype
-  	var NullProtoObjectViaActiveX = function (activeXDocument) {
-  	  activeXDocument.write(scriptTag(''));
-  	  activeXDocument.close();
-  	  var temp = activeXDocument.parentWindow.Object;
-  	  // eslint-disable-next-line no-useless-assignment -- avoid memory leak
-  	  activeXDocument = null;
-  	  return temp;
-  	};
-
-  	// Create object with fake `null` prototype: use iframe Object with cleared prototype
-  	var NullProtoObjectViaIFrame = function () {
-  	  // Thrash, waste and sodomy: IE GC bug
-  	  var iframe = documentCreateElement('iframe');
-  	  var JS = 'java' + SCRIPT + ':';
-  	  var iframeDocument;
-  	  iframe.style.display = 'none';
-  	  html.appendChild(iframe);
-  	  // https://github.com/zloirock/core-js/issues/475
-  	  iframe.src = String(JS);
-  	  iframeDocument = iframe.contentWindow.document;
-  	  iframeDocument.open();
-  	  iframeDocument.write(scriptTag('document.F=Object'));
-  	  iframeDocument.close();
-  	  return iframeDocument.F;
-  	};
-
-  	// Check for document.domain and active x support
-  	// No need to use active x approach when document.domain is not set
-  	// see https://github.com/es-shims/es5-shim/issues/150
-  	// variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
-  	// avoid IE GC bug
-  	var activeXDocument;
-  	var NullProtoObject = function () {
-  	  try {
-  	    activeXDocument = new ActiveXObject('htmlfile');
-  	  } catch (error) { /* ignore */ }
-  	  NullProtoObject = typeof document != 'undefined'
-  	    ? document.domain && activeXDocument
-  	      ? NullProtoObjectViaActiveX(activeXDocument) // old IE
-  	      : NullProtoObjectViaIFrame()
-  	    : NullProtoObjectViaActiveX(activeXDocument); // WSH
-  	  var length = enumBugKeys.length;
-  	  while (length--) delete NullProtoObject[PROTOTYPE][enumBugKeys[length]];
-  	  return NullProtoObject();
-  	};
-
-  	hiddenKeys[IE_PROTO] = true;
-
-  	// `Object.create` method
-  	// https://tc39.es/ecma262/#sec-object.create
-  	// eslint-disable-next-line es/no-object-create -- safe
-  	objectCreate = Object.create || function create(O, Properties) {
-  	  var result;
-  	  if (O !== null) {
-  	    EmptyConstructor[PROTOTYPE] = anObject(O);
-  	    result = new EmptyConstructor();
-  	    EmptyConstructor[PROTOTYPE] = null;
-  	    // add "__proto__" for Object.getPrototypeOf polyfill
-  	    result[IE_PROTO] = O;
-  	  } else result = NullProtoObject();
-  	  return Properties === undefined ? result : definePropertiesModule.f(result, Properties);
-  	};
-  	return objectCreate;
-  }
-
-  var addToUnscopables;
-  var hasRequiredAddToUnscopables;
-
-  function requireAddToUnscopables () {
-  	if (hasRequiredAddToUnscopables) return addToUnscopables;
-  	hasRequiredAddToUnscopables = 1;
-  	var wellKnownSymbol = requireWellKnownSymbol();
-  	var create = requireObjectCreate();
-  	var defineProperty = requireObjectDefineProperty().f;
-
-  	var UNSCOPABLES = wellKnownSymbol('unscopables');
-  	var ArrayPrototype = Array.prototype;
-
-  	// Array.prototype[@@unscopables]
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	if (ArrayPrototype[UNSCOPABLES] === undefined) {
-  	  defineProperty(ArrayPrototype, UNSCOPABLES, {
-  	    configurable: true,
-  	    value: create(null)
-  	  });
-  	}
-
-  	// add a key to Array.prototype[@@unscopables]
-  	addToUnscopables = function (key) {
-  	  ArrayPrototype[UNSCOPABLES][key] = true;
-  	};
-  	return addToUnscopables;
-  }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_object_assign = {};
-
-  var objectAssign;
-  var hasRequiredObjectAssign;
-
-  function requireObjectAssign () {
-  	if (hasRequiredObjectAssign) return objectAssign;
-  	hasRequiredObjectAssign = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var uncurryThis = requireFunctionUncurryThis();
-  	var call = requireFunctionCall();
-  	var fails = requireFails();
-  	var objectKeys = requireObjectKeys();
-  	var getOwnPropertySymbolsModule = requireObjectGetOwnPropertySymbols();
-  	var propertyIsEnumerableModule = requireObjectPropertyIsEnumerable();
-  	var toObject = requireToObject();
-  	var IndexedObject = requireIndexedObject();
-
-  	// eslint-disable-next-line es/no-object-assign -- safe
-  	var $assign = Object.assign;
-  	// eslint-disable-next-line es/no-object-defineproperty -- required for testing
-  	var defineProperty = Object.defineProperty;
-  	var concat = uncurryThis([].concat);
-
-  	// `Object.assign` method
-  	// https://tc39.es/ecma262/#sec-object.assign
-  	objectAssign = !$assign || fails(function () {
-  	  // should have correct order of operations (Edge bug)
-  	  if (DESCRIPTORS && $assign({ b: 1 }, $assign(defineProperty({}, 'a', {
-  	    enumerable: true,
-  	    get: function () {
-  	      defineProperty(this, 'b', {
-  	        value: 3,
-  	        enumerable: false
-  	      });
-  	    }
-  	  }), { b: 2 })).b !== 1) return true;
-  	  // should work with symbols and should have deterministic property order (V8 bug)
-  	  var A = {};
-  	  var B = {};
-  	  // eslint-disable-next-line es/no-symbol -- safe
-  	  var symbol = Symbol('assign detection');
-  	  var alphabet = 'abcdefghijklmnopqrst';
-  	  A[symbol] = 7;
-  	  // eslint-disable-next-line es/no-array-prototype-foreach -- safe
-  	  alphabet.split('').forEach(function (chr) { B[chr] = chr; });
-  	  return $assign({}, A)[symbol] !== 7 || objectKeys($assign({}, B)).join('') !== alphabet;
-  	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars -- required for `.length`
-  	  var T = toObject(target);
-  	  var argumentsLength = arguments.length;
-  	  var index = 1;
-  	  var getOwnPropertySymbols = getOwnPropertySymbolsModule.f;
-  	  var propertyIsEnumerable = propertyIsEnumerableModule.f;
-  	  while (argumentsLength > index) {
-  	    var S = IndexedObject(arguments[index++]);
-  	    var keys = getOwnPropertySymbols ? concat(objectKeys(S), getOwnPropertySymbols(S)) : objectKeys(S);
-  	    var length = keys.length;
-  	    var j = 0;
-  	    var key;
-  	    while (length > j) {
-  	      key = keys[j++];
-  	      if (!DESCRIPTORS || call(propertyIsEnumerable, S, key)) T[key] = S[key];
-  	    }
-  	  } return T;
-  	} : $assign;
-  	return objectAssign;
-  }
-
-  var hasRequiredEs_object_assign;
-
-  function requireEs_object_assign () {
-  	if (hasRequiredEs_object_assign) return es_object_assign;
-  	hasRequiredEs_object_assign = 1;
-  	var $ = require_export();
-  	var assign = requireObjectAssign();
-
-  	// `Object.assign` method
-  	// https://tc39.es/ecma262/#sec-object.assign
-  	// eslint-disable-next-line es/no-object-assign -- required for testing
-  	$({ target: 'Object', stat: true, arity: 2, forced: Object.assign !== assign }, {
-  	  assign: assign
-  	});
-  	return es_object_assign;
-  }
-
-  requireEs_object_assign();
-
-  var es_object_toString = {};
-
-  var objectToString;
-  var hasRequiredObjectToString;
-
-  function requireObjectToString () {
-  	if (hasRequiredObjectToString) return objectToString;
-  	hasRequiredObjectToString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var classof = requireClassof();
-
-  	// `Object.prototype.toString` method implementation
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	objectToString = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
-  	  return '[object ' + classof(this) + ']';
-  	};
-  	return objectToString;
-  }
-
-  var hasRequiredEs_object_toString;
-
-  function requireEs_object_toString () {
-  	if (hasRequiredEs_object_toString) return es_object_toString;
-  	hasRequiredEs_object_toString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var defineBuiltIn = requireDefineBuiltIn();
-  	var toString = requireObjectToString();
-
-  	// `Object.prototype.toString` method
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	if (!TO_STRING_TAG_SUPPORT) {
-  	  defineBuiltIn(Object.prototype, 'toString', toString, { unsafe: true });
-  	}
-  	return es_object_toString;
-  }
-
-  requireEs_object_toString();
-
-  var web_domCollections_forEach = {};
-
-  var domIterables;
-  var hasRequiredDomIterables;
-
-  function requireDomIterables () {
-  	if (hasRequiredDomIterables) return domIterables;
-  	hasRequiredDomIterables = 1;
-  	// iterable DOM collections
-  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
-  	domIterables = {
-  	  CSSRuleList: 0,
-  	  CSSStyleDeclaration: 0,
-  	  CSSValueList: 0,
-  	  ClientRectList: 0,
-  	  DOMRectList: 0,
-  	  DOMStringList: 0,
-  	  DOMTokenList: 1,
-  	  DataTransferItemList: 0,
-  	  FileList: 0,
-  	  HTMLAllCollection: 0,
-  	  HTMLCollection: 0,
-  	  HTMLFormElement: 0,
-  	  HTMLSelectElement: 0,
-  	  MediaList: 0,
-  	  MimeTypeArray: 0,
-  	  NamedNodeMap: 0,
-  	  NodeList: 1,
-  	  PaintRequestList: 0,
-  	  Plugin: 0,
-  	  PluginArray: 0,
-  	  SVGLengthList: 0,
-  	  SVGNumberList: 0,
-  	  SVGPathSegList: 0,
-  	  SVGPointList: 0,
-  	  SVGStringList: 0,
-  	  SVGTransformList: 0,
-  	  SourceBufferList: 0,
-  	  StyleSheetList: 0,
-  	  TextTrackCueList: 0,
-  	  TextTrackList: 0,
-  	  TouchList: 0
-  	};
-  	return domIterables;
-  }
-
-  var domTokenListPrototype;
-  var hasRequiredDomTokenListPrototype;
-
-  function requireDomTokenListPrototype () {
-  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
-  	hasRequiredDomTokenListPrototype = 1;
-  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
-  	var documentCreateElement = requireDocumentCreateElement();
-
-  	var classList = documentCreateElement('span').classList;
-  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
-
-  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
-  	return domTokenListPrototype;
-  }
-
   var arrayMethodIsStrict;
   var hasRequiredArrayMethodIsStrict;
 
@@ -2463,14 +2266,14 @@
    * @update zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.locales, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.locales, {
     formatCopyRows: function formatCopyRows() {
       return 'Copy Rows';
     }
   });
-  Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales);
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'copy', {
+  Object.assign(BootstrapTable.defaults, BootstrapTable.locales);
+  Utils.assignIcons(BootstrapTable.icons, 'copy', {
     glyphicon: 'glyphicon-copy icon-pencil',
     fa: 'fa-copy',
     bi: 'bi-clipboard',
@@ -2479,7 +2282,7 @@
   });
   var copyText = function copyText(text) {
     var textField = document.createElement('textarea');
-    $(textField).html(text);
+    textField.innerHTML = text;
     document.body.appendChild(textField);
     textField.select();
     try {
@@ -2487,9 +2290,9 @@
     } catch (e) {
       console.warn('Oops, unable to copy', e);
     }
-    $(textField).remove();
+    textField.remove();
   };
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     showCopyRows: false,
     copyWithHidden: false,
     copyDelimiter: ', ',
@@ -2498,18 +2301,18 @@
       return text;
     }
   });
-  Object.assign($.fn.bootstrapTable.columnDefaults, {
+  Object.assign(BootstrapTable.columnDefaults, {
     ignoreCopy: false,
     rawCopy: false
   });
-  $.fn.bootstrapTable.methods.push('copyColumnsToClipboard');
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  BootstrapTable.methods.push('copyColumnsToClipboard');
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initToolbar",
       value: function initToolbar() {
         if (this.options.showCopyRows && this.header.stateField) {
@@ -2528,8 +2331,8 @@
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initToolbar", this)(args);
-        this.$copyButton = this.$toolbar.find('>.columns [name="copyRows"]');
+        _superPropGet(_default, "initToolbar", this)(args);
+        this.$copyButton = this.$toolbar.querySelector(':scope > .columns [name="copyRows"]');
         if (this.options.showCopyRows && this.header.stateField) {
           this.updateCopyButton();
         }
@@ -2570,17 +2373,19 @@
     }, {
       key: "updateSelected",
       value: function updateSelected() {
-        _superPropGet(_class, "updateSelected", this)([]);
+        _superPropGet(_default, "updateSelected", this)([]);
         this.updateCopyButton();
       }
     }, {
       key: "updateCopyButton",
       value: function updateCopyButton() {
         if (this.options.showCopyRows && this.header.stateField && this.$copyButton) {
-          this.$copyButton.prop('disabled', !this.getSelections().length);
+          this.$copyButton.disabled = !this.getSelections().length;
         }
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

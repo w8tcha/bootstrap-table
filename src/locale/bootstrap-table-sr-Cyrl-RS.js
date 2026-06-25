@@ -3,7 +3,9 @@
  * Author: Vladimir Kanazir (vladimir@kanazir.com)
  */
 
-$.fn.bootstrapTable.locales['sr-Cyrl-RS'] = $.fn.bootstrapTable.locales['sr'] = {
+
+
+BootstrapTable.locales['sr-Cyrl-RS'] = BootstrapTable.locales['sr'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['sr-Cyrl-RS'] = $.fn.bootstrapTable.locales['sr'] = 
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['sr-Cyrl-RS'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['sr-Cyrl-RS'])

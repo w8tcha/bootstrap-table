@@ -2,38 +2,43 @@
 /**
  * @author zhixin wen <wenzhixin2010@gmail.com>
  * extensions: https://github.com/vitalets/x-editable
+ *
+ * Note: this extension depends on the x-editable jQuery plugin.
+ * jQuery must be available and the plugin loaded for this to work.
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Object.assign(BootstrapTable.defaults, {
   editable: true,
   onEditableInit () {
     return false
   },
-  onEditableSave (field, row, rowIndex, oldValue, $el) {
+  onEditableSave (field, row, rowIndex, oldValue, el) {
     return false
   },
-  onEditableShown (field, row, $el, editable) {
+  onEditableShown (field, row, el, editable) {
     return false
   },
-  onEditableHidden (field, row, $el, reason) {
+  onEditableHidden (field, row, el, reason) {
     return false
   }
 })
 
-Object.assign($.fn.bootstrapTable.columnDefaults, {
+Object.assign(BootstrapTable.columnDefaults, {
   alwaysUseFormatter: false
 })
 
-Object.assign($.fn.bootstrapTable.events, {
+Object.assign(BootstrapTable.events, {
   'editable-init.bs.table': 'onEditableInit',
   'editable-save.bs.table': 'onEditableSave',
   'editable-shown.bs.table': 'onEditableShown',
   'editable-hidden.bs.table': 'onEditableHidden'
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initTable () {
     super.initTable()
 
@@ -42,7 +47,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
     }
 
     this.editedCells = []
-    $.each(this.columns, (i, column) => {
+    this.columns.forEach((column, i) => {
       if (!column.editable) {
         return
       }
@@ -60,7 +65,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
       const formatterIsSet = column.formatter ? true : false
 
-      $.each(this.options, processDataOptions)
+      Object.entries(this.options).forEach(([key, value]) => processDataOptions(key, value))
 
       column.formatter = column.formatter || (value => value)
       column._formatter = column._formatter ? column._formatter : column.formatter
@@ -71,16 +76,16 @@ $.BootstrapTable = class extends $.BootstrapTable {
         if (this.options.uniqueId !== undefined && !column.alwaysUseFormatter) {
           const uniqueId = Utils.getItemField(row, this.options.uniqueId, false)
 
-          if ($.inArray(column.field + uniqueId, this.editedCells) !== -1) {
+          if (this.editedCells.indexOf(column.field + uniqueId) !== -1) {
             result = value
           }
         }
 
-        $.each(column, processDataOptions)
+        Object.entries(column).forEach(([key, value]) => processDataOptions(key, value))
 
         const editableOpts = Utils.calculateObjectValue(column,
           column.editable, [index, row], {})
-        const noEditFormatter = editableOpts.hasOwnProperty('noEditFormatter') &&
+        const noEditFormatter = Object.prototype.hasOwnProperty.call(editableOpts, 'noEditFormatter') &&
                                 editableOpts.noEditFormatter(value, row, index, field)
 
         if (noEditFormatter) {
@@ -89,7 +94,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
         let editableDataMarkup = ''
 
-        $.each(editableOptions, (key, value) => {
+        Object.entries(editableOptions).forEach(([key, value]) => {
           editableDataMarkup += ` ${key}="${value}"`
         })
 
@@ -109,65 +114,72 @@ $.BootstrapTable = class extends $.BootstrapTable {
       return
     }
 
-    $.each(this.columns, (i, column) => {
+    this.columns.forEach((column, i) => {
       if (!column.editable) {
         return
       }
 
       const data = this.getData({ escape: true })
-      const $field = this.$body.find(`a[data-name="${column.field}"]`)
+      const fields = [...this.$body.querySelectorAll(`a[data-name="${column.field}"]`)]
 
-      $field.each((i, element) => {
-        const $element = $(element)
-        const $tr = $element.closest('tr')
-        const index = $tr.data('index')
+      fields.forEach((element, i) => {
+        const tr = element.closest('tr')
+        const index = +tr.dataset.index
         const row = data[index]
 
         const editableOpts = Utils.calculateObjectValue(column,
-          column.editable, [index, row, $element], {})
+          column.editable, [index, row, element], {})
 
-        $element.editable(editableOpts)
-      })
-
-      $field.off('save').on('save', ({ currentTarget }, { submitValue }) => {
-        const $this = $(currentTarget)
-        const data = this.getData()
-        const rowIndex = $this.parents('tr[data-index]').data('index')
-        const row = data[rowIndex]
-        const oldValue = row[column.field]
-
-        if (this.options.uniqueId !== undefined && !column.alwaysUseFormatter) {
-          const uniqueId = Utils.getItemField(row, this.options.uniqueId, false)
-
-          if ($.inArray(column.field + uniqueId, this.editedCells) === -1) {
-            this.editedCells.push(column.field + uniqueId)
-          }
+        // x-editable requires jQuery
+        if (typeof window.$ !== 'undefined') {
+          $(element).editable(editableOpts)
         }
-
-        submitValue = Utils.escapeHTML(submitValue)
-        $this.data('value', submitValue)
-        row[column.field] = submitValue
-        this.trigger('editable-save', column.field, row, rowIndex, oldValue, $this)
-        this.initBody()
       })
 
-      $field.off('shown').on('shown', ({ currentTarget }, editable) => {
-        const $this = $(currentTarget)
-        const data = this.getData()
-        const rowIndex = $this.parents('tr[data-index]').data('index')
-        const row = data[rowIndex]
+      // x-editable events require jQuery
+      if (typeof window.$ !== 'undefined') {
+        const $fields = $(this.$body).find(`a[data-name="${column.field}"]`)
 
-        this.trigger('editable-shown', column.field, row, $this, editable)
-      })
+        $fields.off('save').on('save', ({ currentTarget }, { submitValue }) => {
+          const data = this.getData()
+          const rowIndex = currentTarget.closest('tr[data-index]') ?
+            +currentTarget.closest('tr[data-index]').dataset.index : -1
+          const row = data[rowIndex]
+          const oldValue = row[column.field]
 
-      $field.off('hidden').on('hidden', ({ currentTarget }, reason) => {
-        const $this = $(currentTarget)
-        const data = this.getData()
-        const rowIndex = $this.parents('tr[data-index]').data('index')
-        const row = data[rowIndex]
+          if (this.options.uniqueId !== undefined && !column.alwaysUseFormatter) {
+            const uniqueId = Utils.getItemField(row, this.options.uniqueId, false)
 
-        this.trigger('editable-hidden', column.field, row, $this, reason)
-      })
+            if (this.editedCells.indexOf(column.field + uniqueId) === -1) {
+              this.editedCells.push(column.field + uniqueId)
+            }
+          }
+
+          submitValue = Utils.escapeHTML(submitValue)
+          currentTarget.dataset.value = submitValue
+          row[column.field] = submitValue
+          this.trigger('editable-save', column.field, row, rowIndex, oldValue, currentTarget)
+          this.initBody()
+        })
+
+        $fields.off('shown').on('shown', ({ currentTarget }, editable) => {
+          const data = this.getData()
+          const rowIndex = currentTarget.closest('tr[data-index]') ?
+            +currentTarget.closest('tr[data-index]').dataset.index : -1
+          const row = data[rowIndex]
+
+          this.trigger('editable-shown', column.field, row, currentTarget, editable)
+        })
+
+        $fields.off('hidden').on('hidden', ({ currentTarget }, reason) => {
+          const data = this.getData()
+          const rowIndex = currentTarget.closest('tr[data-index]') ?
+            +currentTarget.closest('tr[data-index]').dataset.index : -1
+          const row = data[rowIndex]
+
+          this.trigger('editable-hidden', column.field, row, currentTarget, reason)
+        })
+      }
     })
     this.trigger('editable-init')
   }

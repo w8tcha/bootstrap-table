@@ -3,7 +3,9 @@
  * Author: Jim Nordbø, jim@nordb.no
  */
 
-$.fn.bootstrapTable.locales['nb-NO'] = $.fn.bootstrapTable.locales['nb'] = {
+
+
+BootstrapTable.locales['nb-NO'] = BootstrapTable.locales['nb'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['nb-NO'] = $.fn.bootstrapTable.locales['nb'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['nb-NO'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['nb-NO'])

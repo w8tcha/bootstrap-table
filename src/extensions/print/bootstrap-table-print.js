@@ -2,9 +2,10 @@
  * @update zhixin wen <wenzhixin2010@gmail.com>
  */
 
+
 import DOMHelper from '../../helpers/dom.js'
 
-const Utils = $.fn.bootstrapTable.utils
+const Utils = BootstrapTable.utils
 
 function printPageBuilderDefault (table, styles) {
   return `
@@ -56,14 +57,14 @@ function printPageBuilderDefault (table, styles) {
   `
 }
 
-Object.assign($.fn.bootstrapTable.locales, {
+Object.assign(BootstrapTable.locales, {
   formatPrint () {
     return 'Print'
   }
 })
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales)
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales)
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   showPrint: false,
   printAsFilteredAndSortedOnUI: true,
   printSortColumn: undefined,
@@ -74,13 +75,13 @@ Object.assign($.fn.bootstrapTable.defaults, {
   }
 })
 
-Object.assign($.fn.bootstrapTable.columnDefaults, {
+Object.assign(BootstrapTable.columnDefaults, {
   printFilter: undefined,
   printIgnore: false,
   printFormatter: undefined
 })
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'print', {
+Utils.assignIcons(BootstrapTable.icons, 'print', {
   glyphicon: 'glyphicon-print icon-share',
   fa: 'fa-print',
   bi: 'bi-printer',
@@ -88,7 +89,7 @@ Utils.assignIcons($.fn.bootstrapTable.icons, 'print', {
   'material-icons': 'print'
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   init (...args) {
     super.init(...args)
 
@@ -184,7 +185,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
     }
 
     const buildTable = (data, columnsArray) => {
-      const dir = this.$el.attr('dir') || 'ltr'
+      const dir = this.$el.getAttribute('dir') || 'ltr'
       const html = [`<table dir="${dir}"><thead>`]
 
       for (const columns of columnsArray) {
@@ -295,7 +296,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
         const columns = columnsArray.flat(1).filter(column => !(column.colspanGroup > 0))
 
         columns.sort((c1, c2) => c1.colspanIndex - c2.colspanIndex)
-        const footerData = Utils.trToData(columns, this.$el.find('>tfoot>tr').get())
+        const footerData = Utils.trToData(columns, [...this.$el.querySelectorAll(':scope > tfoot > tr')])
 
         for (const column of columns) {
           if (canPrint(column)) {

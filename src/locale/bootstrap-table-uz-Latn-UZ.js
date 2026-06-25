@@ -3,7 +3,9 @@
  * Author: Nabijon Masharipov <mnabijonz@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['uz-Latn-UZ'] = $.fn.bootstrapTable.locales['uz'] = {
+
+
+BootstrapTable.locales['uz-Latn-UZ'] = BootstrapTable.locales['uz'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['uz-Latn-UZ'] = $.fn.bootstrapTable.locales['uz'] = 
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['uz-Latn-UZ'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['uz-Latn-UZ'])

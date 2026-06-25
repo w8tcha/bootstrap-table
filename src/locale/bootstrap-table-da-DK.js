@@ -3,7 +3,9 @@
  * Author: Your Name Jan Borup Coyle, github@coyle.dk
  */
 
-$.fn.bootstrapTable.locales['da-DK'] = $.fn.bootstrapTable.locales['da'] = {
+
+
+BootstrapTable.locales['da-DK'] = BootstrapTable.locales['da'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['da-DK'] = $.fn.bootstrapTable.locales['da'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['da-DK'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['da-DK'])

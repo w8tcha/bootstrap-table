@@ -3,16 +3,22 @@
  * https://github.com/wenzhixin/bootstrap-table/
  */
 
-$.fn.bootstrapTable.theme = 'bootstrap-table'
 
-$.BootstrapTable = class extends $.BootstrapTable {
+
+BootstrapTable.theme = 'bootstrap-table'
+
+export default class extends BootstrapTable {
   init () {
     super.init()
 
     this.constants.classes.dropup = 'dropdown-menu-up'
 
-    $('.modal').on('click', '[data-close]', e => {
-      $(e.delegateTarget).removeClass('show')
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', e => {
+        if (e.target.closest('[data-close]')) {
+          e.currentTarget.classList.remove('show')
+        }
+      })
     })
   }
 
@@ -22,14 +28,13 @@ $.BootstrapTable = class extends $.BootstrapTable {
     this.constants.html.inputGroup = '<div class="input-group">%s%s</div>'
   }
 
-
   initToolbar () {
     super.initToolbar()
     this.handleToolbar()
   }
 
   handleToolbar () {
-    if (this.$toolbar.find('.dropdown-toggle').length) {
+    if (this.$toolbar.querySelector('.dropdown-toggle')) {
       this._initDropdown()
     }
   }
@@ -42,24 +47,39 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   _initDropdown () {
-    const $dropdownToggles = $('.dropdown-toggle')
+    // Remove previous handlers to avoid duplicates on re-init
+    this._dropdownToggles?.forEach(t => {
+      if (t._ddClickHandler) t.removeEventListener('click', t._ddClickHandler)
+    })
+    if (this._windowClickHandler) {
+      window.removeEventListener('click', this._windowClickHandler)
+    }
 
-    $dropdownToggles.off('click').on('click', e => {
-      let $target = $(e.currentTarget)
+    this._dropdownToggles = Array.from(this.$container.querySelectorAll('.dropdown-toggle'))
 
-      if ($target.parents('.dropdown-toggle').length > 0) {
-        $target = $target.parents('.dropdown-toggle')
+    this._dropdownToggles.forEach(toggle => {
+      toggle._ddClickHandler = e => {
+        const target = e.currentTarget.closest('.dropdown-toggle') || e.currentTarget
+        const menu = target.nextElementSibling
+
+        if (menu?.classList.contains('dropdown-menu')) {
+          menu.classList.toggle('open')
+        }
       }
-
-      $target.next('.dropdown-menu').toggleClass('open')
+      toggle.addEventListener('click', toggle._ddClickHandler)
     })
 
-    $(window).off('click').on('click', e => {
-      const $dropdownToggles = $('.dropdown-toggle')
+    this._windowClickHandler = e => {
+      if (!e.target.closest('.dropdown-toggle, .dropdown-menu')) {
+        this._dropdownToggles?.forEach(toggle => {
+          const menu = toggle.nextElementSibling
 
-      if ($(e.target).parents('.dropdown-toggle, .dropdown-menu').length === 0 && !$(e.target).hasClass('dropdown-toggle')) {
-        $dropdownToggles.next('.dropdown-menu').removeClass('open')
+          if (menu?.classList.contains('dropdown-menu')) {
+            menu.classList.remove('open')
+          }
+        })
       }
-    })
+    }
+    window.addEventListener('click', this._windowClickHandler)
   }
 }

@@ -3,7 +3,9 @@
  * Author: Dunaevsky Maxim <dunmaksim@yandex.ru>
  */
 
-$.fn.bootstrapTable.locales['ru-RU'] = $.fn.bootstrapTable.locales['ru'] = {
+
+
+BootstrapTable.locales['ru-RU'] = BootstrapTable.locales['ru'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['ru-RU'] = $.fn.bootstrapTable.locales['ru'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ru-RU'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ru-RU'])

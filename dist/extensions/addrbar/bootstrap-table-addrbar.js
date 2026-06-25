@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -4470,19 +4470,19 @@
    * @update: zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.defaults, {
     addrbar: false,
     addrPrefix: '',
     addrCustomParams: {}
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "init",
       value: function init() {
         if (this.options.pagination && this.options.addrbar) {
@@ -4491,7 +4491,7 @@
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "init", this)(args);
+        _superPropGet(_default, "init", this)(args);
       }
 
       /*
@@ -4503,10 +4503,10 @@
     }, {
       key: "getDefaultOptionValue",
       value: function getDefaultOptionValue(optionName, prefixName) {
-        if (this.options[optionName] !== $.BootstrapTable.DEFAULTS[optionName]) {
+        if (this.options[optionName] !== BootstrapTable.DEFAULTS[optionName]) {
           return this.options[optionName];
         }
-        return this.searchParams.get("".concat(this.options.addrPrefix || '').concat(prefixName)) || $.BootstrapTable.DEFAULTS[optionName];
+        return this.searchParams.get("".concat(this.options.addrPrefix || '').concat(prefixName)) || BootstrapTable.DEFAULTS[optionName];
       }
     }, {
       key: "initAddrbar",
@@ -4575,10 +4575,12 @@
     }, {
       key: "resetSearch",
       value: function resetSearch(text) {
-        _superPropGet(_class, "resetSearch", this)([text]);
+        _superPropGet(_default, "resetSearch", this)([text]);
         this.options.searchText = text || '';
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

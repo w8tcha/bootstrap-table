@@ -3,7 +3,7 @@
 * Author: Paul Mohr - Sopamo<p.mohr@sopamo.de>
 */
 
-$.fn.bootstrapTable.locales['de-DE'] = $.fn.bootstrapTable.locales['de'] = {
+BootstrapTable.locales['de-DE'] = BootstrapTable.locales['de'] = {
   formatAddLevel () {
     return 'Ebene hinzufügen'
   },
@@ -188,4 +188,4 @@ $.fn.bootstrapTable.locales['de-DE'] = $.fn.bootstrapTable.locales['de'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['de-DE'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['de-DE'])

@@ -5,20 +5,20 @@ export default {
     const opts = this.options
 
     if (!opts.pagination) {
-      this.$pagination.hide()
+      this.$pagination.forEach(el => {
+        el.style.display = 'none'
+      })
       return
     }
-    this.$pagination.show()
+    this.$pagination.forEach(el => {
+      el.style.display = ''
+    })
 
     const html = []
     let allSelected = false
     let i
     let from
     let to
-    let $pageList
-    let $pre
-    let $next
-    let $number
     const data = this.getData({ includeHiddenRows: false })
     let pageList = opts.pageList
 
@@ -226,54 +226,77 @@ export default {
       html.push(Utils.sprintf(this.constants.html.paginationItem, ' page-next', opts.formatSRPaginationNextText(), opts.paginationNextText))
       html.push(this.constants.html.pagination[1], '</div>')
     }
-    this.$pagination.html(html.join(''))
+
+    const htmlStr = html.join('')
+
+    this.$pagination.forEach(el => {
+      el.innerHTML = htmlStr
+    })
 
     const dropupClass = ['bottom', 'both'].includes(opts.paginationVAlign) ?
       ` ${this.constants.classes.dropup}` : ''
+    const lastPag = this.$pagination[this.$pagination.length - 1]
 
-    this.$pagination.last().find('.page-list > div').addClass(dropupClass)
+    if (lastPag && dropupClass.trim()) {
+      lastPag.querySelectorAll('.page-list > div')
+        .forEach(el => el.classList.add(dropupClass.trim()))
+    }
 
     if (!opts.onlyInfoPagination) {
-      $pageList = this.$pagination.find('.page-list a')
-      $pre = this.$pagination.find('.page-pre')
-      $next = this.$pagination.find('.page-next')
-      $number = this.$pagination.find('.page-item').not('.page-next, .page-pre, .page-last-separator, .page-first-separator')
+      const $pageList = this.$pagination.flatMap(el => [...el.querySelectorAll('.page-list a')])
+      const $pre = this.$pagination.flatMap(el => [...el.querySelectorAll('.page-pre')])
+      const $next = this.$pagination.flatMap(el => [...el.querySelectorAll('.page-next')])
+      const $number = this.$pagination.flatMap(el =>
+        [...el.querySelectorAll('.page-item:not(.page-next):not(.page-pre):not(.page-last-separator):not(.page-first-separator)')]
+      )
 
       if (this.totalPages <= 1) {
-        this.$pagination.find('div.pagination').hide()
+        this.$pagination.forEach(el =>
+          el.querySelectorAll('div.pagination').forEach(p => {
+            p.style.display = 'none'
+          })
+        )
       }
 
       if (opts.smartDisplay) {
         if (pageList.length < 2 || opts.totalRows <= pageList[0]) {
-          this.$pagination.find('div.page-list').hide()
+          this.$pagination.forEach(el =>
+            el.querySelectorAll('div.page-list').forEach(p => {
+              p.style.display = 'none'
+            })
+          )
         }
       }
 
       // when data is empty, hide the pagination
-      this.$pagination[this.getData().length ? 'show' : 'hide']()
+      const hasData = this.getData().length > 0
+
+      this.$pagination.forEach(el => {
+        el.style.display = hasData ? '' : 'none'
+      })
 
       if (!opts.paginationLoop) {
         if (opts.pageNumber === 1) {
-          $pre.addClass('disabled')
+          $pre.forEach(el => el.classList.add('disabled'))
         }
         if (opts.pageNumber === this.totalPages) {
-          $next.addClass('disabled')
+          $next.forEach(el => el.classList.add('disabled'))
         }
       }
 
       if (allSelected) {
         opts.pageSize = opts.formatAllRows()
       }
-      $pageList.off('click').on('click', e => this.onPageListChange(e))
-      $pre.off('click').on('click', e => this.onPagePre(e))
-      $next.off('click').on('click', e => this.onPageNext(e))
-      $number.off('click').on('click', e => this.onPageNumber(e))
+      $pageList.forEach(el => el.addEventListener('click', e => this.onPageListChange(e)))
+      $pre.forEach(el => el.addEventListener('click', e => this.onPagePre(e)))
+      $next.forEach(el => el.addEventListener('click', e => this.onPageNext(e)))
+      $number.forEach(el => el.addEventListener('click', e => this.onPageNumber(e)))
     }
   },
 
   updatePagination (event) {
     // Fix #171: IE disabled button can be clicked bug.
-    if (event && $(event.currentTarget).hasClass('disabled')) {
+    if (event && event.currentTarget?.classList.contains('disabled')) {
       return
     }
 
@@ -300,20 +323,27 @@ export default {
 
   onPageListChange (event) {
     event.preventDefault()
-    const $this = $(event.currentTarget)
+    const el = event.currentTarget
+    const parent = el.parentElement
 
-    $this.parent().addClass(this.constants.classes.dropdownActive)
-      .siblings().removeClass(this.constants.classes.dropdownActive)
-    this.options.pageSize = $this.text().toUpperCase() === this.options.formatAllRows().toUpperCase() ?
-      this.options.formatAllRows() : +$this.text()
-    this.$toolbar.find('.page-size').text(this.options.pageSize)
+    parent?.classList.add(this.constants.classes.dropdownActive)
+    Array.from(parent?.parentElement?.children || [])
+      .filter(c => c !== parent)
+      .forEach(c => c.classList.remove(this.constants.classes.dropdownActive))
+
+    this.options.pageSize = el.textContent.toUpperCase() === this.options.formatAllRows().toUpperCase() ?
+      this.options.formatAllRows() : +el.textContent
+
+    const pageSizeEl = this.$toolbar.querySelector('.page-size')
+
+    if (pageSizeEl) pageSizeEl.textContent = this.options.pageSize
 
     this.updatePagination(event)
     return false
   },
 
   onPagePre (event) {
-    if ($(event.target).hasClass('disabled')) {
+    if (event.currentTarget.classList.contains('disabled')) {
       return
     }
     event.preventDefault()
@@ -327,7 +357,7 @@ export default {
   },
 
   onPageNext (event) {
-    if ($(event.target).hasClass('disabled')) {
+    if (event.currentTarget.classList.contains('disabled')) {
       return
     }
     event.preventDefault()
@@ -342,10 +372,10 @@ export default {
 
   onPageNumber (event) {
     event.preventDefault()
-    if (this.options.pageNumber === +$(event.currentTarget).text()) {
+    if (this.options.pageNumber === +event.currentTarget.textContent) {
       return
     }
-    this.options.pageNumber = +$(event.currentTarget).text()
+    this.options.pageNumber = +event.currentTarget.textContent
     this.updatePagination(event)
     return false
   },
@@ -377,8 +407,9 @@ export default {
     const icon = this.options.showButtonIcons ? this.options.pagination ? this.options.icons.paginationSwitchDown : this.options.icons.paginationSwitchUp : ''
     const text = this.options.showButtonText ? this.options.pagination ? this.options.formatPaginationSwitchUp() : this.options.formatPaginationSwitchDown() : ''
 
-    this.$toolbar.find('button[name="paginationSwitch"]')
-      .html(`${Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, icon)} ${text}`)
+    const btn = this.$toolbar.querySelector('button[name="paginationSwitch"]')
+
+    if (btn) btn.innerHTML = `${Utils.sprintf(this.constants.html.icon, this.options.iconsPrefix, icon)} ${text}`
     this.updatePagination()
     this.trigger('toggle-pagination', this.options.pagination)
   }

@@ -3,7 +3,9 @@
  * Author: Nagy Gergely <info@nagygergely.eu>
  */
 
-$.fn.bootstrapTable.locales['hu-HU'] = $.fn.bootstrapTable.locales['hu'] = {
+
+
+BootstrapTable.locales['hu-HU'] = BootstrapTable.locales['hu'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['hu-HU'] = $.fn.bootstrapTable.locales['hu'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['hu-HU'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['hu-HU'])

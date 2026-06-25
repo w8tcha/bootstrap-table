@@ -3,10 +3,12 @@
  * @update zhixin wen <wenzhixin2010@gmail.com>
  */
 
-$.fn.bootstrapTable.methods.push('changeTitle')
-$.fn.bootstrapTable.methods.push('changeLocale')
 
-$.BootstrapTable = class extends $.BootstrapTable {
+
+BootstrapTable.methods.push('changeTitle')
+BootstrapTable.methods.push('changeLocale')
+
+export default class extends BootstrapTable {
 
   changeTitle (locale) {
     this.options.columns.forEach(columnList => {

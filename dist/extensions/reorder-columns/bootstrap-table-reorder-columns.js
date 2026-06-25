@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -11,6 +11,9 @@
   }
   function _arrayWithHoles(r) {
     if (Array.isArray(r)) return r;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
   }
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -115,6 +118,9 @@
       return !!t;
     })();
   }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
   function _iterableToArrayLimit(r, l) {
     var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
     if (null != t) {
@@ -145,6 +151,9 @@
   function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
   function _possibleConstructorReturn(t, e) {
     if (e && ("object" == typeof e || "function" == typeof e)) return e;
     if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
@@ -167,6 +176,9 @@
     return "function" == typeof p ? function (t) {
       return p.apply(e, t);
     } : p;
+  }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
   function _toPrimitive(t, r) {
     if ("object" != typeof t || !t) return t;
@@ -2823,29 +2835,150 @@
 
   requireEs_object_toString();
 
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
+  var arrayForEach;
+  var hasRequiredArrayForEach;
+
+  function requireArrayForEach () {
+  	if (hasRequiredArrayForEach) return arrayForEach;
+  	hasRequiredArrayForEach = 1;
+  	var $forEach = requireArrayIteration().forEach;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+  	var STRICT_METHOD = arrayMethodIsStrict('forEach');
+
+  	// `Array.prototype.forEach` method implementation
+  	// https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	arrayForEach = !STRICT_METHOD ? function forEach(callbackfn /* , thisArg */) {
+  	  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	// eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	} : [].forEach;
+  	return arrayForEach;
+  }
+
+  var hasRequiredWeb_domCollections_forEach;
+
+  function requireWeb_domCollections_forEach () {
+  	if (hasRequiredWeb_domCollections_forEach) return web_domCollections_forEach;
+  	hasRequiredWeb_domCollections_forEach = 1;
+  	var globalThis = requireGlobalThis();
+  	var DOMIterables = requireDomIterables();
+  	var DOMTokenListPrototype = requireDomTokenListPrototype();
+  	var forEach = requireArrayForEach();
+  	var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+
+  	var handlePrototype = function (CollectionPrototype) {
+  	  // some Chrome versions have non-configurable methods on DOMTokenList
+  	  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+  	    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  	  } catch (error) {
+  	    CollectionPrototype.forEach = forEach;
+  	  }
+  	};
+
+  	for (var COLLECTION_NAME in DOMIterables) {
+  	  if (DOMIterables[COLLECTION_NAME]) {
+  	    handlePrototype(globalThis[COLLECTION_NAME] && globalThis[COLLECTION_NAME].prototype);
+  	  }
+  	}
+
+  	handlePrototype(DOMTokenListPrototype);
+  	return web_domCollections_forEach;
+  }
+
+  requireWeb_domCollections_forEach();
+
+  var _window$$$akottr;
+
   /**
    * @author: Dennis Hernández
    * @update: https://github.com/wenzhixin
    * @version: v1.2.0
+   *
+   * Note: this extension depends on the jQuery dragtable plugin.
+   * jQuery must be available and the plugin loaded for this to work.
    */
 
-  $.akottr.dragtable.prototype._restoreState = function (persistObj) {
-    var i = 0;
-    for (var _i = 0, _Object$entries = Object.entries(persistObj); _i < _Object$entries.length; _i++) {
-      var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
-        field = _Object$entries$_i[0],
-        value = _Object$entries$_i[1];
-      var $th = this.originalTable.el.find("th[data-field=\"".concat(field, "\"]"));
-      if (!$th.length) {
-        i++;
-        continue;
+  if (typeof window.$ !== 'undefined' && (_window$$$akottr = window.$.akottr) !== null && _window$$$akottr !== void 0 && (_window$$$akottr = _window$$$akottr.dragtable) !== null && _window$$$akottr !== void 0 && _window$$$akottr.prototype) {
+    window.$.akottr.dragtable.prototype._restoreState = function (persistObj) {
+      var i = 0;
+      for (var _i = 0, _Object$entries = Object.entries(persistObj); _i < _Object$entries.length; _i++) {
+        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
+          field = _Object$entries$_i[0],
+          value = _Object$entries$_i[1];
+        var $th = this.originalTable.el.find("th[data-field=\"".concat(field, "\"]"));
+        if (!$th.length) {
+          i++;
+          continue;
+        }
+        this.originalTable.startIndex = $th.prevAll().length + 1;
+        this.originalTable.endIndex = parseInt(value, 10) + 1 - i;
+        this._bubbleCols();
       }
-      this.originalTable.startIndex = $th.prevAll().length + 1;
-      this.originalTable.endIndex = parseInt(value, 10) + 1 - i;
-      this._bubbleCols();
-    }
-  };
-  Object.assign($.fn.bootstrapTable.defaults, {
+    };
+  }
+  Object.assign(BootstrapTable.defaults, {
     reorderableColumns: false,
     maxMovingRows: 10,
     // eslint-disable-next-line no-unused-vars
@@ -2854,29 +2987,29 @@
     },
     dragaccept: null
   });
-  Object.assign($.fn.bootstrapTable.events, {
+  Object.assign(BootstrapTable.events, {
     'reorder-column.bs.table': 'onReorderColumn'
   });
-  $.fn.bootstrapTable.methods.push('orderColumns');
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  BootstrapTable.methods.push('orderColumns');
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initHeader",
       value: function initHeader() {
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initHeader", this)(args);
+        _superPropGet(_default, "initHeader", this)(args);
         if (!this.options.reorderableColumns) {
           return;
         }
         if (this.columnsSortOrder) {
           this.syncColumnsStateFromDOM();
-          _superPropGet(_class, "initHeader", this)(args);
+          _superPropGet(_default, "initHeader", this)(args);
         }
         this.makeColumnsReorderable();
       }
@@ -2888,11 +3021,12 @@
         var formatters = [];
         var columns = [];
         var optionsColumns = [];
-        var $headerRow = this.$header.find('tr').last();
-        var $headerCells = ($headerRow.length ? $headerRow : this.$header).find('th[data-field]:not(.detail)');
-        $headerCells.each(function (i, el) {
-          ths.push($(el).data('field'));
-          formatters.push($(el).data('formatter'));
+        var headerRows = this.$header.querySelectorAll('tr');
+        var lastRow = headerRows[headerRows.length - 1] || this.$header;
+        var headerCells = _toConsumableArray((lastRow.querySelectorAll ? lastRow : this.$header).querySelectorAll('th[data-field]:not(.detail)'));
+        headerCells.forEach(function (el) {
+          ths.push(el.dataset.field);
+          formatters.push(el.dataset.formatter);
         });
         if (ths.length < this.columns.length) {
           var columnsHidden = this.columns.filter(function (column) {
@@ -2944,7 +3078,7 @@
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "_toggleColumns", this)(args);
+        _superPropGet(_default, "_toggleColumns", this)(args);
         if (!this.options.reorderableColumns) {
           return;
         }
@@ -2956,7 +3090,7 @@
         for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
           args[_key3] = arguments[_key3];
         }
-        _superPropGet(_class, "toggleView", this)(args);
+        _superPropGet(_default, "toggleView", this)(args);
         if (!this.options.reorderableColumns) {
           return;
         }
@@ -2971,7 +3105,7 @@
         for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
           args[_key4] = arguments[_key4];
         }
-        _superPropGet(_class, "resetView", this)(args);
+        _superPropGet(_default, "resetView", this)(args);
         if (!this.options.reorderableColumns) {
           return;
         }
@@ -2991,6 +3125,9 @@
       value: function makeColumnsReorderable() {
         var _this2 = this;
         var order = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        if (typeof window.$ === 'undefined') {
+          return;
+        }
         try {
           $(this.$el).dragtable('destroy');
         } catch (_unused) {
@@ -3027,8 +3164,9 @@
         if (!order || _typeof(order) !== 'object') {
           return;
         }
-        var $headerRow = this.$header.find('tr').last();
-        var $target = $headerRow.length ? $headerRow : this.$header;
+        var headerRows = this.$header.querySelectorAll('tr');
+        var lastRow = headerRows[headerRows.length - 1];
+        var target = lastRow || this.$header;
         var sortedEntries = Object.entries(order).sort(function (a, b) {
           return a[1] - b[1];
         });
@@ -3038,9 +3176,9 @@
           for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
             var _step2$value = _slicedToArray(_step2.value, 1),
               field = _step2$value[0];
-            var $th = $target.find("th[data-field=\"".concat(field, "\"]"));
-            if ($th.length) {
-              $target.append($th);
+            var th = target.querySelector("th[data-field=\"".concat(field, "\"]"));
+            if (th) {
+              target.appendChild(th);
             }
           }
         } catch (err) {
@@ -3059,6 +3197,8 @@
         this.trigger('reorder-column', this.header.fields);
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

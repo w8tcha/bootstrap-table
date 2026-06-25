@@ -160,48 +160,63 @@ export default {
       }
     })
 
-    this.$header.html(headerHtml.join(''))
-    this.$header.find('th[data-field]').each((i, el) => {
-      $(el).data(visibleColumns[$(el).data('field')])
-    })
-    this.$container.off('click', '.th-inner').on('click', '.th-inner', e => {
-      const $this = $(e.currentTarget)
+    this.$header.innerHTML = headerHtml.join('')
 
-      if (this.options.detailView && !$this.parent().hasClass('bs-checkbox')) {
-        if ($this.closest('.bootstrap-table')[0] !== this.$container[0]) {
-          return false
+    // Store column data on each th using WeakMap instead of jQuery .data()
+    this.$header.querySelectorAll('th[data-field]').forEach(el => {
+      this._thDataMap.set(el, visibleColumns[el.dataset.field])
+    })
+
+    // Event delegation for th-inner clicks (sorting)
+    if (this._thInnerClickHandler) {
+      this.$container.removeEventListener('click', this._thInnerClickHandler)
+    }
+    this._thInnerClickHandler = e => {
+      const thInner = e.target.closest('.th-inner')
+
+      if (!thInner) return
+      const thEl = thInner.parentElement
+
+      if (this.options.detailView && !thEl?.classList.contains('bs-checkbox')) {
+        if (thInner.closest('.bootstrap-table') !== this.$container) {
+          return
         }
       }
 
-      if (this.options.sortable && $this.parent().data().sortable) {
-        this.onSort(e)
+      if (this.options.sortable && this._thDataMap.get(thEl)?.sortable) {
+        this.onSort({ type: e.type, currentTarget: thInner })
       }
-    })
+    }
+    this.$container.addEventListener('click', this._thInnerClickHandler)
 
-    const resizeEvent = Utils.getEventName('resize.bootstrap-table', this.$el.attr('id'))
-
-    $(window).off(resizeEvent)
-    if (!this.options.showHeader || this.options.cardView) {
-      this.$header.hide()
-      this.$tableHeader.hide()
-      this.$tableLoading.css('top', 0)
-    } else {
-      this.$header.show()
-      this.$tableHeader.show()
-      this.$tableLoading.css('top', this.$header.outerHeight() + 1)
-      // Assign the correct sortable arrow
-      this.resetCaret()
-      $(window).on(resizeEvent, () => this.resetView())
+    // Remove previous resize handler before potentially adding a new one
+    if (this._resizeHandler) {
+      window.removeEventListener('resize', this._resizeHandler)
+      this._resizeHandler = null
     }
 
-    this.$selectAll = this.$header.find('[name="btSelectAll"]')
-    this.$selectAll.off('click').on('click', e => {
-      e.stopPropagation()
-      const checked = $(e.currentTarget).prop('checked')
+    if (!this.options.showHeader || this.options.cardView) {
+      this.$header.style.display = 'none'
+      this.$tableHeader.style.display = 'none'
+      this.$tableLoading.style.top = '0'
+    } else {
+      this.$header.style.display = ''
+      this.$tableHeader.style.display = ''
+      this.$tableLoading.style.top = `${this.$header.offsetHeight + 1}px`
+      // Assign the correct sortable arrow
+      this.resetCaret()
+      this._resizeHandler = () => this.resetView()
+      window.addEventListener('resize', this._resizeHandler)
+    }
 
-      this[checked ? 'checkAll' : 'uncheckAll']()
-      this.updateSelected()
-    })
+    this.$selectAll = this.$header.querySelector('[name="btSelectAll"]')
+    if (this.$selectAll) {
+      this.$selectAll.addEventListener('click', e => {
+        e.stopPropagation()
+        this[e.currentTarget.checked ? 'checkAll' : 'uncheckAll']()
+        this.updateSelected()
+      })
+    }
   },
 
   getVisibleFields () {
@@ -220,107 +235,129 @@ export default {
 
   resetHeader () {
     // Fix #61: the hidden table reset header bug.
-    // Fix bug: get $el.css('width') error sometime (height = 500)
-    this._setDelayTimeout('header', () => this.fitHeader(), this.$el.is(':hidden') ? 100 : 0)
+    const isHidden = !this.$el.offsetWidth && !this.$el.offsetHeight
+
+    this._setDelayTimeout('header', () => this.fitHeader(), isHidden ? 100 : 0)
   },
 
   fitHeader () {
-    if (this.$el.is(':hidden')) {
+    if (!this.$el.offsetWidth && !this.$el.offsetHeight) {
       this._setDelayTimeout('header', () => this.fitHeader(), 100)
       return
     }
 
-    const fixedBody = this.$tableBody.get(0)
+    const fixedBody = this.$tableBody
     const scrollWidth = this.hasScrollBar &&
-    fixedBody.scrollHeight > fixedBody.clientHeight + this.$header.outerHeight() ?
+    fixedBody.scrollHeight > fixedBody.clientHeight + this.$header.offsetHeight ?
       Utils.getScrollBarWidth() : 0
 
-    this.$el.css('margin-top', -this.$header.outerHeight())
+    this.$el.style.marginTop = `-${this.$header.offsetHeight}px`
 
-    const focused = this.$tableHeader.find(':focus')
+    const focused = this.$tableHeader.querySelector(':focus')
 
-    if (focused.length > 0) {
-      const $th = focused.parents('th')
+    if (focused) {
+      const thEl = focused.closest('th')
 
-      if ($th.length > 0) {
-        const dataField = $th.attr('data-field')
+      if (thEl) {
+        const dataField = thEl.getAttribute('data-field')
 
         if (dataField !== undefined) {
-          const $headerTh = this.$header.find(`[data-field='${dataField}']`)
+          const inputs = this.$header.querySelectorAll(
+            `[data-field='${dataField}'] input, [data-field='${dataField}'] select, [data-field='${dataField}'] textarea`
+          )
 
-          if ($headerTh.length > 0) {
-            $headerTh.find(':input').addClass('focus-temp')
-          }
+          inputs.forEach(el => el.classList.add('focus-temp'))
         }
       }
     }
 
-    this.$header_ = this.$header.clone(true, true)
-    this.$selectAll_ = this.$header_.find('[name="btSelectAll"]')
+    this.$header_ = this.$header.cloneNode(true)
+    this.$selectAll_ = this.$header_.querySelector('[name="btSelectAll"]')
 
-    const $caption = this.$el.find('caption')
-    const $fixedHeaderTable = this.$tableHeader
-      .css('margin-right', scrollWidth)
-      .find('table').css('width', this.$el.outerWidth())
-      .html('').attr('class', this.$el.attr('class'))
+    // Copy _thDataMap entries to cloned header ths
+    this.$header.querySelectorAll('th[data-field]').forEach(origTh => {
+      const data = this._thDataMap.get(origTh)
 
-    if ($caption.length > 0) {
-      $fixedHeaderTable.append($caption.clone(true, true))
-    }
+      if (data) {
+        const clonedTh = this.$header_.querySelector(`th[data-field="${origTh.dataset.field}"]`)
 
-    $fixedHeaderTable.append(this.$header_)
-
-    this.$tableLoading.css('width', this.$el.outerWidth())
-
-    const focusedTemp = $('.focus-temp:visible:eq(0)')
-
-    if (focusedTemp.length > 0) {
-      focusedTemp.focus()
-      this.$header.find('.focus-temp').removeClass('focus-temp')
-    }
-
-    // fix bug: $.data() is not working as expected after $.append()
-    this.$header.find('th[data-field]').each((i, el) => {
-      this.$header_.find(Utils.sprintf('th[data-field="%s"]', $(el).data('field'))).data($(el).data())
+        if (clonedTh) this._thDataMap.set(clonedTh, data)
+      }
     })
+
+    const captionEl = this.$el.querySelector('caption')
+    const fixedHeaderTable = this.$tableHeader.querySelector('table')
+
+    this.$tableHeader.style.marginRight = `${scrollWidth}px`
+    fixedHeaderTable.style.width = `${this.$el.offsetWidth}px`
+    fixedHeaderTable.innerHTML = ''
+    fixedHeaderTable.className = this.$el.className
+
+    if (captionEl) {
+      fixedHeaderTable.appendChild(captionEl.cloneNode(true))
+    }
+
+    fixedHeaderTable.appendChild(this.$header_)
+
+    this.$tableLoading.style.width = `${this.$el.offsetWidth}px`
+
+    const focusedTempEl = document.querySelector('.focus-temp')
+
+    if (focusedTempEl && focusedTempEl.offsetParent !== null) {
+      focusedTempEl.focus()
+      this.$header.querySelectorAll('.focus-temp').forEach(el => el.classList.remove('focus-temp'))
+    }
 
     const visibleFields = this.getVisibleFields()
-    const $ths = this.$header_.find('th')
-    let $tr = this.$body.find('>tr:not(.no-records-found,.virtual-scroll-top)').eq(0)
+    const ths = Array.from(this.$header_.querySelectorAll('th'))
+    const bodyRows = this.$body.querySelectorAll(':scope > tr:not(.no-records-found):not(.virtual-scroll-top)')
+    let trEl = bodyRows[0] || null
 
-    while ($tr.length && $tr.find('>td[colspan]:not([colspan="1"])').length) {
-      $tr = $tr.next()
+    while (trEl && trEl.querySelector(':scope > td[colspan]:not([colspan="1"])')) {
+      trEl = trEl.nextElementSibling
+      while (trEl && (trEl.classList.contains('no-records-found') || trEl.classList.contains('virtual-scroll-top'))) {
+        trEl = trEl.nextElementSibling
+      }
     }
 
-    const trLength = $tr.find('> *').length
+    if (trEl) {
+      const cells = Array.from(trEl.querySelectorAll(':scope > *'))
+      const trLength = cells.length
 
-    $tr.find('> *').each((i, el) => {
-      const $this = $(el)
+      cells.forEach((el, i) => {
+        if (Utils.hasDetailViewIcon(this.options)) {
+          if (
+            i === 0 && this.options.detailViewAlign !== 'right' ||
+            i === trLength - 1 && this.options.detailViewAlign === 'right'
+          ) {
+            const thDetail = ths.find(th => th.classList.contains('detail'))
 
-      if (Utils.hasDetailViewIcon(this.options)) {
-        if (
-          i === 0 && this.options.detailViewAlign !== 'right' ||
-          i === trLength - 1 && this.options.detailViewAlign === 'right'
-        ) {
-          const $thDetail = $ths.filter('.detail')
-          const zoomWidth = $thDetail.innerWidth() - $thDetail.find('.fht-cell').width()
+            if (thDetail) {
+              const fhtCell = thDetail.querySelector('.fht-cell')
+              const zoomWidth = thDetail.clientWidth - (fhtCell ? fhtCell.clientWidth : 0)
 
-          $thDetail.find('.fht-cell').width($this.innerWidth() - zoomWidth)
-          return
+              if (fhtCell) fhtCell.style.width = `${el.clientWidth - zoomWidth}px`
+            }
+            return
+          }
         }
-      }
 
-      const index = i - Utils.getDetailViewIndexOffset(this.options)
-      let $th = this.$header_.find(Utils.sprintf('th[data-field="%s"]', visibleFields[index]))
+        const index = i - Utils.getDetailViewIndexOffset(this.options)
+        const matchingThs = this.$header_.querySelectorAll(`th[data-field="${visibleFields[index]}"]`)
+        let th = matchingThs[0]
 
-      if ($th.length > 1) {
-        $th = $($ths[$this[0].cellIndex])
-      }
+        if (matchingThs.length > 1) {
+          th = ths[el.cellIndex]
+        }
 
-      const zoomWidth = $th.innerWidth() - $th.find('.fht-cell').width()
+        if (th) {
+          const fhtCell = th.querySelector('.fht-cell')
+          const zoomWidth = th.clientWidth - (fhtCell ? fhtCell.clientWidth : 0)
 
-      $th.find('.fht-cell').width($this.innerWidth() - zoomWidth)
-    })
+          if (fhtCell) fhtCell.style.width = `${el.clientWidth - zoomWidth}px`
+        }
+      })
+    }
 
     this.horizontalScroll()
     this.trigger('post-header')
@@ -330,14 +367,19 @@ export default {
     const { sortName, sortOrder } = this.options
     const ariaSort = sortOrder === 'asc' ? 'ascending' : 'descending'
 
-    this.$header.find('th').each((i, th) => {
-      const isActive = $(th).data('field') === sortName
+    this.$header.querySelectorAll('th').forEach(th => {
+      const isActive = th.dataset.field === sortName
 
-      $(th)
-        .attr('aria-sort', isActive ? ariaSort : null)
-        .find('.sortable')
-        .removeClass('desc asc')
-        .addClass(isActive ? sortOrder : 'both')
+      if (isActive) {
+        th.setAttribute('aria-sort', ariaSort)
+      } else {
+        th.removeAttribute('aria-sort')
+      }
+
+      th.querySelectorAll('.sortable').forEach(el => {
+        el.classList.remove('desc', 'asc')
+        el.classList.add(isActive ? sortOrder : 'both')
+      })
     })
   },
 
@@ -348,7 +390,7 @@ export default {
 
     const data = this.getData()
     const html = []
-    let detailTemplate = ''
+    let detailTemplate = null
 
     if (Utils.hasDetailViewIcon(this.options)) {
       detailTemplate = Utils.h('th', { class: 'detail' }, [
@@ -403,88 +445,119 @@ export default {
       html.push(detailTemplate)
     }
 
-    if (!this.options.height && !this.$tableFooter.length) {
-      this.$el.append('<tfoot><tr></tr></tfoot>')
-      this.$tableFooter = this.$el.find('tfoot')
+    if (!this.options.height && !this.$tableFooter) {
+      this.$el.insertAdjacentHTML('beforeend', '<tfoot><tr></tr></tfoot>')
+      this.$tableFooter = this.$el.querySelector('tfoot')
     }
 
-    if (!this.$tableFooter.find('tr').length) {
-      this.$tableFooter.html('<table><thead><tr></tr></thead></table>')
+    if (this.$tableFooter && !this.$tableFooter.querySelector('tr')) {
+      this.$tableFooter.innerHTML = '<table><thead><tr></tr></thead></table>'
     }
 
-    this.$tableFooter.find('tr').html(html)
+    const trEl = this.$tableFooter?.querySelector('tr')
+
+    if (trEl) {
+      trEl.innerHTML = ''
+      for (const node of html) {
+        if (node instanceof Node) {
+          trEl.appendChild(node)
+        } else if (typeof node === 'string') {
+          trEl.insertAdjacentHTML('beforeend', node)
+        }
+      }
+    }
 
     this.trigger('post-footer', this.$tableFooter)
   },
 
   fitFooter () {
-    if (this.$el.is(':hidden')) {
+    if (!this.$el.offsetWidth && !this.$el.offsetHeight) {
       this._setDelayTimeout('footer', () => this.fitFooter(), 100)
       return
     }
 
-    const fixedBody = this.$tableBody.get(0)
+    const fixedBody = this.$tableBody
     const scrollWidth = this.hasScrollBar &&
-      fixedBody.scrollHeight > fixedBody.clientHeight + this.$header.outerHeight() ?
+      fixedBody.scrollHeight > fixedBody.clientHeight + this.$header.offsetHeight ?
       Utils.getScrollBarWidth() : 0
 
-    this.$tableFooter
-      .css('margin-right', scrollWidth)
-      .find('table').css('width', this.$el.outerWidth())
-      .attr('class', this.$el.attr('class'))
+    this.$tableFooter.style.marginRight = `${scrollWidth}px`
+    const footerTable = this.$tableFooter.querySelector('table')
 
-    const $ths = this.$tableFooter.find('th')
-    let $tr = this.$body.find('>tr:first-child:not(.no-records-found)')
-
-    $ths.find('.fht-cell').width('auto')
-
-    while ($tr.length && $tr.find('>td[colspan]:not([colspan="1"])').length) {
-      $tr = $tr.next()
+    if (footerTable) {
+      footerTable.style.width = `${this.$el.offsetWidth}px`
+      footerTable.className = this.$el.className
     }
 
-    const trLength = $tr.find('> *').length
+    const ths = Array.from(this.$tableFooter.querySelectorAll('th'))
 
-    $tr.find('> *').each((i, el) => {
-      const $this = $(el)
+    ths.forEach(th => {
+      const fhtCell = th.querySelector('.fht-cell')
 
-      if (Utils.hasDetailViewIcon(this.options)) {
-        if (
-          i === 0 && this.options.detailViewAlign === 'left' ||
-          i === trLength - 1 && this.options.detailViewAlign === 'right'
-        ) {
-          const $thDetail = $ths.filter('.detail')
-          const zoomWidth = $thDetail.innerWidth() - $thDetail.find('.fht-cell').width()
-
-          $thDetail.find('.fht-cell').width($this.innerWidth() - zoomWidth)
-          return
-        }
-      }
-
-      const $th = $ths.eq(i)
-      const zoomWidth = $th.innerWidth() - $th.find('.fht-cell').width()
-
-      $th.find('.fht-cell').width($this.innerWidth() - zoomWidth)
+      if (fhtCell) fhtCell.style.width = 'auto'
     })
+
+    const bodyRows = this.$body.querySelectorAll(':scope > tr:not(.no-records-found)')
+    let trEl = bodyRows[0] || null
+
+    while (trEl && trEl.querySelector(':scope > td[colspan]:not([colspan="1"])')) {
+      trEl = trEl.nextElementSibling
+    }
+
+    if (trEl) {
+      const cells = Array.from(trEl.querySelectorAll(':scope > *'))
+      const trLength = cells.length
+
+      cells.forEach((el, i) => {
+        if (Utils.hasDetailViewIcon(this.options)) {
+          if (
+            i === 0 && this.options.detailViewAlign === 'left' ||
+            i === trLength - 1 && this.options.detailViewAlign === 'right'
+          ) {
+            const thDetail = ths.find(th => th.classList.contains('detail'))
+
+            if (thDetail) {
+              const fhtCell = thDetail.querySelector('.fht-cell')
+              const zoomWidth = thDetail.clientWidth - (fhtCell ? fhtCell.clientWidth : 0)
+
+              if (fhtCell) fhtCell.style.width = `${el.clientWidth - zoomWidth}px`
+            }
+            return
+          }
+        }
+
+        const th = ths[i]
+
+        if (th) {
+          const fhtCell = th.querySelector('.fht-cell')
+          const zoomWidth = th.clientWidth - (fhtCell ? fhtCell.clientWidth : 0)
+
+          if (fhtCell) fhtCell.style.width = `${el.clientWidth - zoomWidth}px`
+        }
+      })
+    }
 
     this.horizontalScroll()
   },
 
   horizontalScroll () {
-    // horizontal scroll event
-    // TODO: it's probably better improving the layout than binding to scroll event
-    this.$tableBody.off('scroll').on('scroll', () => {
-      const scrollLeft = this.$tableBody.scrollLeft()
+    if (this._scrollHandler) {
+      this.$tableBody.removeEventListener('scroll', this._scrollHandler)
+    }
+    this._scrollHandler = () => {
+      const scrollLeft = this.$tableBody.scrollLeft
 
       if (this.options.showHeader && this.options.height) {
-        this.$tableHeader.scrollLeft(scrollLeft)
+        this.$tableHeader.scrollLeft = scrollLeft
       }
 
       if (this.options.showFooter && !this.options.cardView) {
-        this.$tableFooter.scrollLeft(scrollLeft)
+        this.$tableFooter.scrollLeft = scrollLeft
       }
 
       this.trigger('scroll-body', this.$tableBody)
-    })
+    }
+    this.$tableBody.addEventListener('scroll', this._scrollHandler)
   },
 
   updateColumnTitle (params) {
@@ -496,12 +569,14 @@ export default {
       this.options.escape && this.options.escapeTitle ? Utils.escapeHTML(params.title) : params.title
 
     if (this.columns[this.fieldsColumnsIndex[params.field]].visible) {
-      this.$header.find('th[data-field]').each((i, el) => {
-        if ($(el).data('field') === params.field) {
-          $($(el).find('.th-inner')[0]).html(params.title)
-          return false
+      for (const el of this.$header.querySelectorAll('th[data-field]')) {
+        if (el.dataset.field === params.field) {
+          const thInner = el.querySelector('.th-inner')
+
+          if (thInner) thInner.innerHTML = params.title
+          break
         }
-      })
+      }
 
       this.resetView()
     }

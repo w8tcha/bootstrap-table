@@ -3,7 +3,9 @@
  * @version: v1.1.0
  */
 
-const Utils = $.fn.bootstrapTable.utils
+
+
+const Utils = BootstrapTable.utils
 let initBodyCaller
 
 const groupBy = (array, f) => {
@@ -21,21 +23,21 @@ const groupBy = (array, f) => {
   return Object.fromEntries(tmpGroups)
 }
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'collapseGroup', {
+Utils.assignIcons(BootstrapTable.icons, 'collapseGroup', {
   glyphicon: 'glyphicon-chevron-up',
   fa: 'fa-angle-up',
   bi: 'bi-chevron-up',
   'material-icons': 'arrow_drop_down'
 })
 
-Utils.assignIcons($.fn.bootstrapTable.icons, 'expandGroup', {
+Utils.assignIcons(BootstrapTable.icons, 'expandGroup', {
   glyphicon: 'glyphicon-chevron-down',
   fa: 'fa-angle-down',
   bi: 'bi-chevron-down',
   'material-icons': 'arrow_drop_up'
 })
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   groupBy: false,
   groupByField: '',
   groupByFormatter: undefined,
@@ -44,7 +46,6 @@ Object.assign($.fn.bootstrapTable.defaults, {
   groupByCollapsedGroups: []
 })
 
-const BootstrapTable = $.fn.bootstrapTable.Constructor
 const _initSort = BootstrapTable.prototype.initSort
 const _initBody = BootstrapTable.prototype.initBody
 const _updateSelected = BootstrapTable.prototype.updateSelected
@@ -201,52 +202,76 @@ BootstrapTable.prototype.initBody = function (...args) {
       }
 
       html.push('</td></tr>')
-      this.$body.find(`tr[data-parent-index=${item.id}]:first`).before($(html.join('')))
+
+      const firstRow = this.$body.querySelector(`tr[data-parent-index="${item.id}"]`)
+
+      if (firstRow) {
+        const template = document.createElement('template')
+
+        template.innerHTML = html.join('')
+        firstRow.before(template.content.firstElementChild)
+      }
     })
 
     this.selectGroup = []
-    for (const el of this.$body.find('[name="btSelectGroup"]')) {
-      const groupIndex = $(el).closest('tr').data('group-index')
+    for (const el of this.$body.querySelectorAll('[name="btSelectGroup"]')) {
+      const groupIndex = +el.closest('tr').dataset.groupIndex
 
       this.selectGroup.push({
-        group: $(el),
-        item: this.$selectItem.filter((i, el) => $(el).closest('tr').data('parent-index') === groupIndex)
+        group: el,
+        item: this.$selectItem.filter(si => +si.closest('tr')?.dataset.parentIndex === groupIndex)
       })
     }
 
     if (this.options.groupByToggle) {
-      this.$container.off('click', '.group-by')
-        .on('click', '.group-by', event => {
-          const $this = $(event.currentTarget)
-          const groupIndex = $this.closest('tr').data('group-index')
-          const $groupRows = this.$body.find(`tr[data-parent-index=${groupIndex}]`)
+      if (this._groupByClickHandler) {
+        this.$container.removeEventListener('click', this._groupByClickHandler)
+      }
+      this._groupByClickHandler = event => {
+        const groupRow = event.target.closest('.group-by')
 
-          $this.toggleClass('expanded collapsed')
-          $this.find('span').toggleClass(`${this.options.icons.collapseGroup} ${this.options.icons.expandGroup}`)
-          $groupRows.toggleClass('hidden')
+        if (!groupRow) return
+        const groupIndex = +groupRow.dataset.groupIndex
+        const groupRows = [...this.$body.querySelectorAll(`tr[data-parent-index="${groupIndex}"]`)]
 
-          // Store the user's toggle state
-          const groupItem = this.tableGroups.find(g => g.id === groupIndex)
+        groupRow.classList.toggle('expanded')
+        groupRow.classList.toggle('collapsed')
+        const span = groupRow.querySelector('span')
 
-          if (groupItem) {
-            this._groupCollapsedState.set(groupItem.name, $this.hasClass('collapsed'))
-          }
+        if (span) {
+          span.classList.toggle(this.options.icons.collapseGroup)
+          span.classList.toggle(this.options.icons.expandGroup)
+        }
+        groupRows.forEach(row => row.classList.toggle('hidden'))
 
-          for (const element of $groupRows) {
-            this.collapseRow($(element).data('index'))
-          }
-        })
+        // Store the user's toggle state
+        const groupItem = this.tableGroups.find(g => g.id === groupIndex)
+
+        if (groupItem) {
+          this._groupCollapsedState.set(groupItem.name, groupRow.classList.contains('collapsed'))
+        }
+
+        for (const element of groupRows) {
+          this.collapseRow(+element.dataset.index)
+        }
+      }
+      this.$container.addEventListener('click', this._groupByClickHandler)
     }
 
-    this.$container.off('click', '[name="btSelectGroup"]')
-      .on('click', '[name="btSelectGroup"]', event => {
-        event.stopImmediatePropagation()
+    if (this._groupSelectHandler) {
+      this.$container.removeEventListener('click', this._groupSelectHandler)
+    }
+    this._groupSelectHandler = event => {
+      const checkbox = event.target.closest('[name="btSelectGroup"]')
 
-        const $this = $(event.currentTarget)
-        const checked = $this.prop('checked')
+      if (!checkbox) return
+      event.stopImmediatePropagation()
 
-        this[checked ? 'checkGroup' : 'uncheckGroup']($this.closest('tr').data('group-index'))
-      })
+      const checked = checkbox.checked
+
+      this[checked ? 'checkGroup' : 'uncheckGroup'](+checkbox.closest('tr').dataset.groupIndex)
+    }
+    this.$container.addEventListener('click', this._groupSelectHandler)
   }
 
   initBodyCaller = false
@@ -259,8 +284,10 @@ BootstrapTable.prototype.updateSelected = function (...args) {
 
     if (this.options.groupBy && this.options.groupByField !== '') {
       this.selectGroup.forEach(item => {
-        item.group.prop('checked', item.item.filter(':enabled').length ===
-          item.item.filter(':enabled').filter(':checked').length)
+        const enabledItems = item.item.filter(el => !el.disabled)
+
+        item.group.checked = enabledItems.length > 0 &&
+          enabledItems.length === enabledItems.filter(el => el.checked).length
       })
     }
   }
@@ -303,8 +330,10 @@ BootstrapTable.prototype.checkGroup_ = function (index, checked) {
   const rowsBefore = this.getSelections()
 
   this.$selectItem
-    .filter((i, el) => $(el).closest('tr').data('parent-index') === index)
-    .prop('checked', checked)
+    .filter(el => +el.closest('tr')?.dataset.parentIndex === index)
+    .forEach(el => {
+      el.checked = checked
+    })
 
   this.updateRows()
   this.updateSelected()
@@ -322,7 +351,7 @@ BootstrapTable.prototype.getGroupByFields = function () {
   return Array.isArray(this.options.groupByField) ? this.options.groupByField : [this.options.groupByField]
 }
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   scrollTo (params) {
     if (this.options.groupBy) {
       let options = { unit: 'px', value: 0 }
@@ -334,20 +363,29 @@ $.BootstrapTable = class extends $.BootstrapTable {
       if (options.unit === 'rows') {
         let scrollTo = 0
 
-        const rows = this.$body.find(`> tr:not(.group-by):lt(${options.value})`)
+        const rows = [...this.$body.querySelectorAll(':scope > tr:not(.group-by)')]
+          .slice(0, options.value)
 
         for (const row of rows) {
-          scrollTo += $(row).outerHeight(true)
+          scrollTo += row.offsetHeight
         }
 
-        const $targetColumn = this.$body.find(`> tr:not(.group-by):eq(${options.value})`)
-        const prevGroupRows = $targetColumn.prevAll('.group-by')
+        const targetRow = [...this.$body.querySelectorAll(':scope > tr:not(.group-by)')][options.value]
+        const prevGroupRows = []
+        let prev = targetRow?.previousElementSibling
+
+        while (prev) {
+          if (prev.classList.contains('group-by')) {
+            prevGroupRows.push(prev)
+          }
+          prev = prev.previousElementSibling
+        }
 
         for (const row of prevGroupRows) {
-          scrollTo += $(row).outerHeight(true)
+          scrollTo += row.offsetHeight
         }
 
-        this.$tableBody.scrollTop(scrollTo)
+        this.$tableBody.scrollTop = scrollTo
         return
       }
     }

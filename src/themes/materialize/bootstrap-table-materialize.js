@@ -4,17 +4,19 @@
  * theme: https://materializecss.com/
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Utils.extend($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Utils.extend(BootstrapTable.defaults, {
   classes: 'table highlight',
   buttonsPrefix: '',
   buttonsClass: 'waves-effect waves-light btn'
 })
 
-$.fn.bootstrapTable.theme = 'materialize'
+BootstrapTable.theme = 'materialize'
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initConstants () {
     super.initConstants()
 
@@ -43,32 +45,33 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   handleToolbar () {
-    if (this.$toolbar.find('.dropdown-toggle').length) {
-      this.$toolbar.find('.dropdown-toggle').each((i, el) => {
-        if (!$(el).next().length) {
-          return
-        }
+    const toggles = Array.from(this.$toolbar.querySelectorAll('.dropdown-toggle'))
 
-        const id = `toolbar-columns-id${i}`
+    toggles.forEach((el, i) => {
+      const next = el.nextElementSibling
 
-        $(el).next().attr('id', id)
-        $(el).attr('data-target', id)
-          .dropdown({
-            alignment: 'right',
-            constrainWidth: false,
-            closeOnClick: false
-          })
-      })
-    }
+      if (!next) return
+      const id = `toolbar-columns-id${i}`
+
+      next.id = id
+      el.setAttribute('data-target', id)
+      // TODO: use Materialize native Dropdown API without jQuery:
+      // M.Dropdown.init(el, { alignment: 'right', constrainWidth: false, closeOnClick: false })
+    })
   }
 
   initPagination () {
     super.initPagination()
 
     if (this.options.pagination && this.paginationParts.includes('pageSize')) {
-      this.$pagination.find('.dropdown-toggle')
-        .attr('data-target', this.$pagination.find('.dropdown-content').attr('id'))
-        .dropdown()
+      const toggle = this.$pagination.flatMap(p => [...p.querySelectorAll('.dropdown-toggle')])[0]
+      const content = this.$pagination.flatMap(p => [...p.querySelectorAll('.dropdown-content')])[0]
+
+      if (toggle && content?.id) {
+        toggle.setAttribute('data-target', content.id)
+        // TODO: use Materialize native Dropdown API without jQuery:
+        // M.Dropdown.init(toggle)
+      }
     }
   }
 }

@@ -1,15 +1,16 @@
-import Utils from '../utils/index.js'
 
 export default {
   updateSelected () {
-    const checkAll = this.$selectItem.filter(':enabled').length &&
-      this.$selectItem.filter(':enabled').length ===
-      this.$selectItem.filter(':enabled').filter(':checked').length
+    const enabled = this.$selectItem.filter(el => !el.disabled)
+    const checkAll = enabled.length > 0 &&
+      enabled.length === enabled.filter(el => el.checked).length;
 
-    this.$selectAll.add(this.$selectAll_).prop('checked', checkAll)
+    [this.$selectAll, this.$selectAll_].filter(Boolean).forEach(el => {
+      el.checked = checkAll
+    })
 
-    this.$selectItem.each((i, el) => {
-      $(el).closest('tr')[$(el).prop('checked') ? 'addClass' : 'removeClass']('selected')
+    this.$selectItem.forEach(el => {
+      el.closest('tr')?.classList.toggle('selected', el.checked)
     })
   },
 
@@ -23,15 +24,17 @@ export default {
   },
 
   updateRows () {
-    this.$selectItem.each((i, el) => {
-      this.data[$(el).data('index')][this.header.stateField] = $(el).prop('checked')
+    this.$selectItem.forEach(el => {
+      this.data[+el.dataset.index][this.header.stateField] = el.checked
     })
   },
 
   resetRows () {
     if (this.data.length) {
-      this.$selectAll.prop('checked', false)
-      this.$selectItem.prop('checked', false)
+      if (this.$selectAll) this.$selectAll.checked = false
+      this.$selectItem.forEach(el => {
+        el.checked = false
+      })
     }
     if (this.header.stateField) {
       for (const row of this.data) {
@@ -50,10 +53,14 @@ export default {
   },
 
   _toggleCheckAll (checked) {
-    const rowsBefore = this.getSelections()
+    const rowsBefore = this.getSelections();
 
-    this.$selectAll.add(this.$selectAll_).prop('checked', checked)
-    this.$selectItem.filter(':enabled').prop('checked', checked)
+    [this.$selectAll, this.$selectAll_].filter(Boolean).forEach(el => {
+      el.checked = checked
+    })
+    this.$selectItem.filter(el => !el.disabled).forEach(el => {
+      el.checked = checked
+    })
     this.updateRows()
     this.updateSelected()
 
@@ -68,11 +75,11 @@ export default {
   },
 
   checkInvert () {
-    const $items = this.$selectItem.filter(':enabled')
-    let checked = $items.filter(':checked')
+    const items = this.$selectItem.filter(el => !el.disabled)
+    let checked = items.filter(el => el.checked)
 
-    $items.each((i, el) => {
-      $(el).prop('checked', !$(el).prop('checked'))
+    items.forEach(el => {
+      el.checked = !el.checked
     })
     this.updateRows()
     this.updateSelected()
@@ -90,11 +97,11 @@ export default {
   },
 
   _toggleCheck (checked, index) {
-    const $el = this.$selectItem.filter(`[data-index="${index}"]`)
+    const $el = this.$selectItem.filter(el => +el.dataset.index === index)
     const row = this.data[index]
 
     if (
-      $el.is(':radio') ||
+      $el.length > 0 && $el[0].type === 'radio' ||
       this.options.singleSelect ||
       this.options.multipleSelectRow &&
       !this.multipleSelectRowCtrlKey &&
@@ -103,7 +110,9 @@ export default {
       for (const r of this.options.data) {
         r[this.header.stateField] = false
       }
-      this.$selectItem.filter(':checked').not($el).prop('checked', false)
+      this.$selectItem.filter(el => el.checked && !$el.includes(el)).forEach(el => {
+        el.checked = false
+      })
     }
 
     row[this.header.stateField] = checked
@@ -115,7 +124,9 @@ export default {
 
         for (let i = fromIndex + 1; i < toIndex; i++) {
           this.data[i][this.header.stateField] = true
-          this.$selectItem.filter(`[data-index="${i}"]`).prop('checked', true)
+          this.$selectItem.filter(el => +el.dataset.index === i).forEach(el => {
+            el.checked = true
+          })
         }
       }
 
@@ -124,9 +135,11 @@ export default {
       this.multipleSelectRowLastSelectedIndex = checked ? index : -1
     }
 
-    $el.prop('checked', checked)
+    $el.forEach(el => {
+      el.checked = checked
+    })
     this.updateSelected()
-    this.trigger(checked ? 'check' : 'uncheck', this.data[index], $el)
+    this.trigger(checked ? 'check' : 'uncheck', this.data[index], $el[0])
   },
 
   checkBy (obj) {
@@ -149,20 +162,23 @@ export default {
         return false
       }
       if (obj.values.includes(row[obj.field])) {
-        let $el = this.$selectItem.filter(':enabled')
-          .filter(Utils.sprintf('[data-index="%s"]', i))
+        let els = this.$selectItem
+          .filter(el => !el.disabled)
+          .filter(el => +el.dataset.index === i)
         const onlyCurrentPage = obj.hasOwnProperty('onlyCurrentPage') ? obj.onlyCurrentPage : false
 
-        $el = checked ? $el.not(':checked') : $el.filter(':checked')
+        els = checked ? els.filter(el => !el.checked) : els.filter(el => el.checked)
 
-        if (!$el.length && onlyCurrentPage) {
+        if (!els.length && onlyCurrentPage) {
           return
         }
 
-        $el.prop('checked', checked)
+        els.forEach(el => {
+          el.checked = checked
+        })
         row[this.header.stateField] = checked
         rows.push(row)
-        this.trigger(checked ? 'check' : 'uncheck', row, $el)
+        this.trigger(checked ? 'check' : 'uncheck', row, els[0])
       }
     })
     this.updateSelected()

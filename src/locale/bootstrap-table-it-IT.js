@@ -5,7 +5,9 @@
  * Author: Alessio Felicioni <alessio.felicioni@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['it-IT'] = $.fn.bootstrapTable.locales['it'] = {
+
+
+BootstrapTable.locales['it-IT'] = BootstrapTable.locales['it'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -190,4 +192,4 @@ $.fn.bootstrapTable.locales['it-IT'] = $.fn.bootstrapTable.locales['it'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['it-IT'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['it-IT'])

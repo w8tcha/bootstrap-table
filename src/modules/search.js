@@ -7,7 +7,7 @@ export default {
       if (this.options.searchText !== '') {
         const search = Utils.getSearchInput(this)
 
-        $(search).val(this.options.searchText)
+        if (search) search.value = this.options.searchText
         this.onSearch({ currentTarget: search, firedByInitSearchText: true })
       }
     }
@@ -89,7 +89,10 @@ export default {
               this.header.formatters[j], [value, item, i, column.field], value)
             if (this.header.formatters[j] && typeof value !== 'number') {
               // search innerText
-              value = $('<div>').html(value).text()
+              const div = document.createElement('div')
+
+              div.innerHTML = value
+              value = div.textContent
             }
           }
 
@@ -157,11 +160,11 @@ export default {
   },
 
   onSearch ({ currentTarget, firedByInitSearchText } = {}, overwriteSearchText = true) {
-    if (currentTarget !== undefined && $(currentTarget).length && overwriteSearchText) {
-      const text = $(currentTarget).val().trim()
+    if (currentTarget !== undefined && currentTarget && overwriteSearchText) {
+      const text = (currentTarget.value ?? '').trim()
 
-      if (this.options.trimOnSearch && $(currentTarget).val() !== text) {
-        $(currentTarget).val(text)
+      if (this.options.trimOnSearch && currentTarget.value !== text) {
+        currentTarget.value = text
       }
 
       if (this.searchText === text) {
@@ -169,10 +172,8 @@ export default {
       }
 
       const searchInput = Utils.getSearchInput(this)
-      const $searchInput = $(searchInput)
-      const $currentTarget = currentTarget instanceof jQuery ? currentTarget : $(currentTarget)
 
-      if ($currentTarget.is($searchInput) || $currentTarget.hasClass('search-input')) {
+      if (currentTarget === searchInput || currentTarget.classList?.contains('search-input')) {
         this.searchText = text
         this.options.searchText = text
       }
@@ -196,7 +197,7 @@ export default {
     const search = Utils.getSearchInput(this)
     const textToUse = text || ''
 
-    $(search).val(textToUse)
+    if (search) search.value = textToUse
     this.searchText = textToUse
     this.options.searchText = textToUse
     this.onSearch({ currentTarget: search }, false)

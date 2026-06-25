@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -96,7 +96,7 @@
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-  var es_array_find = {};
+  var es_array_includes = {};
 
   var globalThis_1;
   var hasRequiredGlobalThis;
@@ -1612,322 +1612,6 @@
   	return _export;
   }
 
-  var functionUncurryThisClause;
-  var hasRequiredFunctionUncurryThisClause;
-
-  function requireFunctionUncurryThisClause () {
-  	if (hasRequiredFunctionUncurryThisClause) return functionUncurryThisClause;
-  	hasRequiredFunctionUncurryThisClause = 1;
-  	var classofRaw = requireClassofRaw();
-  	var uncurryThis = requireFunctionUncurryThis();
-
-  	functionUncurryThisClause = function (fn) {
-  	  // Nashorn bug:
-  	  //   https://github.com/zloirock/core-js/issues/1128
-  	  //   https://github.com/zloirock/core-js/issues/1130
-  	  if (classofRaw(fn) === 'Function') return uncurryThis(fn);
-  	};
-  	return functionUncurryThisClause;
-  }
-
-  var functionBindContext;
-  var hasRequiredFunctionBindContext;
-
-  function requireFunctionBindContext () {
-  	if (hasRequiredFunctionBindContext) return functionBindContext;
-  	hasRequiredFunctionBindContext = 1;
-  	var uncurryThis = requireFunctionUncurryThisClause();
-  	var aCallable = requireACallable();
-  	var NATIVE_BIND = requireFunctionBindNative();
-
-  	var bind = uncurryThis(uncurryThis.bind);
-
-  	// optional / simple context binding
-  	functionBindContext = function (fn, that) {
-  	  aCallable(fn);
-  	  return that === undefined ? fn : NATIVE_BIND ? bind(fn, that) : function (/* ...args */) {
-  	    return fn.apply(that, arguments);
-  	  };
-  	};
-  	return functionBindContext;
-  }
-
-  var isArray;
-  var hasRequiredIsArray;
-
-  function requireIsArray () {
-  	if (hasRequiredIsArray) return isArray;
-  	hasRequiredIsArray = 1;
-  	var classof = requireClassofRaw();
-
-  	// `IsArray` abstract operation
-  	// https://tc39.es/ecma262/#sec-isarray
-  	// eslint-disable-next-line es/no-array-isarray -- safe
-  	isArray = Array.isArray || function isArray(argument) {
-  	  return classof(argument) === 'Array';
-  	};
-  	return isArray;
-  }
-
-  var toStringTagSupport;
-  var hasRequiredToStringTagSupport;
-
-  function requireToStringTagSupport () {
-  	if (hasRequiredToStringTagSupport) return toStringTagSupport;
-  	hasRequiredToStringTagSupport = 1;
-  	var wellKnownSymbol = requireWellKnownSymbol();
-
-  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-  	var test = {};
-  	// eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
-  	test[TO_STRING_TAG] = 'z';
-
-  	toStringTagSupport = String(test) === '[object z]';
-  	return toStringTagSupport;
-  }
-
-  var classof;
-  var hasRequiredClassof;
-
-  function requireClassof () {
-  	if (hasRequiredClassof) return classof;
-  	hasRequiredClassof = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var isCallable = requireIsCallable();
-  	var classofRaw = requireClassofRaw();
-  	var wellKnownSymbol = requireWellKnownSymbol();
-
-  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
-  	var $Object = Object;
-
-  	// ES3 wrong here
-  	var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) === 'Arguments';
-
-  	// fallback for IE11 Script Access Denied error
-  	var tryGet = function (it, key) {
-  	  try {
-  	    return it[key];
-  	  } catch (error) { /* empty */ }
-  	};
-
-  	// getting tag from ES6+ `Object.prototype.toString`
-  	classof = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
-  	  var O, tag, result;
-  	  return it === undefined ? 'Undefined' : it === null ? 'Null'
-  	    // @@toStringTag case
-  	    : typeof (tag = tryGet(O = $Object(it), TO_STRING_TAG)) == 'string' ? tag
-  	    // builtinTag case
-  	    : CORRECT_ARGUMENTS ? classofRaw(O)
-  	    // ES3 arguments fallback
-  	    : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result;
-  	};
-  	return classof;
-  }
-
-  var isConstructor;
-  var hasRequiredIsConstructor;
-
-  function requireIsConstructor () {
-  	if (hasRequiredIsConstructor) return isConstructor;
-  	hasRequiredIsConstructor = 1;
-  	var uncurryThis = requireFunctionUncurryThis();
-  	var fails = requireFails();
-  	var isCallable = requireIsCallable();
-  	var classof = requireClassof();
-  	var getBuiltIn = requireGetBuiltIn();
-  	var inspectSource = requireInspectSource();
-
-  	var noop = function () { /* empty */ };
-  	var construct = getBuiltIn('Reflect', 'construct');
-  	var constructorRegExp = /^\s*(?:class|function)\b/;
-  	var exec = uncurryThis(constructorRegExp.exec);
-  	var INCORRECT_TO_STRING = !constructorRegExp.test(noop);
-
-  	var isConstructorModern = function isConstructor(argument) {
-  	  if (!isCallable(argument)) return false;
-  	  try {
-  	    construct(noop, [], argument);
-  	    return true;
-  	  } catch (error) {
-  	    return false;
-  	  }
-  	};
-
-  	var isConstructorLegacy = function isConstructor(argument) {
-  	  if (!isCallable(argument)) return false;
-  	  switch (classof(argument)) {
-  	    case 'AsyncFunction':
-  	    case 'GeneratorFunction':
-  	    case 'AsyncGeneratorFunction': return false;
-  	  }
-  	  try {
-  	    // we can't check .prototype since constructors produced by .bind haven't it
-  	    // `Function#toString` throws on some built-it function in some legacy engines
-  	    // (for example, `DOMQuad` and similar in FF41-)
-  	    return INCORRECT_TO_STRING || !!exec(constructorRegExp, inspectSource(argument));
-  	  } catch (error) {
-  	    return true;
-  	  }
-  	};
-
-  	isConstructorLegacy.sham = true;
-
-  	// `IsConstructor` abstract operation
-  	// https://tc39.es/ecma262/#sec-isconstructor
-  	isConstructor = !construct || fails(function () {
-  	  var called;
-  	  return isConstructorModern(isConstructorModern.call)
-  	    || !isConstructorModern(Object)
-  	    || !isConstructorModern(function () { called = true; })
-  	    || called;
-  	}) ? isConstructorLegacy : isConstructorModern;
-  	return isConstructor;
-  }
-
-  var arraySpeciesConstructor;
-  var hasRequiredArraySpeciesConstructor;
-
-  function requireArraySpeciesConstructor () {
-  	if (hasRequiredArraySpeciesConstructor) return arraySpeciesConstructor;
-  	hasRequiredArraySpeciesConstructor = 1;
-  	var isArray = requireIsArray();
-  	var isConstructor = requireIsConstructor();
-  	var isObject = requireIsObject();
-  	var wellKnownSymbol = requireWellKnownSymbol();
-
-  	var SPECIES = wellKnownSymbol('species');
-  	var $Array = Array;
-
-  	// a part of `ArraySpeciesCreate` abstract operation
-  	// https://tc39.es/ecma262/#sec-arrayspeciescreate
-  	arraySpeciesConstructor = function (originalArray) {
-  	  var C;
-  	  if (isArray(originalArray)) {
-  	    C = originalArray.constructor;
-  	    // cross-realm fallback
-  	    if (isConstructor(C) && (C === $Array || isArray(C.prototype))) C = undefined;
-  	    else if (isObject(C)) {
-  	      C = C[SPECIES];
-  	      if (C === null) C = undefined;
-  	    }
-  	  } return C === undefined ? $Array : C;
-  	};
-  	return arraySpeciesConstructor;
-  }
-
-  var arraySpeciesCreate;
-  var hasRequiredArraySpeciesCreate;
-
-  function requireArraySpeciesCreate () {
-  	if (hasRequiredArraySpeciesCreate) return arraySpeciesCreate;
-  	hasRequiredArraySpeciesCreate = 1;
-  	var arraySpeciesConstructor = requireArraySpeciesConstructor();
-
-  	// `ArraySpeciesCreate` abstract operation
-  	// https://tc39.es/ecma262/#sec-arrayspeciescreate
-  	arraySpeciesCreate = function (originalArray, length) {
-  	  return new (arraySpeciesConstructor(originalArray))(length === 0 ? 0 : length);
-  	};
-  	return arraySpeciesCreate;
-  }
-
-  var createProperty;
-  var hasRequiredCreateProperty;
-
-  function requireCreateProperty () {
-  	if (hasRequiredCreateProperty) return createProperty;
-  	hasRequiredCreateProperty = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var definePropertyModule = requireObjectDefineProperty();
-  	var createPropertyDescriptor = requireCreatePropertyDescriptor();
-
-  	createProperty = function (object, key, value) {
-  	  if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value));
-  	  else object[key] = value;
-  	};
-  	return createProperty;
-  }
-
-  var arrayIteration;
-  var hasRequiredArrayIteration;
-
-  function requireArrayIteration () {
-  	if (hasRequiredArrayIteration) return arrayIteration;
-  	hasRequiredArrayIteration = 1;
-  	var bind = requireFunctionBindContext();
-  	var IndexedObject = requireIndexedObject();
-  	var toObject = requireToObject();
-  	var lengthOfArrayLike = requireLengthOfArrayLike();
-  	var arraySpeciesCreate = requireArraySpeciesCreate();
-  	var createProperty = requireCreateProperty();
-
-  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
-  	var createMethod = function (TYPE) {
-  	  var IS_MAP = TYPE === 1;
-  	  var IS_FILTER = TYPE === 2;
-  	  var IS_SOME = TYPE === 3;
-  	  var IS_EVERY = TYPE === 4;
-  	  var IS_FIND_INDEX = TYPE === 6;
-  	  var IS_FILTER_REJECT = TYPE === 7;
-  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
-  	  return function ($this, callbackfn, that) {
-  	    var O = toObject($this);
-  	    var self = IndexedObject(O);
-  	    var length = lengthOfArrayLike(self);
-  	    var boundFunction = bind(callbackfn, that);
-  	    var index = 0;
-  	    var resIndex = 0;
-  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
-  	    var value, result;
-  	    for (;length > index; index++) if (NO_HOLES || index in self) {
-  	      value = self[index];
-  	      result = boundFunction(value, index, O);
-  	      if (TYPE) {
-  	        if (IS_MAP) createProperty(target, index, result);    // map
-  	        else if (result) switch (TYPE) {
-  	          case 3: return true;                                // some
-  	          case 5: return value;                               // find
-  	          case 6: return index;                               // findIndex
-  	          case 2: createProperty(target, resIndex++, value);  // filter
-  	        } else switch (TYPE) {
-  	          case 4: return false;                               // every
-  	          case 7: createProperty(target, resIndex++, value);  // filterReject
-  	        }
-  	      }
-  	    }
-  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
-  	  };
-  	};
-
-  	arrayIteration = {
-  	  // `Array.prototype.forEach` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
-  	  forEach: createMethod(0),
-  	  // `Array.prototype.map` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.map
-  	  map: createMethod(1),
-  	  // `Array.prototype.filter` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
-  	  filter: createMethod(2),
-  	  // `Array.prototype.some` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.some
-  	  some: createMethod(3),
-  	  // `Array.prototype.every` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.every
-  	  every: createMethod(4),
-  	  // `Array.prototype.find` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.find
-  	  find: createMethod(5),
-  	  // `Array.prototype.findIndex` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
-  	  findIndex: createMethod(6),
-  	  // `Array.prototype.filterReject` method
-  	  // https://github.com/tc39/proposal-array-filtering
-  	  filterReject: createMethod(7)
-  	};
-  	return arrayIteration;
-  }
-
   var objectDefineProperties = {};
 
   var objectKeys;
@@ -2110,39 +1794,6 @@
   	return addToUnscopables;
   }
 
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_array_includes = {};
-
   var hasRequiredEs_array_includes;
 
   function requireEs_array_includes () {
@@ -2179,44 +1830,6 @@
   }
 
   requireEs_array_includes();
-
-  var es_object_toString = {};
-
-  var objectToString;
-  var hasRequiredObjectToString;
-
-  function requireObjectToString () {
-  	if (hasRequiredObjectToString) return objectToString;
-  	hasRequiredObjectToString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var classof = requireClassof();
-
-  	// `Object.prototype.toString` method implementation
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	objectToString = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
-  	  return '[object ' + classof(this) + ']';
-  	};
-  	return objectToString;
-  }
-
-  var hasRequiredEs_object_toString;
-
-  function requireEs_object_toString () {
-  	if (hasRequiredEs_object_toString) return es_object_toString;
-  	hasRequiredEs_object_toString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var defineBuiltIn = requireDefineBuiltIn();
-  	var toString = requireObjectToString();
-
-  	// `Object.prototype.toString` method
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	if (!TO_STRING_TAG_SUPPORT) {
-  	  defineBuiltIn(Object.prototype, 'toString', toString, { unsafe: true });
-  	}
-  	return es_object_toString;
-  }
-
-  requireEs_object_toString();
 
   var es_string_includes = {};
 
@@ -2257,6 +1870,61 @@
   	  } return it;
   	};
   	return notARegexp;
+  }
+
+  var toStringTagSupport;
+  var hasRequiredToStringTagSupport;
+
+  function requireToStringTagSupport () {
+  	if (hasRequiredToStringTagSupport) return toStringTagSupport;
+  	hasRequiredToStringTagSupport = 1;
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+  	var test = {};
+  	// eslint-disable-next-line unicorn/no-immediate-mutation -- ES3 syntax limitation
+  	test[TO_STRING_TAG] = 'z';
+
+  	toStringTagSupport = String(test) === '[object z]';
+  	return toStringTagSupport;
+  }
+
+  var classof;
+  var hasRequiredClassof;
+
+  function requireClassof () {
+  	if (hasRequiredClassof) return classof;
+  	hasRequiredClassof = 1;
+  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
+  	var isCallable = requireIsCallable();
+  	var classofRaw = requireClassofRaw();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+
+  	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
+  	var $Object = Object;
+
+  	// ES3 wrong here
+  	var CORRECT_ARGUMENTS = classofRaw(function () { return arguments; }()) === 'Arguments';
+
+  	// fallback for IE11 Script Access Denied error
+  	var tryGet = function (it, key) {
+  	  try {
+  	    return it[key];
+  	  } catch (error) { /* empty */ }
+  	};
+
+  	// getting tag from ES6+ `Object.prototype.toString`
+  	classof = TO_STRING_TAG_SUPPORT ? classofRaw : function (it) {
+  	  var O, tag, result;
+  	  return it === undefined ? 'Undefined' : it === null ? 'Null'
+  	    // @@toStringTag case
+  	    : typeof (tag = tryGet(O = $Object(it), TO_STRING_TAG)) == 'string' ? tag
+  	    // builtinTag case
+  	    : CORRECT_ARGUMENTS ? classofRaw(O)
+  	    // ES3 arguments fallback
+  	    : (result = classofRaw(O)) === 'Object' && isCallable(O.callee) ? 'Arguments' : result;
+  	};
+  	return classof;
   }
 
   var toString;
@@ -2336,23 +2004,23 @@
    * theme: https://github.com/Semantic-Org/Semantic-UI
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Utils.extend($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Utils.extend(BootstrapTable.defaults, {
     classes: 'ui selectable celled table unstackable',
     buttonsPrefix: '',
     buttonsClass: 'ui button'
   });
-  $.fn.bootstrapTable.theme = 'semantic';
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  BootstrapTable.theme = 'semantic';
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initConstants",
       value: function initConstants() {
-        _superPropGet(_class, "initConstants", this)([]);
+        _superPropGet(_default, "initConstants", this)([]);
         this.constants.classes.buttonsGroup = 'ui buttons';
         this.constants.classes.buttonsDropdown = 'ui button dropdown';
         this.constants.classes.inputGroup = 'ui input';
@@ -2370,23 +2038,24 @@
     }, {
       key: "initToolbar",
       value: function initToolbar() {
-        _superPropGet(_class, "initToolbar", this)([]);
+        _superPropGet(_default, "initToolbar", this)([]);
         this.handleToolbar();
       }
     }, {
       key: "handleToolbar",
       value: function handleToolbar() {
-        this.$toolbar.find('.button.dropdown').dropdown();
+        // TODO: use Semantic UI native API without jQuery:
+        // Array.from(this.$toolbar.querySelectorAll('.button.dropdown')).forEach(el => $(el).dropdown())
       }
     }, {
       key: "initPagination",
       value: function initPagination() {
-        _superPropGet(_class, "initPagination", this)([]);
-        if (this.options.pagination && this.paginationParts.includes('pageSize')) {
-          this.$pagination.find('.dropdown').dropdown();
-        }
+        _superPropGet(_default, "initPagination", this)([]);
+        if (this.options.pagination && this.paginationParts.includes('pageSize')) ;
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

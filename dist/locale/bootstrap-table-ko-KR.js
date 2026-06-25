@@ -1,8 +1,5 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+(function (BootstrapTable) {
+	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1976,7 +1973,7 @@
 	 * Revision: Abel Yeom (abel.yeom@gmail.com)
 	 */
 
-	$.fn.bootstrapTable.locales['ko-KR'] = $.fn.bootstrapTable.locales['ko'] = {
+	BootstrapTable.locales['ko-KR'] = BootstrapTable.locales['ko'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2116,6 +2113,6 @@
 	    return '카드뷰 보기';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ko-KR']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ko-KR']);
 
-}));
+})(BootstrapTable);

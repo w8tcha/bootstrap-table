@@ -4,7 +4,9 @@
  * Revision: Le Ngo Duc Manh <myt@nnsvn.me> (07/Mar/2024)
  */
 
-$.fn.bootstrapTable.locales['vi-VN'] = $.fn.bootstrapTable.locales['vi'] = {
+
+
+BootstrapTable.locales['vi-VN'] = BootstrapTable.locales['vi'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -189,4 +191,4 @@ $.fn.bootstrapTable.locales['vi-VN'] = $.fn.bootstrapTable.locales['vi'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['vi-VN'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['vi-VN'])

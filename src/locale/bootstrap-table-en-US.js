@@ -3,7 +3,9 @@
  * Author: Zhixin Wen<wenzhixin2010@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['en-US'] = $.fn.bootstrapTable.locales['en'] = {
+
+
+BootstrapTable.locales['en-US'] = BootstrapTable.locales['en'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['en-US'] = $.fn.bootstrapTable.locales['en'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['en-US'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['en-US'])

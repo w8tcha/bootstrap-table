@@ -1,9 +1,17 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
+  function _arrayLikeToArray(r, a) {
+    (null == a || a > r.length) && (a = r.length);
+    for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+    return n;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
+  }
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     return e;
@@ -59,6 +67,12 @@
       return !!t;
     })();
   }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
   function _possibleConstructorReturn(t, e) {
     if (e && ("object" == typeof e || "function" == typeof e)) return e;
     if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
@@ -79,6 +93,9 @@
       return p.apply(e, t);
     } : p;
   }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
+  }
   function _toPrimitive(t, r) {
     if ("object" != typeof t || !t) return t;
     var e = t[Symbol.toPrimitive];
@@ -93,10 +110,17 @@
     var i = _toPrimitive(t, "string");
     return "symbol" == typeof i ? i : i + "";
   }
+  function _unsupportedIterableToArray(r, a) {
+    if (r) {
+      if ("string" == typeof r) return _arrayLikeToArray(r, a);
+      var t = {}.toString.call(r).slice(8, -1);
+      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+    }
+  }
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-  var es_array_find = {};
+  var es_array_concat = {};
 
   var globalThis_1;
   var hasRequiredGlobalThis;
@@ -1612,46 +1636,6 @@
   	return _export;
   }
 
-  var functionUncurryThisClause;
-  var hasRequiredFunctionUncurryThisClause;
-
-  function requireFunctionUncurryThisClause () {
-  	if (hasRequiredFunctionUncurryThisClause) return functionUncurryThisClause;
-  	hasRequiredFunctionUncurryThisClause = 1;
-  	var classofRaw = requireClassofRaw();
-  	var uncurryThis = requireFunctionUncurryThis();
-
-  	functionUncurryThisClause = function (fn) {
-  	  // Nashorn bug:
-  	  //   https://github.com/zloirock/core-js/issues/1128
-  	  //   https://github.com/zloirock/core-js/issues/1130
-  	  if (classofRaw(fn) === 'Function') return uncurryThis(fn);
-  	};
-  	return functionUncurryThisClause;
-  }
-
-  var functionBindContext;
-  var hasRequiredFunctionBindContext;
-
-  function requireFunctionBindContext () {
-  	if (hasRequiredFunctionBindContext) return functionBindContext;
-  	hasRequiredFunctionBindContext = 1;
-  	var uncurryThis = requireFunctionUncurryThisClause();
-  	var aCallable = requireACallable();
-  	var NATIVE_BIND = requireFunctionBindNative();
-
-  	var bind = uncurryThis(uncurryThis.bind);
-
-  	// optional / simple context binding
-  	functionBindContext = function (fn, that) {
-  	  aCallable(fn);
-  	  return that === undefined ? fn : NATIVE_BIND ? bind(fn, that) : function (/* ...args */) {
-  	    return fn.apply(that, arguments);
-  	  };
-  	};
-  	return functionBindContext;
-  }
-
   var isArray;
   var hasRequiredIsArray;
 
@@ -1667,6 +1651,74 @@
   	  return classof(argument) === 'Array';
   	};
   	return isArray;
+  }
+
+  var doesNotExceedSafeInteger;
+  var hasRequiredDoesNotExceedSafeInteger;
+
+  function requireDoesNotExceedSafeInteger () {
+  	if (hasRequiredDoesNotExceedSafeInteger) return doesNotExceedSafeInteger;
+  	hasRequiredDoesNotExceedSafeInteger = 1;
+  	var $TypeError = TypeError;
+  	var MAX_SAFE_INTEGER = 0x1FFFFFFFFFFFFF; // 2 ** 53 - 1 == 9007199254740991
+
+  	doesNotExceedSafeInteger = function (it) {
+  	  if (it > MAX_SAFE_INTEGER) throw new $TypeError('Maximum allowed index exceeded');
+  	  return it;
+  	};
+  	return doesNotExceedSafeInteger;
+  }
+
+  var createProperty;
+  var hasRequiredCreateProperty;
+
+  function requireCreateProperty () {
+  	if (hasRequiredCreateProperty) return createProperty;
+  	hasRequiredCreateProperty = 1;
+  	var DESCRIPTORS = requireDescriptors();
+  	var definePropertyModule = requireObjectDefineProperty();
+  	var createPropertyDescriptor = requireCreatePropertyDescriptor();
+
+  	createProperty = function (object, key, value) {
+  	  if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value));
+  	  else object[key] = value;
+  	};
+  	return createProperty;
+  }
+
+  var arraySetLength;
+  var hasRequiredArraySetLength;
+
+  function requireArraySetLength () {
+  	if (hasRequiredArraySetLength) return arraySetLength;
+  	hasRequiredArraySetLength = 1;
+  	var DESCRIPTORS = requireDescriptors();
+  	var isArray = requireIsArray();
+
+  	var $TypeError = TypeError;
+  	// eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+  	var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+
+  	// Safari < 13 does not throw an error in this case
+  	var SILENT_ON_NON_WRITABLE_LENGTH_SET = DESCRIPTORS && !function () {
+  	  // makes no sense without proper strict mode support
+  	  if (this !== undefined) return true;
+  	  try {
+  	    // eslint-disable-next-line es/no-object-defineproperty -- safe
+  	    Object.defineProperty([], 'length', { writable: false }).length = 1;
+  	  } catch (error) {
+  	    return error instanceof TypeError;
+  	  }
+  	}();
+
+  	arraySetLength = SILENT_ON_NON_WRITABLE_LENGTH_SET ? function (O, length) {
+  	  if (isArray(O) && !getOwnPropertyDescriptor(O, 'length').writable) {
+  	    throw new $TypeError('Cannot set read only .length');
+  	  } return O.length = length;
+  	} : function (O, length) {
+  	  return O.length = length;
+  	};
+  	return arraySetLength;
   }
 
   var toStringTagSupport;
@@ -1831,317 +1883,121 @@
   	return arraySpeciesCreate;
   }
 
-  var createProperty;
-  var hasRequiredCreateProperty;
+  var arrayMethodHasSpeciesSupport;
+  var hasRequiredArrayMethodHasSpeciesSupport;
 
-  function requireCreateProperty () {
-  	if (hasRequiredCreateProperty) return createProperty;
-  	hasRequiredCreateProperty = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var definePropertyModule = requireObjectDefineProperty();
-  	var createPropertyDescriptor = requireCreatePropertyDescriptor();
+  function requireArrayMethodHasSpeciesSupport () {
+  	if (hasRequiredArrayMethodHasSpeciesSupport) return arrayMethodHasSpeciesSupport;
+  	hasRequiredArrayMethodHasSpeciesSupport = 1;
+  	var fails = requireFails();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+  	var V8_VERSION = requireEnvironmentV8Version();
 
-  	createProperty = function (object, key, value) {
-  	  if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value));
-  	  else object[key] = value;
+  	var SPECIES = wellKnownSymbol('species');
+
+  	arrayMethodHasSpeciesSupport = function (METHOD_NAME) {
+  	  // We can't use this feature detection in V8 since it causes
+  	  // deoptimization and serious performance degradation
+  	  // https://github.com/zloirock/core-js/issues/677
+  	  return V8_VERSION >= 51 || !fails(function () {
+  	    var array = [];
+  	    var constructor = array.constructor = {};
+  	    constructor[SPECIES] = function () {
+  	      return { foo: 1 };
+  	    };
+  	    return array[METHOD_NAME](Boolean).foo !== 1;
+  	  });
   	};
-  	return createProperty;
+  	return arrayMethodHasSpeciesSupport;
   }
 
-  var arrayIteration;
-  var hasRequiredArrayIteration;
+  var hasRequiredEs_array_concat;
 
-  function requireArrayIteration () {
-  	if (hasRequiredArrayIteration) return arrayIteration;
-  	hasRequiredArrayIteration = 1;
-  	var bind = requireFunctionBindContext();
-  	var IndexedObject = requireIndexedObject();
+  function requireEs_array_concat () {
+  	if (hasRequiredEs_array_concat) return es_array_concat;
+  	hasRequiredEs_array_concat = 1;
+  	var $ = require_export();
+  	var fails = requireFails();
+  	var isArray = requireIsArray();
+  	var isObject = requireIsObject();
   	var toObject = requireToObject();
   	var lengthOfArrayLike = requireLengthOfArrayLike();
-  	var arraySpeciesCreate = requireArraySpeciesCreate();
+  	var doesNotExceedSafeInteger = requireDoesNotExceedSafeInteger();
   	var createProperty = requireCreateProperty();
-
-  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
-  	var createMethod = function (TYPE) {
-  	  var IS_MAP = TYPE === 1;
-  	  var IS_FILTER = TYPE === 2;
-  	  var IS_SOME = TYPE === 3;
-  	  var IS_EVERY = TYPE === 4;
-  	  var IS_FIND_INDEX = TYPE === 6;
-  	  var IS_FILTER_REJECT = TYPE === 7;
-  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
-  	  return function ($this, callbackfn, that) {
-  	    var O = toObject($this);
-  	    var self = IndexedObject(O);
-  	    var length = lengthOfArrayLike(self);
-  	    var boundFunction = bind(callbackfn, that);
-  	    var index = 0;
-  	    var resIndex = 0;
-  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
-  	    var value, result;
-  	    for (;length > index; index++) if (NO_HOLES || index in self) {
-  	      value = self[index];
-  	      result = boundFunction(value, index, O);
-  	      if (TYPE) {
-  	        if (IS_MAP) createProperty(target, index, result);    // map
-  	        else if (result) switch (TYPE) {
-  	          case 3: return true;                                // some
-  	          case 5: return value;                               // find
-  	          case 6: return index;                               // findIndex
-  	          case 2: createProperty(target, resIndex++, value);  // filter
-  	        } else switch (TYPE) {
-  	          case 4: return false;                               // every
-  	          case 7: createProperty(target, resIndex++, value);  // filterReject
-  	        }
-  	      }
-  	    }
-  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
-  	  };
-  	};
-
-  	arrayIteration = {
-  	  // `Array.prototype.forEach` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
-  	  forEach: createMethod(0),
-  	  // `Array.prototype.map` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.map
-  	  map: createMethod(1),
-  	  // `Array.prototype.filter` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
-  	  filter: createMethod(2),
-  	  // `Array.prototype.some` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.some
-  	  some: createMethod(3),
-  	  // `Array.prototype.every` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.every
-  	  every: createMethod(4),
-  	  // `Array.prototype.find` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.find
-  	  find: createMethod(5),
-  	  // `Array.prototype.findIndex` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
-  	  findIndex: createMethod(6),
-  	  // `Array.prototype.filterReject` method
-  	  // https://github.com/tc39/proposal-array-filtering
-  	  filterReject: createMethod(7)
-  	};
-  	return arrayIteration;
-  }
-
-  var objectDefineProperties = {};
-
-  var objectKeys;
-  var hasRequiredObjectKeys;
-
-  function requireObjectKeys () {
-  	if (hasRequiredObjectKeys) return objectKeys;
-  	hasRequiredObjectKeys = 1;
-  	var internalObjectKeys = requireObjectKeysInternal();
-  	var enumBugKeys = requireEnumBugKeys();
-
-  	// `Object.keys` method
-  	// https://tc39.es/ecma262/#sec-object.keys
-  	// eslint-disable-next-line es/no-object-keys -- safe
-  	objectKeys = Object.keys || function keys(O) {
-  	  return internalObjectKeys(O, enumBugKeys);
-  	};
-  	return objectKeys;
-  }
-
-  var hasRequiredObjectDefineProperties;
-
-  function requireObjectDefineProperties () {
-  	if (hasRequiredObjectDefineProperties) return objectDefineProperties;
-  	hasRequiredObjectDefineProperties = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var V8_PROTOTYPE_DEFINE_BUG = requireV8PrototypeDefineBug();
-  	var definePropertyModule = requireObjectDefineProperty();
-  	var anObject = requireAnObject();
-  	var toIndexedObject = requireToIndexedObject();
-  	var objectKeys = requireObjectKeys();
-
-  	// `Object.defineProperties` method
-  	// https://tc39.es/ecma262/#sec-object.defineproperties
-  	// eslint-disable-next-line es/no-object-defineproperties -- safe
-  	objectDefineProperties.f = DESCRIPTORS && !V8_PROTOTYPE_DEFINE_BUG ? Object.defineProperties : function defineProperties(O, Properties) {
-  	  anObject(O);
-  	  var props = toIndexedObject(Properties);
-  	  var keys = objectKeys(Properties);
-  	  var length = keys.length;
-  	  var index = 0;
-  	  var key;
-  	  while (length > index) definePropertyModule.f(O, key = keys[index++], props[key]);
-  	  return O;
-  	};
-  	return objectDefineProperties;
-  }
-
-  var html;
-  var hasRequiredHtml;
-
-  function requireHtml () {
-  	if (hasRequiredHtml) return html;
-  	hasRequiredHtml = 1;
-  	var getBuiltIn = requireGetBuiltIn();
-
-  	html = getBuiltIn('document', 'documentElement');
-  	return html;
-  }
-
-  var objectCreate;
-  var hasRequiredObjectCreate;
-
-  function requireObjectCreate () {
-  	if (hasRequiredObjectCreate) return objectCreate;
-  	hasRequiredObjectCreate = 1;
-  	/* global ActiveXObject -- old IE, WSH */
-  	var anObject = requireAnObject();
-  	var definePropertiesModule = requireObjectDefineProperties();
-  	var enumBugKeys = requireEnumBugKeys();
-  	var hiddenKeys = requireHiddenKeys();
-  	var html = requireHtml();
-  	var documentCreateElement = requireDocumentCreateElement();
-  	var sharedKey = requireSharedKey();
-
-  	var GT = '>';
-  	var LT = '<';
-  	var PROTOTYPE = 'prototype';
-  	var SCRIPT = 'script';
-  	var IE_PROTO = sharedKey('IE_PROTO');
-
-  	var EmptyConstructor = function () { /* empty */ };
-
-  	var scriptTag = function (content) {
-  	  return LT + SCRIPT + GT + content + LT + '/' + SCRIPT + GT;
-  	};
-
-  	// Create object with fake `null` prototype: use ActiveX Object with cleared prototype
-  	var NullProtoObjectViaActiveX = function (activeXDocument) {
-  	  activeXDocument.write(scriptTag(''));
-  	  activeXDocument.close();
-  	  var temp = activeXDocument.parentWindow.Object;
-  	  // eslint-disable-next-line no-useless-assignment -- avoid memory leak
-  	  activeXDocument = null;
-  	  return temp;
-  	};
-
-  	// Create object with fake `null` prototype: use iframe Object with cleared prototype
-  	var NullProtoObjectViaIFrame = function () {
-  	  // Thrash, waste and sodomy: IE GC bug
-  	  var iframe = documentCreateElement('iframe');
-  	  var JS = 'java' + SCRIPT + ':';
-  	  var iframeDocument;
-  	  iframe.style.display = 'none';
-  	  html.appendChild(iframe);
-  	  // https://github.com/zloirock/core-js/issues/475
-  	  iframe.src = String(JS);
-  	  iframeDocument = iframe.contentWindow.document;
-  	  iframeDocument.open();
-  	  iframeDocument.write(scriptTag('document.F=Object'));
-  	  iframeDocument.close();
-  	  return iframeDocument.F;
-  	};
-
-  	// Check for document.domain and active x support
-  	// No need to use active x approach when document.domain is not set
-  	// see https://github.com/es-shims/es5-shim/issues/150
-  	// variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
-  	// avoid IE GC bug
-  	var activeXDocument;
-  	var NullProtoObject = function () {
-  	  try {
-  	    activeXDocument = new ActiveXObject('htmlfile');
-  	  } catch (error) { /* ignore */ }
-  	  NullProtoObject = typeof document != 'undefined'
-  	    ? document.domain && activeXDocument
-  	      ? NullProtoObjectViaActiveX(activeXDocument) // old IE
-  	      : NullProtoObjectViaIFrame()
-  	    : NullProtoObjectViaActiveX(activeXDocument); // WSH
-  	  var length = enumBugKeys.length;
-  	  while (length--) delete NullProtoObject[PROTOTYPE][enumBugKeys[length]];
-  	  return NullProtoObject();
-  	};
-
-  	hiddenKeys[IE_PROTO] = true;
-
-  	// `Object.create` method
-  	// https://tc39.es/ecma262/#sec-object.create
-  	// eslint-disable-next-line es/no-object-create -- safe
-  	objectCreate = Object.create || function create(O, Properties) {
-  	  var result;
-  	  if (O !== null) {
-  	    EmptyConstructor[PROTOTYPE] = anObject(O);
-  	    result = new EmptyConstructor();
-  	    EmptyConstructor[PROTOTYPE] = null;
-  	    // add "__proto__" for Object.getPrototypeOf polyfill
-  	    result[IE_PROTO] = O;
-  	  } else result = NullProtoObject();
-  	  return Properties === undefined ? result : definePropertiesModule.f(result, Properties);
-  	};
-  	return objectCreate;
-  }
-
-  var addToUnscopables;
-  var hasRequiredAddToUnscopables;
-
-  function requireAddToUnscopables () {
-  	if (hasRequiredAddToUnscopables) return addToUnscopables;
-  	hasRequiredAddToUnscopables = 1;
+  	var setArrayLength = requireArraySetLength();
+  	var arraySpeciesCreate = requireArraySpeciesCreate();
+  	var arrayMethodHasSpeciesSupport = requireArrayMethodHasSpeciesSupport();
   	var wellKnownSymbol = requireWellKnownSymbol();
-  	var create = requireObjectCreate();
-  	var defineProperty = requireObjectDefineProperty().f;
+  	var V8_VERSION = requireEnvironmentV8Version();
 
-  	var UNSCOPABLES = wellKnownSymbol('unscopables');
-  	var ArrayPrototype = Array.prototype;
+  	var IS_CONCAT_SPREADABLE = wellKnownSymbol('isConcatSpreadable');
 
-  	// Array.prototype[@@unscopables]
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	if (ArrayPrototype[UNSCOPABLES] === undefined) {
-  	  defineProperty(ArrayPrototype, UNSCOPABLES, {
-  	    configurable: true,
-  	    value: create(null)
-  	  });
-  	}
-
-  	// add a key to Array.prototype[@@unscopables]
-  	addToUnscopables = function (key) {
-  	  ArrayPrototype[UNSCOPABLES][key] = true;
-  	};
-  	return addToUnscopables;
-  }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
+  	// We can't use this feature detection in V8 since it causes
+  	// deoptimization and serious performance degradation
+  	// https://github.com/zloirock/core-js/issues/679
+  	var IS_CONCAT_SPREADABLE_SUPPORT = V8_VERSION >= 51 || !fails(function () {
+  	  var array = [];
+  	  array[IS_CONCAT_SPREADABLE] = false;
+  	  return array.concat()[0] !== array;
   	});
 
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
+  	var isConcatSpreadable = function (O) {
+  	  if (!isObject(O)) return false;
+  	  var spreadable = O[IS_CONCAT_SPREADABLE];
+  	  return spreadable !== undefined ? !!spreadable : isArray(O);
+  	};
+
+  	var FORCED = !IS_CONCAT_SPREADABLE_SUPPORT || !arrayMethodHasSpeciesSupport('concat');
+
+  	// `Array.prototype.concat` method
+  	// https://tc39.es/ecma262/#sec-array.prototype.concat
+  	// with adding support of @@isConcatSpreadable and @@species
+  	$({ target: 'Array', proto: true, arity: 1, forced: FORCED }, {
+  	  // eslint-disable-next-line no-unused-vars -- required for `.length`
+  	  concat: function concat(arg) {
+  	    var O = toObject(this);
+  	    var A = arraySpeciesCreate(O, 0);
+  	    var n = 0;
+  	    var i, k, length, len, E;
+  	    for (i = -1, length = arguments.length; i < length; i++) {
+  	      E = i === -1 ? O : arguments[i];
+  	      if (isConcatSpreadable(E)) {
+  	        len = lengthOfArrayLike(E);
+  	        doesNotExceedSafeInteger(n + len);
+  	        for (k = 0; k < len; k++, n++) if (k in E) createProperty(A, n, E[k]);
+  	      } else {
+  	        doesNotExceedSafeInteger(n + 1);
+  	        createProperty(A, n++, E);
+  	      }
+  	    }
+  	    setArrayLength(A, n);
+  	    return A;
+  	  }
+  	});
+  	return es_array_concat;
   }
 
-  requireEs_array_find();
+  requireEs_array_concat();
 
   var es_array_indexOf = {};
+
+  var functionUncurryThisClause;
+  var hasRequiredFunctionUncurryThisClause;
+
+  function requireFunctionUncurryThisClause () {
+  	if (hasRequiredFunctionUncurryThisClause) return functionUncurryThisClause;
+  	hasRequiredFunctionUncurryThisClause = 1;
+  	var classofRaw = requireClassofRaw();
+  	var uncurryThis = requireFunctionUncurryThis();
+
+  	functionUncurryThisClause = function (fn) {
+  	  // Nashorn bug:
+  	  //   https://github.com/zloirock/core-js/issues/1128
+  	  //   https://github.com/zloirock/core-js/issues/1130
+  	  if (classofRaw(fn) === 'Function') return uncurryThis(fn);
+  	};
+  	return functionUncurryThisClause;
+  }
 
   var arrayMethodIsStrict;
   var hasRequiredArrayMethodIsStrict;
@@ -2194,6 +2050,24 @@
   requireEs_array_indexOf();
 
   var es_object_assign = {};
+
+  var objectKeys;
+  var hasRequiredObjectKeys;
+
+  function requireObjectKeys () {
+  	if (hasRequiredObjectKeys) return objectKeys;
+  	hasRequiredObjectKeys = 1;
+  	var internalObjectKeys = requireObjectKeysInternal();
+  	var enumBugKeys = requireEnumBugKeys();
+
+  	// `Object.keys` method
+  	// https://tc39.es/ecma262/#sec-object.keys
+  	// eslint-disable-next-line es/no-object-keys -- safe
+  	objectKeys = Object.keys || function keys(O) {
+  	  return internalObjectKeys(O, enumBugKeys);
+  	};
+  	return objectKeys;
+  }
 
   var objectAssign;
   var hasRequiredObjectAssign;
@@ -2318,11 +2192,227 @@
 
   requireEs_object_toString();
 
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
+  var functionBindContext;
+  var hasRequiredFunctionBindContext;
+
+  function requireFunctionBindContext () {
+  	if (hasRequiredFunctionBindContext) return functionBindContext;
+  	hasRequiredFunctionBindContext = 1;
+  	var uncurryThis = requireFunctionUncurryThisClause();
+  	var aCallable = requireACallable();
+  	var NATIVE_BIND = requireFunctionBindNative();
+
+  	var bind = uncurryThis(uncurryThis.bind);
+
+  	// optional / simple context binding
+  	functionBindContext = function (fn, that) {
+  	  aCallable(fn);
+  	  return that === undefined ? fn : NATIVE_BIND ? bind(fn, that) : function (/* ...args */) {
+  	    return fn.apply(that, arguments);
+  	  };
+  	};
+  	return functionBindContext;
+  }
+
+  var arrayIteration;
+  var hasRequiredArrayIteration;
+
+  function requireArrayIteration () {
+  	if (hasRequiredArrayIteration) return arrayIteration;
+  	hasRequiredArrayIteration = 1;
+  	var bind = requireFunctionBindContext();
+  	var IndexedObject = requireIndexedObject();
+  	var toObject = requireToObject();
+  	var lengthOfArrayLike = requireLengthOfArrayLike();
+  	var arraySpeciesCreate = requireArraySpeciesCreate();
+  	var createProperty = requireCreateProperty();
+
+  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
+  	var createMethod = function (TYPE) {
+  	  var IS_MAP = TYPE === 1;
+  	  var IS_FILTER = TYPE === 2;
+  	  var IS_SOME = TYPE === 3;
+  	  var IS_EVERY = TYPE === 4;
+  	  var IS_FIND_INDEX = TYPE === 6;
+  	  var IS_FILTER_REJECT = TYPE === 7;
+  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
+  	  return function ($this, callbackfn, that) {
+  	    var O = toObject($this);
+  	    var self = IndexedObject(O);
+  	    var length = lengthOfArrayLike(self);
+  	    var boundFunction = bind(callbackfn, that);
+  	    var index = 0;
+  	    var resIndex = 0;
+  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
+  	    var value, result;
+  	    for (;length > index; index++) if (NO_HOLES || index in self) {
+  	      value = self[index];
+  	      result = boundFunction(value, index, O);
+  	      if (TYPE) {
+  	        if (IS_MAP) createProperty(target, index, result);    // map
+  	        else if (result) switch (TYPE) {
+  	          case 3: return true;                                // some
+  	          case 5: return value;                               // find
+  	          case 6: return index;                               // findIndex
+  	          case 2: createProperty(target, resIndex++, value);  // filter
+  	        } else switch (TYPE) {
+  	          case 4: return false;                               // every
+  	          case 7: createProperty(target, resIndex++, value);  // filterReject
+  	        }
+  	      }
+  	    }
+  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
+  	  };
+  	};
+
+  	arrayIteration = {
+  	  // `Array.prototype.forEach` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	  forEach: createMethod(0),
+  	  // `Array.prototype.map` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.map
+  	  map: createMethod(1),
+  	  // `Array.prototype.filter` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
+  	  filter: createMethod(2),
+  	  // `Array.prototype.some` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.some
+  	  some: createMethod(3),
+  	  // `Array.prototype.every` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.every
+  	  every: createMethod(4),
+  	  // `Array.prototype.find` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.find
+  	  find: createMethod(5),
+  	  // `Array.prototype.findIndex` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
+  	  findIndex: createMethod(6),
+  	  // `Array.prototype.filterReject` method
+  	  // https://github.com/tc39/proposal-array-filtering
+  	  filterReject: createMethod(7)
+  	};
+  	return arrayIteration;
+  }
+
+  var arrayForEach;
+  var hasRequiredArrayForEach;
+
+  function requireArrayForEach () {
+  	if (hasRequiredArrayForEach) return arrayForEach;
+  	hasRequiredArrayForEach = 1;
+  	var $forEach = requireArrayIteration().forEach;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+  	var STRICT_METHOD = arrayMethodIsStrict('forEach');
+
+  	// `Array.prototype.forEach` method implementation
+  	// https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	arrayForEach = !STRICT_METHOD ? function forEach(callbackfn /* , thisArg */) {
+  	  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	// eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	} : [].forEach;
+  	return arrayForEach;
+  }
+
+  var hasRequiredWeb_domCollections_forEach;
+
+  function requireWeb_domCollections_forEach () {
+  	if (hasRequiredWeb_domCollections_forEach) return web_domCollections_forEach;
+  	hasRequiredWeb_domCollections_forEach = 1;
+  	var globalThis = requireGlobalThis();
+  	var DOMIterables = requireDomIterables();
+  	var DOMTokenListPrototype = requireDomTokenListPrototype();
+  	var forEach = requireArrayForEach();
+  	var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+
+  	var handlePrototype = function (CollectionPrototype) {
+  	  // some Chrome versions have non-configurable methods on DOMTokenList
+  	  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+  	    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  	  } catch (error) {
+  	    CollectionPrototype.forEach = forEach;
+  	  }
+  	};
+
+  	for (var COLLECTION_NAME in DOMIterables) {
+  	  if (DOMIterables[COLLECTION_NAME]) {
+  	    handlePrototype(globalThis[COLLECTION_NAME] && globalThis[COLLECTION_NAME].prototype);
+  	  }
+  	}
+
+  	handlePrototype(DOMTokenListPrototype);
+  	return web_domCollections_forEach;
+  }
+
+  requireWeb_domCollections_forEach();
+
   /**
    * @author zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
+  var Utils = BootstrapTable.utils;
 
   // Reasonable defaults
   var PIXEL_STEP = 10;
@@ -2387,18 +2477,18 @@
       pixelY: pY
     };
   }
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     fixedColumns: false,
     fixedNumber: 0,
     fixedRightNumber: 0
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "fixedColumnsSupported",
       value: function fixedColumnsSupported() {
         return this.options.fixedColumns && !this.options.detailView && !this.options.cardView;
@@ -2406,17 +2496,21 @@
     }, {
       key: "initContainer",
       value: function initContainer() {
-        _superPropGet(_class, "initContainer", this)([]);
+        _superPropGet(_default, "initContainer", this)([]);
         if (!this.fixedColumnsSupported()) {
           return;
         }
         if (this.options.fixedNumber) {
-          this.$tableContainer.append('<div class="fixed-columns"></div>');
-          this.$fixedColumns = this.$tableContainer.find('.fixed-columns');
+          var div = document.createElement('div');
+          div.className = 'fixed-columns';
+          this.$tableContainer.appendChild(div);
+          this.$fixedColumns = this.$tableContainer.querySelector('.fixed-columns');
         }
         if (this.options.fixedRightNumber) {
-          this.$tableContainer.append('<div class="fixed-columns-right"></div>');
-          this.$fixedColumnsRight = this.$tableContainer.find('.fixed-columns-right');
+          var _div = document.createElement('div');
+          _div.className = 'fixed-columns-right';
+          this.$tableContainer.appendChild(_div);
+          this.$fixedColumnsRight = this.$tableContainer.querySelector('.fixed-columns-right');
         }
       }
     }, {
@@ -2425,12 +2519,12 @@
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initBody", this)(args);
-        if (this.$fixedColumns && this.$fixedColumns.length) {
-          this.$fixedColumns.toggle(this.fixedColumnsSupported());
+        _superPropGet(_default, "initBody", this)(args);
+        if (this.$fixedColumns) {
+          this.$fixedColumns.style.display = this.fixedColumnsSupported() ? '' : 'none';
         }
-        if (this.$fixedColumnsRight && this.$fixedColumnsRight.length) {
-          this.$fixedColumnsRight.toggle(this.fixedColumnsSupported());
+        if (this.$fixedColumnsRight) {
+          this.$fixedColumnsRight.style.display = this.fixedColumnsSupported() ? '' : 'none';
         }
         if (!this.fixedColumnsSupported()) {
           return;
@@ -2447,7 +2541,7 @@
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "trigger", this)(args);
+        _superPropGet(_default, "trigger", this)(args);
         if (!this.fixedColumnsSupported()) {
           return;
         }
@@ -2455,10 +2549,10 @@
           this.initFixedColumnsHeader();
         } else if (args[0] === 'scroll-body') {
           if (this.needFixedColumns && this.options.fixedNumber) {
-            this.$fixedBody.scrollTop(this.$tableBody.scrollTop());
+            this.$fixedBody.scrollTop = this.$tableBody.scrollTop;
           }
           if (this.needFixedColumns && this.options.fixedRightNumber) {
-            this.$fixedBodyRight.scrollTop(this.$tableBody.scrollTop());
+            this.$fixedBodyRight.scrollTop = this.$tableBody.scrollTop;
           }
         }
       }
@@ -2466,27 +2560,32 @@
       key: "updateSelected",
       value: function updateSelected() {
         var _this = this;
-        _superPropGet(_class, "updateSelected", this)([]);
+        _superPropGet(_default, "updateSelected", this)([]);
         if (!this.fixedColumnsSupported()) {
           return;
         }
-        this.$tableBody.find('tr').each(function (i, el) {
-          var $el = $(el);
-          var index = $el.data('index');
-          var classes = $el.attr('class');
+        this.$tableBody.querySelectorAll('tr').forEach(function (el) {
+          var index = el.dataset.index;
+          var classes = el.getAttribute('class') || '';
           var inputSelector = "[name=\"".concat(_this.options.selectItemName, "\"]");
-          var $input = $el.find(inputSelector);
+          var input = el.querySelector(inputSelector);
           if (typeof index === 'undefined') {
             return;
           }
-          var updateFixedBody = function updateFixedBody($fixedHeader, $fixedBody) {
-            var $tr = $fixedBody.find("tr[data-index=\"".concat(index, "\"]"));
-            $tr.attr('class', classes);
-            if ($input.length) {
-              $tr.find(inputSelector).prop('checked', $input.prop('checked'));
+          var updateFixedBody = function updateFixedBody(fixedHeader, fixedBody) {
+            var tr = fixedBody.querySelector("tr[data-index=\"".concat(index, "\"]"));
+            if (!tr) return;
+            tr.setAttribute('class', classes);
+            if (input) {
+              var fixedInput = tr.querySelector(inputSelector);
+              if (fixedInput) fixedInput.checked = input.checked;
             }
-            if (_this.$selectAll.length) {
-              $fixedHeader.add($fixedBody).find('[name="btSelectAll"]').prop('checked', _this.$selectAll.prop('checked'));
+            if (_this.$selectAll && _this.$selectAll.length) {
+              var _this$$selectAll$0$ch, _this$$selectAll$;
+              var checked = (_this$$selectAll$0$ch = (_this$$selectAll$ = _this.$selectAll[0]) === null || _this$$selectAll$ === void 0 ? void 0 : _this$$selectAll$.checked) !== null && _this$$selectAll$0$ch !== void 0 ? _this$$selectAll$0$ch : false;
+              [].concat(_toConsumableArray(fixedHeader.querySelectorAll('[name="btSelectAll"]')), _toConsumableArray(fixedBody.querySelectorAll('[name="btSelectAll"]'))).forEach(function (cb) {
+                cb.checked = checked;
+              });
             }
           };
           if (_this.$fixedBody && _this.options.fixedNumber) {
@@ -2500,12 +2599,14 @@
     }, {
       key: "hideLoading",
       value: function hideLoading() {
-        _superPropGet(_class, "hideLoading", this)([]);
+        _superPropGet(_default, "hideLoading", this)([]);
         if (this.needFixedColumns && this.options.fixedNumber) {
-          this.$fixedColumns.find('.fixed-table-loading').hide();
+          var loading = this.$fixedColumns.querySelector('.fixed-table-loading');
+          if (loading) loading.style.display = 'none';
         }
         if (this.needFixedColumns && this.options.fixedRightNumber && this.$fixedColumnsRight) {
-          this.$fixedColumnsRight.find('.fixed-table-loading').hide();
+          var _loading = this.$fixedColumnsRight.querySelector('.fixed-table-loading');
+          if (_loading) _loading.style.display = 'none';
         }
       }
     }, {
@@ -2513,29 +2614,31 @@
       value: function initFixedColumnsHeader() {
         var _this2 = this;
         if (this.options.height) {
-          this.needFixedColumns = this.$tableHeader.outerWidth(true) < this.$tableHeader.find('table').outerWidth(true);
+          this.needFixedColumns = this.$tableHeader.offsetWidth < this.$tableHeader.querySelector('table').offsetWidth;
         } else {
-          this.needFixedColumns = this.$tableBody.outerWidth(true) < this.$tableBody.find('table').outerWidth(true);
+          this.needFixedColumns = this.$tableBody.offsetWidth < this.$tableBody.querySelector('table').offsetWidth;
         }
-        var initFixedHeader = function initFixedHeader($fixedColumns, isRight) {
-          $fixedColumns.find('.fixed-table-header').remove();
-          $fixedColumns.append(_this2.$tableHeader.clone(true));
-          $fixedColumns.css({
-            width: _this2.getFixedColumnsWidth(isRight)
-          });
-          return $fixedColumns.find('.fixed-table-header');
+        var initFixedHeader = function initFixedHeader(fixedColumns, isRight) {
+          var _fixedColumns$querySe;
+          (_fixedColumns$querySe = fixedColumns.querySelector('.fixed-table-header')) === null || _fixedColumns$querySe === void 0 || _fixedColumns$querySe.remove();
+          fixedColumns.appendChild(_this2.$tableHeader.cloneNode(true));
+          fixedColumns.style.width = "".concat(_this2.getFixedColumnsWidth(isRight), "px");
+          return fixedColumns.querySelector('.fixed-table-header');
         };
         if (this.needFixedColumns && this.options.fixedNumber) {
           this.$fixedHeader = initFixedHeader(this.$fixedColumns);
-          this.$fixedHeader.css('margin-right', '');
+          this.$fixedHeader.style.marginRight = '';
         } else if (this.$fixedColumns) {
-          this.$fixedColumns.html('').css('width', '');
+          this.$fixedColumns.innerHTML = '';
+          this.$fixedColumns.style.width = '';
         }
         if (this.needFixedColumns && this.options.fixedRightNumber && this.$fixedColumnsRight) {
+          var _this$$fixedHeaderRig;
           this.$fixedHeaderRight = initFixedHeader(this.$fixedColumnsRight, true);
-          this.$fixedHeaderRight.scrollLeft(this.$fixedHeaderRight.find('table').width());
+          this.$fixedHeaderRight.scrollLeft = ((_this$$fixedHeaderRig = this.$fixedHeaderRight.querySelector('table')) === null || _this$$fixedHeaderRig === void 0 ? void 0 : _this$$fixedHeaderRig.offsetWidth) || 0;
         } else if (this.$fixedColumnsRight) {
-          this.$fixedColumnsRight.html('').css('width', '');
+          this.$fixedColumnsRight.innerHTML = '';
+          this.$fixedColumnsRight.style.width = '';
         }
         this.initFixedColumnsBody();
         this.initFixedColumnsEvents();
@@ -2544,29 +2647,27 @@
       key: "initFixedColumnsBody",
       value: function initFixedColumnsBody() {
         var _this3 = this;
-        var initFixedBody = function initFixedBody($fixedColumns, $fixedHeader) {
-          $fixedColumns.find('.fixed-table-body').remove();
-          $fixedColumns.append(_this3.$tableBody.clone(true));
-          $fixedColumns.find('.fixed-table-body table').removeAttr('id');
-          var $fixedBody = $fixedColumns.find('.fixed-table-body');
-          var tableBody = _this3.$tableBody.get(0);
+        var initFixedBody = function initFixedBody(fixedColumns, fixedHeader) {
+          var _fixedColumns$querySe2, _fixedColumns$querySe3;
+          (_fixedColumns$querySe2 = fixedColumns.querySelector('.fixed-table-body')) === null || _fixedColumns$querySe2 === void 0 || _fixedColumns$querySe2.remove();
+          fixedColumns.appendChild(_this3.$tableBody.cloneNode(true));
+          (_fixedColumns$querySe3 = fixedColumns.querySelector('.fixed-table-body table')) === null || _fixedColumns$querySe3 === void 0 || _fixedColumns$querySe3.removeAttribute('id');
+          var fixedBody = fixedColumns.querySelector('.fixed-table-body');
+          var tableBody = _this3.$tableBody;
           var scrollHeight = tableBody.scrollWidth > tableBody.clientWidth ? Utils.getScrollBarWidth() : 0;
-          var height = _this3.$tableContainer.outerHeight(true) - scrollHeight - 1;
-          $fixedColumns.css({
-            height: height
-          });
-          $fixedBody.css({
-            height: height - $fixedHeader.height()
-          });
-          return $fixedBody;
+          var height = _this3.$tableContainer.offsetHeight - scrollHeight - 1;
+          fixedColumns.style.height = "".concat(height, "px");
+          fixedBody.style.height = "".concat(height - fixedHeader.offsetHeight, "px");
+          return fixedBody;
         };
         if (this.needFixedColumns && this.options.fixedNumber) {
           this.$fixedBody = initFixedBody(this.$fixedColumns, this.$fixedHeader);
         }
         if (this.needFixedColumns && this.options.fixedRightNumber && this.$fixedColumnsRight) {
+          var _this$$fixedBodyRight;
           this.$fixedBodyRight = initFixedBody(this.$fixedColumnsRight, this.$fixedHeaderRight);
-          this.$fixedBodyRight.scrollLeft(this.$fixedBodyRight.find('table').width());
-          this.$fixedBodyRight.css('overflow-y', this.options.height ? 'auto' : 'hidden');
+          this.$fixedBodyRight.scrollLeft = ((_this$$fixedBodyRight = this.$fixedBodyRight.querySelector('table')) === null || _this$$fixedBodyRight === void 0 ? void 0 : _this$$fixedBodyRight.offsetWidth) || 0;
+          this.$fixedBodyRight.style.overflowY = this.options.height ? 'auto' : 'hidden';
         }
       }
     }, {
@@ -2579,10 +2680,11 @@
         if (isRight) {
           visibleFields = visibleFields.reverse();
           fixedNumber = this.options.fixedRightNumber;
-          marginRight = parseInt(this.$tableHeader.css('margin-right'), 10);
+          marginRight = parseInt(getComputedStyle(this.$tableHeader).marginRight, 10) || 0;
         }
         for (var i = 0; i < fixedNumber; i++) {
-          width += this.$header.find("th[data-field=\"".concat(visibleFields[i], "\"]")).outerWidth(true);
+          var _this$$header$querySe;
+          width += ((_this$$header$querySe = this.$header.querySelector("th[data-field=\"".concat(visibleFields[i], "\"]"))) === null || _this$$header$querySe === void 0 ? void 0 : _this$$header$querySe.offsetWidth) || 0;
         }
         return width + marginRight + 1;
       }
@@ -2591,25 +2693,31 @@
       value: function initFixedColumnsEvents() {
         var _this4 = this;
         var toggleHover = function toggleHover(e, toggle) {
-          var tr = "tr[data-index=\"".concat($(e.currentTarget).data('index'), "\"]");
-          var isFromFixed = $(e.currentTarget).closest('.fixed-columns, .fixed-columns-right').length > 0;
-          var $trs = $();
+          var index = e.currentTarget.dataset.index;
+          var tr = "tr[data-index=\"".concat(index, "\"]");
+          var isFromFixed = !!e.currentTarget.closest('.fixed-columns, .fixed-columns-right');
+          var trs = [];
           if (isFromFixed) {
-            $trs = $trs.add(_this4.$tableBody.find(tr));
+            trs.push.apply(trs, _toConsumableArray(_this4.$tableBody.querySelectorAll(tr)));
           }
           if (_this4.$fixedBody) {
-            $trs = $trs.add(_this4.$fixedBody.find(tr));
+            trs.push.apply(trs, _toConsumableArray(_this4.$fixedBody.querySelectorAll(tr)));
           }
           if (_this4.$fixedBodyRight) {
-            $trs = $trs.add(_this4.$fixedBodyRight.find(tr));
+            trs.push.apply(trs, _toConsumableArray(_this4.$fixedBodyRight.querySelectorAll(tr)));
           }
-          $trs.toggleClass('hover-row', toggle);
+          trs.forEach(function (row) {
+            return row.classList.toggle('hover-row', toggle);
+          });
         };
-        var bindHover = function bindHover($el) {
-          $el.find('tr').hover(function (e) {
-            toggleHover(e, true);
-          }, function (e) {
-            toggleHover(e, false);
+        var bindHover = function bindHover(el) {
+          el.querySelectorAll('tr').forEach(function (tr) {
+            tr.addEventListener('mouseenter', function (e) {
+              return toggleHover(e, true);
+            });
+            tr.addEventListener('mouseleave', function (e) {
+              return toggleHover(e, false);
+            });
           });
         };
         bindHover(this.$tableBody);
@@ -2618,49 +2726,67 @@
         var updateScroll = function updateScroll(e, fixedBody) {
           var normalized = normalizeWheel(e);
           var deltaY = Math.ceil(normalized.pixelY);
-          var top = _this4.$tableBody.scrollTop() + deltaY;
+          var top = _this4.$tableBody.scrollTop + deltaY;
           if (deltaY < 0 && top > 0 || deltaY > 0 && top < fixedBody.scrollHeight - fixedBody.clientHeight) {
             e.preventDefault();
           }
-          _this4.$tableBody.scrollTop(top);
+          _this4.$tableBody.scrollTop = top;
           if (_this4.$fixedBody) {
-            _this4.$fixedBody.scrollTop(top);
+            _this4.$fixedBody.scrollTop = top;
           }
           if (_this4.$fixedBodyRight) {
-            _this4.$fixedBodyRight.scrollTop(top);
+            _this4.$fixedBodyRight.scrollTop = top;
           }
         };
         if (this.needFixedColumns && this.options.fixedNumber && this.$fixedBody) {
           bindHover(this.$fixedBody);
-          this.$fixedBody[0].addEventListener(mousewheel, function (e) {
-            updateScroll(e, _this4.$fixedBody[0]);
+          this.$fixedBody.addEventListener(mousewheel, function (e) {
+            updateScroll(e, _this4.$fixedBody);
           });
         }
         if (this.needFixedColumns && this.options.fixedRightNumber) {
           bindHover(this.$fixedBodyRight);
-          this.$fixedBodyRight.off('scroll').on('scroll', function () {
-            var top = _this4.$fixedBodyRight.scrollTop();
-            _this4.$tableBody.scrollTop(top);
+          if (this._fixedColumnsRightScrollHandler) {
+            this.$fixedBodyRight.removeEventListener('scroll', this._fixedColumnsRightScrollHandler);
+          }
+          this._fixedColumnsRightScrollHandler = function () {
+            var top = _this4.$fixedBodyRight.scrollTop;
+            _this4.$tableBody.scrollTop = top;
             if (_this4.$fixedBody) {
-              _this4.$fixedBody.scrollTop(top);
+              _this4.$fixedBody.scrollTop = top;
             }
-          });
+          };
+          this.$fixedBodyRight.addEventListener('scroll', this._fixedColumnsRightScrollHandler);
         }
         if (this.options.filterControl) {
-          $(this.$fixedColumns).off('keyup change').on('keyup change', function (e) {
-            var $target = $(e.target);
-            var value = $target.val();
-            var field = $target.parents('th').data('field');
-            var $coreTh = _this4.$header.find("th[data-field=\"".concat(field, "\"]"));
-            if ($target.is('input')) {
-              $coreTh.find('input').val(value);
-            } else if ($target.is('select')) {
-              var $select = $coreTh.find('select');
-              $select.find('option[selected]').removeAttr('selected');
-              $select.find("option[value=\"".concat(value, "\"]")).attr('selected', true);
+          if (this._fixedColumnsFilterHandler) {
+            this.$fixedColumns.removeEventListener('keyup', this._fixedColumnsFilterHandler);
+            this.$fixedColumns.removeEventListener('change', this._fixedColumnsFilterHandler);
+          }
+          this._fixedColumnsFilterHandler = function (e) {
+            var _target$closest;
+            var target = e.target;
+            var value = target.value;
+            var field = (_target$closest = target.closest('th')) === null || _target$closest === void 0 ? void 0 : _target$closest.dataset.field;
+            var coreTh = _this4.$header.querySelector("th[data-field=\"".concat(field, "\"]"));
+            if (!coreTh) return;
+            if (target.tagName === 'INPUT') {
+              var coreInput = coreTh.querySelector('input');
+              if (coreInput) coreInput.value = value;
+            } else if (target.tagName === 'SELECT') {
+              var select = coreTh.querySelector('select');
+              if (select) {
+                select.querySelectorAll('option[selected]').forEach(function (opt) {
+                  return opt.removeAttribute('selected');
+                });
+                var opt = select.querySelector("option[value=\"".concat(value, "\"]"));
+                if (opt) opt.setAttribute('selected', 'true');
+              }
             }
             _this4.triggerSearch();
-          });
+          };
+          this.$fixedColumns.addEventListener('keyup', this._fixedColumnsFilterHandler);
+          this.$fixedColumns.addEventListener('change', this._fixedColumnsFilterHandler);
         }
       }
     }, {
@@ -2669,15 +2795,25 @@
         if (!this.options.stickyHeader) {
           return;
         }
-        this.$stickyContainer = this.$container.find('.sticky-header-container');
-        _superPropGet(_class, "renderStickyHeader", this)([]);
+        this.$stickyContainer = this.$container.querySelector('.sticky-header-container');
+        _superPropGet(_default, "renderStickyHeader", this)([]);
         if (this.needFixedColumns && this.options.fixedNumber) {
-          this.$fixedColumns.css('z-index', 101).find('.sticky-header-container').css('right', '').width(this.$fixedColumns.outerWidth());
+          this.$fixedColumns.style.zIndex = 101;
+          var stickyContainer = this.$fixedColumns.querySelector('.sticky-header-container');
+          if (stickyContainer) {
+            stickyContainer.style.right = '';
+            stickyContainer.style.width = "".concat(this.$fixedColumns.offsetWidth, "px");
+          }
         }
         if (this.needFixedColumns && this.options.fixedRightNumber) {
-          var $stickyHeaderContainerRight = this.$fixedColumnsRight.find('.sticky-header-container');
-          this.$fixedColumnsRight.css('z-index', 101);
-          $stickyHeaderContainerRight.css('left', '').scrollLeft($stickyHeaderContainerRight.find('.table').outerWidth()).width(this.$fixedColumnsRight.outerWidth());
+          this.$fixedColumnsRight.style.zIndex = 101;
+          var stickyContainerRight = this.$fixedColumnsRight.querySelector('.sticky-header-container');
+          if (stickyContainerRight) {
+            var _stickyContainerRight;
+            stickyContainerRight.style.left = '';
+            stickyContainerRight.scrollLeft = ((_stickyContainerRight = stickyContainerRight.querySelector('.table')) === null || _stickyContainerRight === void 0 ? void 0 : _stickyContainerRight.offsetWidth) || 0;
+            stickyContainerRight.style.width = "".concat(this.$fixedColumnsRight.offsetWidth, "px");
+          }
         }
       }
     }, {
@@ -2686,9 +2822,13 @@
         if (!this.options.stickyHeader) {
           return;
         }
-        this.$stickyContainer.eq(0).scrollLeft(this.$tableBody.scrollLeft());
+        if (this.$stickyContainer) {
+          this.$stickyContainer.scrollLeft = this.$tableBody.scrollLeft;
+        }
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

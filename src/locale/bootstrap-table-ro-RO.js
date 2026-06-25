@@ -3,7 +3,9 @@
  * Author: cristake <cristianiosif@me.com>
  */
 
-$.fn.bootstrapTable.locales['ro-RO'] = $.fn.bootstrapTable.locales['ro'] = {
+
+
+BootstrapTable.locales['ro-RO'] = BootstrapTable.locales['ro'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['ro-RO'] = $.fn.bootstrapTable.locales['ro'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['ro-RO'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['ro-RO'])

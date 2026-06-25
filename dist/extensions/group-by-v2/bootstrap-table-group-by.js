@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -11,6 +11,9 @@
   }
   function _arrayWithHoles(r) {
     if (Array.isArray(r)) return r;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
   }
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -123,6 +126,9 @@
       return !!t;
     })();
   }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
   function _iterableToArrayLimit(r, l) {
     var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
     if (null != t) {
@@ -149,6 +155,9 @@
   }
   function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
   function ownKeys$1(e, r) {
     var t = Object.keys(e);
@@ -193,6 +202,9 @@
     return "function" == typeof p ? function (t) {
       return p.apply(e, t);
     } : p;
+  }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
   function _toPrimitive(t, r) {
     if ("object" != typeof t || !t) return t;
@@ -2954,6 +2966,79 @@
 
   requireEs_array_map();
 
+  var es_array_slice = {};
+
+  var arraySlice;
+  var hasRequiredArraySlice;
+
+  function requireArraySlice () {
+  	if (hasRequiredArraySlice) return arraySlice;
+  	hasRequiredArraySlice = 1;
+  	var uncurryThis = requireFunctionUncurryThis();
+
+  	arraySlice = uncurryThis([].slice);
+  	return arraySlice;
+  }
+
+  var hasRequiredEs_array_slice;
+
+  function requireEs_array_slice () {
+  	if (hasRequiredEs_array_slice) return es_array_slice;
+  	hasRequiredEs_array_slice = 1;
+  	var $ = require_export();
+  	var isArray = requireIsArray();
+  	var isConstructor = requireIsConstructor();
+  	var isObject = requireIsObject();
+  	var toAbsoluteIndex = requireToAbsoluteIndex();
+  	var lengthOfArrayLike = requireLengthOfArrayLike();
+  	var toIndexedObject = requireToIndexedObject();
+  	var createProperty = requireCreateProperty();
+  	var setArrayLength = requireArraySetLength();
+  	var wellKnownSymbol = requireWellKnownSymbol();
+  	var arrayMethodHasSpeciesSupport = requireArrayMethodHasSpeciesSupport();
+  	var nativeSlice = requireArraySlice();
+
+  	var HAS_SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('slice');
+
+  	var SPECIES = wellKnownSymbol('species');
+  	var $Array = Array;
+  	var max = Math.max;
+
+  	// `Array.prototype.slice` method
+  	// https://tc39.es/ecma262/#sec-array.prototype.slice
+  	// fallback for not array-like ES3 strings and DOM objects
+  	$({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT }, {
+  	  slice: function slice(start, end) {
+  	    var O = toIndexedObject(this);
+  	    var length = lengthOfArrayLike(O);
+  	    var k = toAbsoluteIndex(start, length);
+  	    var fin = toAbsoluteIndex(end === undefined ? length : end, length);
+  	    // inline `ArraySpeciesCreate` for usage native `Array#slice` where it's possible
+  	    var Constructor, result, n;
+  	    if (isArray(O)) {
+  	      Constructor = O.constructor;
+  	      // cross-realm fallback
+  	      if (isConstructor(Constructor) && (Constructor === $Array || isArray(Constructor.prototype))) {
+  	        Constructor = undefined;
+  	      } else if (isObject(Constructor)) {
+  	        Constructor = Constructor[SPECIES];
+  	        if (Constructor === null) Constructor = undefined;
+  	      }
+  	      if (Constructor === $Array || Constructor === undefined) {
+  	        return nativeSlice(O, k, fin);
+  	      }
+  	    }
+  	    result = new (Constructor === undefined ? $Array : Constructor)(max(fin - k, 0));
+  	    for (n = 0; k < fin; k++, n++) if (k in O) createProperty(result, n, O[k]);
+  	    setArrayLength(result, n);
+  	    return result;
+  	  }
+  	});
+  	return es_array_slice;
+  }
+
+  requireEs_array_slice();
+
   var es_array_sort = {};
 
   var deletePropertyOrThrow;
@@ -2987,18 +3072,6 @@
   	  return $String(argument);
   	};
   	return toString;
-  }
-
-  var arraySlice;
-  var hasRequiredArraySlice;
-
-  function requireArraySlice () {
-  	if (hasRequiredArraySlice) return arraySlice;
-  	hasRequiredArraySlice = 1;
-  	var uncurryThis = requireFunctionUncurryThis();
-
-  	arraySlice = uncurryThis([].slice);
-  	return arraySlice;
   }
 
   var arraySort;
@@ -5320,7 +5393,7 @@
    * @version: v1.1.0
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
+  var Utils = BootstrapTable.utils;
   var initBodyCaller;
   var groupBy = function groupBy(array, f) {
     var tmpGroups = new Map();
@@ -5333,19 +5406,19 @@
     });
     return Object.fromEntries(tmpGroups);
   };
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'collapseGroup', {
+  Utils.assignIcons(BootstrapTable.icons, 'collapseGroup', {
     glyphicon: 'glyphicon-chevron-up',
     fa: 'fa-angle-up',
     bi: 'bi-chevron-up',
     'material-icons': 'arrow_drop_down'
   });
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'expandGroup', {
+  Utils.assignIcons(BootstrapTable.icons, 'expandGroup', {
     glyphicon: 'glyphicon-chevron-down',
     fa: 'fa-angle-down',
     bi: 'bi-chevron-down',
     'material-icons': 'arrow_drop_up'
   });
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     groupBy: false,
     groupByField: '',
     groupByFormatter: undefined,
@@ -5353,7 +5426,6 @@
     groupByShowToggleIcon: false,
     groupByCollapsedGroups: []
   });
-  var BootstrapTable = $.fn.bootstrapTable.Constructor;
   var _initSort = BootstrapTable.prototype.initSort;
   var _initBody = BootstrapTable.prototype.initBody;
   var _updateSelected = BootstrapTable.prototype.updateSelected;
@@ -5375,10 +5447,15 @@
       this._groupCollapsedState = new Map();
       // Pre-populate with default collapsed groups
       if (this.options.groupByCollapsedGroups) {
-        var collapsedGroups = Array.isArray(this.options.groupByCollapsedGroups) ? this.options.groupByCollapsedGroups : [];
-        collapsedGroups.forEach(function (group) {
-          _this._groupCollapsedState.set(group, true);
-        });
+        var collapsedGroups = this.options.groupByCollapsedGroups;
+        if (typeof collapsedGroups === 'string') {
+          collapsedGroups = Utils.parseStringArray(collapsedGroups);
+        }
+        if (Array.isArray(collapsedGroups)) {
+          collapsedGroups.forEach(function (group) {
+            _this._groupCollapsedState.set(group, true);
+          });
+        }
       }
     }
     if (this.options.sortName !== this.options.groupByField) {
@@ -5494,19 +5571,25 @@
           html.push("<span class=\"float-right ".concat(_this2.options.iconsPrefix, " ").concat(icon, "\"></span>"));
         }
         html.push('</td></tr>');
-        _this2.$body.find("tr[data-parent-index=".concat(item.id, "]:first")).before($(html.join('')));
+        var firstRow = _this2.$body.querySelector("tr[data-parent-index=\"".concat(item.id, "\"]"));
+        if (firstRow) {
+          var template = document.createElement('template');
+          template.innerHTML = html.join('');
+          firstRow.before(template.content.firstElementChild);
+        }
       });
       this.selectGroup = [];
-      var _iterator2 = _createForOfIteratorHelper(this.$body.find('[name="btSelectGroup"]')),
+      var _iterator2 = _createForOfIteratorHelper(this.$body.querySelectorAll('[name="btSelectGroup"]')),
         _step2;
       try {
         var _loop2 = function _loop2() {
           var el = _step2.value;
-          var groupIndex = $(el).closest('tr').data('group-index');
+          var groupIndex = +el.closest('tr').dataset.groupIndex;
           _this2.selectGroup.push({
-            group: $(el),
-            item: _this2.$selectItem.filter(function (i, el) {
-              return $(el).closest('tr').data('parent-index') === groupIndex;
+            group: el,
+            item: _this2.$selectItem.filter(function (si) {
+              var _si$closest;
+              return +((_si$closest = si.closest('tr')) === null || _si$closest === void 0 ? void 0 : _si$closest.dataset.parentIndex) === groupIndex;
             })
           });
         };
@@ -5519,41 +5602,58 @@
         _iterator2.f();
       }
       if (this.options.groupByToggle) {
-        this.$container.off('click', '.group-by').on('click', '.group-by', function (event) {
-          var $this = $(event.currentTarget);
-          var groupIndex = $this.closest('tr').data('group-index');
-          var $groupRows = _this2.$body.find("tr[data-parent-index=".concat(groupIndex, "]"));
-          $this.toggleClass('expanded collapsed');
-          $this.find('span').toggleClass("".concat(_this2.options.icons.collapseGroup, " ").concat(_this2.options.icons.expandGroup));
-          $groupRows.toggleClass('hidden');
+        if (this._groupByClickHandler) {
+          this.$container.removeEventListener('click', this._groupByClickHandler);
+        }
+        this._groupByClickHandler = function (event) {
+          var groupRow = event.target.closest('.group-by');
+          if (!groupRow) return;
+          var groupIndex = +groupRow.dataset.groupIndex;
+          var groupRows = _toConsumableArray(_this2.$body.querySelectorAll("tr[data-parent-index=\"".concat(groupIndex, "\"]")));
+          groupRow.classList.toggle('expanded');
+          groupRow.classList.toggle('collapsed');
+          var span = groupRow.querySelector('span');
+          if (span) {
+            span.classList.toggle(_this2.options.icons.collapseGroup);
+            span.classList.toggle(_this2.options.icons.expandGroup);
+          }
+          groupRows.forEach(function (row) {
+            return row.classList.toggle('hidden');
+          });
 
           // Store the user's toggle state
           var groupItem = _this2.tableGroups.find(function (g) {
             return g.id === groupIndex;
           });
           if (groupItem) {
-            _this2._groupCollapsedState.set(groupItem.name, $this.hasClass('collapsed'));
+            _this2._groupCollapsedState.set(groupItem.name, groupRow.classList.contains('collapsed'));
           }
-          var _iterator3 = _createForOfIteratorHelper($groupRows),
+          var _iterator3 = _createForOfIteratorHelper(groupRows),
             _step3;
           try {
             for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
               var element = _step3.value;
-              _this2.collapseRow($(element).data('index'));
+              _this2.collapseRow(+element.dataset.index);
             }
           } catch (err) {
             _iterator3.e(err);
           } finally {
             _iterator3.f();
           }
-        });
+        };
+        this.$container.addEventListener('click', this._groupByClickHandler);
       }
-      this.$container.off('click', '[name="btSelectGroup"]').on('click', '[name="btSelectGroup"]', function (event) {
+      if (this._groupSelectHandler) {
+        this.$container.removeEventListener('click', this._groupSelectHandler);
+      }
+      this._groupSelectHandler = function (event) {
+        var checkbox = event.target.closest('[name="btSelectGroup"]');
+        if (!checkbox) return;
         event.stopImmediatePropagation();
-        var $this = $(event.currentTarget);
-        var checked = $this.prop('checked');
-        _this2[checked ? 'checkGroup' : 'uncheckGroup']($this.closest('tr').data('group-index'));
-      });
+        var checked = checkbox.checked;
+        _this2[checked ? 'checkGroup' : 'uncheckGroup'](+checkbox.closest('tr').dataset.groupIndex);
+      };
+      this.$container.addEventListener('click', this._groupSelectHandler);
     }
     initBodyCaller = false;
     this.updateSelected();
@@ -5566,7 +5666,12 @@
       _updateSelected.apply(this, args);
       if (this.options.groupBy && this.options.groupByField !== '') {
         this.selectGroup.forEach(function (item) {
-          item.group.prop('checked', item.item.filter(':enabled').length === item.item.filter(':enabled').filter(':checked').length);
+          var enabledItems = item.item.filter(function (el) {
+            return !el.disabled;
+          });
+          item.group.checked = enabledItems.length > 0 && enabledItems.length === enabledItems.filter(function (el) {
+            return el.checked;
+          }).length;
         });
       }
     }
@@ -5582,22 +5687,27 @@
     if (this._groupCollapsedState && this._groupCollapsedState.has(groupKey)) {
       return this._groupCollapsedState.get(groupKey);
     }
-
-    // Backwards compatibility: support groupByCollapsedGroups as array or function
-    var collapsedGroups = this.options.groupByCollapsedGroups;
-    if (typeof collapsedGroups === 'function') {
-      return Utils.calculateObjectValue(this.options, collapsedGroups, [groupKey], false);
+    var groupByCollapsedGroups = this.options.groupByCollapsedGroups;
+    if (typeof groupByCollapsedGroups === 'string') {
+      groupByCollapsedGroups = Utils.parseStringArray(groupByCollapsedGroups);
     }
-    if (Array.isArray(collapsedGroups)) {
-      return collapsedGroups.includes(groupKey);
+    var result = Utils.calculateObjectValue(this.options, groupByCollapsedGroups, [groupKey], false);
+    if (Array.isArray(result)) {
+      return result.includes(groupKey);
+    }
+    if (typeof result === 'boolean') {
+      return result;
     }
     return false;
   };
   BootstrapTable.prototype.checkGroup_ = function (index, checked) {
     var rowsBefore = this.getSelections();
-    this.$selectItem.filter(function (i, el) {
-      return $(el).closest('tr').data('parent-index') === index;
-    }).prop('checked', checked);
+    this.$selectItem.filter(function (el) {
+      var _el$closest;
+      return +((_el$closest = el.closest('tr')) === null || _el$closest === void 0 ? void 0 : _el$closest.dataset.parentIndex) === index;
+    }).forEach(function (el) {
+      el.checked = checked;
+    });
     this.updateRows();
     this.updateSelected();
     var rowsAfter = this.getSelections();
@@ -5610,13 +5720,13 @@
   BootstrapTable.prototype.getGroupByFields = function () {
     return Array.isArray(this.options.groupByField) ? this.options.groupByField : [this.options.groupByField];
   };
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "scrollTo",
       value: function scrollTo(params) {
         if (this.options.groupBy) {
@@ -5629,40 +5739,41 @@
           }
           if (options.unit === 'rows') {
             var _scrollTo = 0;
-            var rows = this.$body.find("> tr:not(.group-by):lt(".concat(options.value, ")"));
+            var rows = _toConsumableArray(this.$body.querySelectorAll(':scope > tr:not(.group-by)')).slice(0, options.value);
             var _iterator4 = _createForOfIteratorHelper(rows),
               _step4;
             try {
               for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-                var row = _step4.value;
-                _scrollTo += $(row).outerHeight(true);
+                var _row = _step4.value;
+                _scrollTo += _row.offsetHeight;
               }
             } catch (err) {
               _iterator4.e(err);
             } finally {
               _iterator4.f();
             }
-            var $targetColumn = this.$body.find("> tr:not(.group-by):eq(".concat(options.value, ")"));
-            var prevGroupRows = $targetColumn.prevAll('.group-by');
-            var _iterator5 = _createForOfIteratorHelper(prevGroupRows),
-              _step5;
-            try {
-              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-                var _row = _step5.value;
-                _scrollTo += $(_row).outerHeight(true);
+            var targetRow = _toConsumableArray(this.$body.querySelectorAll(':scope > tr:not(.group-by)'))[options.value];
+            var prevGroupRows = [];
+            var prev = targetRow === null || targetRow === void 0 ? void 0 : targetRow.previousElementSibling;
+            while (prev) {
+              if (prev.classList.contains('group-by')) {
+                prevGroupRows.push(prev);
               }
-            } catch (err) {
-              _iterator5.e(err);
-            } finally {
-              _iterator5.f();
+              prev = prev.previousElementSibling;
             }
-            this.$tableBody.scrollTop(_scrollTo);
+            for (var _i2 = 0, _prevGroupRows = prevGroupRows; _i2 < _prevGroupRows.length; _i2++) {
+              var row = _prevGroupRows[_i2];
+              _scrollTo += row.offsetHeight;
+            }
+            this.$tableBody.scrollTop = _scrollTo;
             return;
           }
         }
-        _superPropGet(_class, "scrollTo", this)([params]);
+        _superPropGet(_default, "scrollTo", this)([params]);
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

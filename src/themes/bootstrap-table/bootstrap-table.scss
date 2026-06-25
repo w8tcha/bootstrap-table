@@ -148,7 +148,7 @@
     margin-top: 2px;
     border: 1px solid custom.$btn-border;
     border-radius: 4px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 3px 12px rgb(0, 0, 0, 0.175);
 
     .dropdown-item {
       color: variables.$color;
@@ -333,7 +333,7 @@
     bottom: 0;
     right: 0;
     z-index: 998;
-    background-color: rgba(10, 10, 10, 0.86);
+    background-color: rgb(10, 10, 10, 0.86);
   }
 
   .modal-content {

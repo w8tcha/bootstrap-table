@@ -2,7 +2,9 @@
  * @author zhixin wen <wenzhixin2010@gmail.com>
  */
 
-const Utils = $.fn.bootstrapTable.utils
+
+
+const Utils = BootstrapTable.utils
 
 // Reasonable defaults
 const PIXEL_STEP = 10
@@ -71,13 +73,13 @@ function normalizeWheel (event) {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   fixedColumns: false,
   fixedNumber: 0,
   fixedRightNumber: 0
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
 
   fixedColumnsSupported () {
     return this.options.fixedColumns &&
@@ -93,24 +95,30 @@ $.BootstrapTable = class extends $.BootstrapTable {
     }
 
     if (this.options.fixedNumber) {
-      this.$tableContainer.append('<div class="fixed-columns"></div>')
-      this.$fixedColumns = this.$tableContainer.find('.fixed-columns')
+      const div = document.createElement('div')
+
+      div.className = 'fixed-columns'
+      this.$tableContainer.appendChild(div)
+      this.$fixedColumns = this.$tableContainer.querySelector('.fixed-columns')
     }
 
     if (this.options.fixedRightNumber) {
-      this.$tableContainer.append('<div class="fixed-columns-right"></div>')
-      this.$fixedColumnsRight = this.$tableContainer.find('.fixed-columns-right')
+      const div = document.createElement('div')
+
+      div.className = 'fixed-columns-right'
+      this.$tableContainer.appendChild(div)
+      this.$fixedColumnsRight = this.$tableContainer.querySelector('.fixed-columns-right')
     }
   }
 
   initBody (...args) {
     super.initBody(...args)
 
-    if (this.$fixedColumns && this.$fixedColumns.length) {
-      this.$fixedColumns.toggle(this.fixedColumnsSupported())
+    if (this.$fixedColumns) {
+      this.$fixedColumns.style.display = this.fixedColumnsSupported() ? '' : 'none'
     }
-    if (this.$fixedColumnsRight && this.$fixedColumnsRight.length) {
-      this.$fixedColumnsRight.toggle(this.fixedColumnsSupported())
+    if (this.$fixedColumnsRight) {
+      this.$fixedColumnsRight.style.display = this.fixedColumnsSupported() ? '' : 'none'
     }
 
     if (!this.fixedColumnsSupported()) {
@@ -136,11 +144,11 @@ $.BootstrapTable = class extends $.BootstrapTable {
       this.initFixedColumnsHeader()
     } else if (args[0] === 'scroll-body') {
       if (this.needFixedColumns && this.options.fixedNumber) {
-        this.$fixedBody.scrollTop(this.$tableBody.scrollTop())
+        this.$fixedBody.scrollTop = this.$tableBody.scrollTop
       }
 
       if (this.needFixedColumns && this.options.fixedRightNumber) {
-        this.$fixedBodyRight.scrollTop(this.$tableBody.scrollTop())
+        this.$fixedBodyRight.scrollTop = this.$tableBody.scrollTop
       }
     }
   }
@@ -152,31 +160,38 @@ $.BootstrapTable = class extends $.BootstrapTable {
       return
     }
 
-    this.$tableBody.find('tr').each((i, el) => {
-      const $el = $(el)
-      const index = $el.data('index')
-      const classes = $el.attr('class')
-
+    this.$tableBody.querySelectorAll('tr').forEach(el => {
+      const index = el.dataset.index
+      const classes = el.getAttribute('class') || ''
       const inputSelector = `[name="${this.options.selectItemName}"]`
-      const $input = $el.find(inputSelector)
+      const input = el.querySelector(inputSelector)
 
       if (typeof index === 'undefined') {
         return
       }
 
-      const updateFixedBody = ($fixedHeader, $fixedBody) => {
-        const $tr = $fixedBody.find(`tr[data-index="${index}"]`)
+      const updateFixedBody = (fixedHeader, fixedBody) => {
+        const tr = fixedBody.querySelector(`tr[data-index="${index}"]`)
 
-        $tr.attr('class', classes)
+        if (!tr) return
 
-        if ($input.length) {
-          $tr.find(inputSelector).prop('checked', $input.prop('checked'))
+        tr.setAttribute('class', classes)
+
+        if (input) {
+          const fixedInput = tr.querySelector(inputSelector)
+
+          if (fixedInput) fixedInput.checked = input.checked
         }
 
-        if (this.$selectAll.length) {
-          $fixedHeader.add($fixedBody)
-            .find('[name="btSelectAll"]')
-            .prop('checked', this.$selectAll.prop('checked'))
+        if (this.$selectAll && this.$selectAll.length) {
+          const checked = this.$selectAll[0]?.checked ?? false;
+
+          [
+            ...fixedHeader.querySelectorAll('[name="btSelectAll"]'),
+            ...fixedBody.querySelectorAll('[name="btSelectAll"]')
+          ].forEach(cb => {
+            cb.checked = checked
+          })
         }
       }
 
@@ -194,43 +209,46 @@ $.BootstrapTable = class extends $.BootstrapTable {
     super.hideLoading()
 
     if (this.needFixedColumns && this.options.fixedNumber) {
-      this.$fixedColumns.find('.fixed-table-loading').hide()
+      const loading = this.$fixedColumns.querySelector('.fixed-table-loading')
+
+      if (loading) loading.style.display = 'none'
     }
 
     if (this.needFixedColumns && this.options.fixedRightNumber && this.$fixedColumnsRight) {
-      this.$fixedColumnsRight.find('.fixed-table-loading').hide()
+      const loading = this.$fixedColumnsRight.querySelector('.fixed-table-loading')
+
+      if (loading) loading.style.display = 'none'
     }
   }
 
   initFixedColumnsHeader () {
     if (this.options.height) {
-      this.needFixedColumns = this.$tableHeader.outerWidth(true) < this.$tableHeader.find('table').outerWidth(true)
+      this.needFixedColumns = this.$tableHeader.offsetWidth < this.$tableHeader.querySelector('table').offsetWidth
     } else {
-      this.needFixedColumns = this.$tableBody.outerWidth(true) < this.$tableBody.find('table').outerWidth(true)
+      this.needFixedColumns = this.$tableBody.offsetWidth < this.$tableBody.querySelector('table').offsetWidth
     }
 
-    const initFixedHeader = ($fixedColumns, isRight) => {
-      $fixedColumns.find('.fixed-table-header').remove()
-      $fixedColumns.append(this.$tableHeader.clone(true))
-
-      $fixedColumns.css({
-        width: this.getFixedColumnsWidth(isRight)
-      })
-      return $fixedColumns.find('.fixed-table-header')
+    const initFixedHeader = (fixedColumns, isRight) => {
+      fixedColumns.querySelector('.fixed-table-header')?.remove()
+      fixedColumns.appendChild(this.$tableHeader.cloneNode(true))
+      fixedColumns.style.width = `${this.getFixedColumnsWidth(isRight)}px`
+      return fixedColumns.querySelector('.fixed-table-header')
     }
 
     if (this.needFixedColumns && this.options.fixedNumber) {
       this.$fixedHeader = initFixedHeader(this.$fixedColumns)
-      this.$fixedHeader.css('margin-right', '')
+      this.$fixedHeader.style.marginRight = ''
     } else if (this.$fixedColumns) {
-      this.$fixedColumns.html('').css('width', '')
+      this.$fixedColumns.innerHTML = ''
+      this.$fixedColumns.style.width = ''
     }
 
     if (this.needFixedColumns && this.options.fixedRightNumber && this.$fixedColumnsRight) {
       this.$fixedHeaderRight = initFixedHeader(this.$fixedColumnsRight, true)
-      this.$fixedHeaderRight.scrollLeft(this.$fixedHeaderRight.find('table').width())
+      this.$fixedHeaderRight.scrollLeft = this.$fixedHeaderRight.querySelector('table')?.offsetWidth || 0
     } else if (this.$fixedColumnsRight) {
-      this.$fixedColumnsRight.html('').css('width', '')
+      this.$fixedColumnsRight.innerHTML = ''
+      this.$fixedColumnsRight.style.width = ''
     }
 
     this.initFixedColumnsBody()
@@ -238,27 +256,21 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   initFixedColumnsBody () {
-    const initFixedBody = ($fixedColumns, $fixedHeader) => {
-      $fixedColumns.find('.fixed-table-body').remove()
-      $fixedColumns.append(this.$tableBody.clone(true))
-      $fixedColumns.find('.fixed-table-body table').removeAttr('id')
+    const initFixedBody = (fixedColumns, fixedHeader) => {
+      fixedColumns.querySelector('.fixed-table-body')?.remove()
+      fixedColumns.appendChild(this.$tableBody.cloneNode(true))
+      fixedColumns.querySelector('.fixed-table-body table')?.removeAttribute('id')
 
-      const $fixedBody = $fixedColumns.find('.fixed-table-body')
-
-      const tableBody = this.$tableBody.get(0)
+      const fixedBody = fixedColumns.querySelector('.fixed-table-body')
+      const tableBody = this.$tableBody
       const scrollHeight = tableBody.scrollWidth > tableBody.clientWidth ?
         Utils.getScrollBarWidth() : 0
-      const height = this.$tableContainer.outerHeight(true) - scrollHeight - 1
+      const height = this.$tableContainer.offsetHeight - scrollHeight - 1
 
-      $fixedColumns.css({
-        height
-      })
+      fixedColumns.style.height = `${height}px`
+      fixedBody.style.height = `${height - fixedHeader.offsetHeight}px`
 
-      $fixedBody.css({
-        height: height - $fixedHeader.height()
-      })
-
-      return $fixedBody
+      return fixedBody
     }
 
     if (this.needFixedColumns && this.options.fixedNumber) {
@@ -267,8 +279,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
     if (this.needFixedColumns && this.options.fixedRightNumber && this.$fixedColumnsRight) {
       this.$fixedBodyRight = initFixedBody(this.$fixedColumnsRight, this.$fixedHeaderRight)
-      this.$fixedBodyRight.scrollLeft(this.$fixedBodyRight.find('table').width())
-      this.$fixedBodyRight.css('overflow-y', this.options.height ? 'auto' : 'hidden')
+      this.$fixedBodyRight.scrollLeft = this.$fixedBodyRight.querySelector('table')?.offsetWidth || 0
+      this.$fixedBodyRight.style.overflowY = this.options.height ? 'auto' : 'hidden'
     }
   }
 
@@ -281,11 +293,11 @@ $.BootstrapTable = class extends $.BootstrapTable {
     if (isRight) {
       visibleFields = visibleFields.reverse()
       fixedNumber = this.options.fixedRightNumber
-      marginRight = parseInt(this.$tableHeader.css('margin-right'), 10)
+      marginRight = parseInt(getComputedStyle(this.$tableHeader).marginRight, 10) || 0
     }
 
     for (let i = 0; i < fixedNumber; i++) {
-      width += this.$header.find(`th[data-field="${visibleFields[i]}"]`).outerWidth(true)
+      width += this.$header.querySelector(`th[data-field="${visibleFields[i]}"]`)?.offsetWidth || 0
     }
 
     return width + marginRight + 1
@@ -293,29 +305,29 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
   initFixedColumnsEvents () {
     const toggleHover = (e, toggle) => {
-      const tr = `tr[data-index="${$(e.currentTarget).data('index')}"]`
-      const isFromFixed = $(e.currentTarget).closest('.fixed-columns, .fixed-columns-right').length > 0
-      let $trs = $()
+      const index = e.currentTarget.dataset.index
+      const tr = `tr[data-index="${index}"]`
+      const isFromFixed = !!e.currentTarget.closest('.fixed-columns, .fixed-columns-right')
+      const trs = []
 
       if (isFromFixed) {
-        $trs = $trs.add(this.$tableBody.find(tr))
+        trs.push(...this.$tableBody.querySelectorAll(tr))
       }
 
       if (this.$fixedBody) {
-        $trs = $trs.add(this.$fixedBody.find(tr))
+        trs.push(...this.$fixedBody.querySelectorAll(tr))
       }
       if (this.$fixedBodyRight) {
-        $trs = $trs.add(this.$fixedBodyRight.find(tr))
+        trs.push(...this.$fixedBodyRight.querySelectorAll(tr))
       }
 
-      $trs.toggleClass('hover-row', toggle)
+      trs.forEach(row => row.classList.toggle('hover-row', toggle))
     }
 
-    const bindHover = $el => {
-      $el.find('tr').hover(e => {
-        toggleHover(e, true)
-      }, e => {
-        toggleHover(e, false)
+    const bindHover = el => {
+      el.querySelectorAll('tr').forEach(tr => {
+        tr.addEventListener('mouseenter', e => toggleHover(e, true))
+        tr.addEventListener('mouseleave', e => toggleHover(e, false))
       })
     }
 
@@ -327,7 +339,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
     const updateScroll = (e, fixedBody) => {
       const normalized = normalizeWheel(e)
       const deltaY = Math.ceil(normalized.pixelY)
-      const top = this.$tableBody.scrollTop() + deltaY
+      const top = this.$tableBody.scrollTop + deltaY
 
       if (
         deltaY < 0 && top > 0 ||
@@ -336,54 +348,72 @@ $.BootstrapTable = class extends $.BootstrapTable {
         e.preventDefault()
       }
 
-      this.$tableBody.scrollTop(top)
+      this.$tableBody.scrollTop = top
       if (this.$fixedBody) {
-        this.$fixedBody.scrollTop(top)
+        this.$fixedBody.scrollTop = top
       }
       if (this.$fixedBodyRight) {
-        this.$fixedBodyRight.scrollTop(top)
+        this.$fixedBodyRight.scrollTop = top
       }
     }
 
     if (this.needFixedColumns && this.options.fixedNumber && this.$fixedBody) {
       bindHover(this.$fixedBody)
 
-      this.$fixedBody[0].addEventListener(mousewheel, e => {
-        updateScroll(e, this.$fixedBody[0])
+      this.$fixedBody.addEventListener(mousewheel, e => {
+        updateScroll(e, this.$fixedBody)
       })
     }
 
     if (this.needFixedColumns && this.options.fixedRightNumber) {
       bindHover(this.$fixedBodyRight)
 
-      this.$fixedBodyRight.off('scroll').on('scroll', () => {
-        const top = this.$fixedBodyRight.scrollTop()
+      if (this._fixedColumnsRightScrollHandler) {
+        this.$fixedBodyRight.removeEventListener('scroll', this._fixedColumnsRightScrollHandler)
+      }
+      this._fixedColumnsRightScrollHandler = () => {
+        const top = this.$fixedBodyRight.scrollTop
 
-        this.$tableBody.scrollTop(top)
+        this.$tableBody.scrollTop = top
         if (this.$fixedBody) {
-          this.$fixedBody.scrollTop(top)
+          this.$fixedBody.scrollTop = top
         }
-      })
+      }
+      this.$fixedBodyRight.addEventListener('scroll', this._fixedColumnsRightScrollHandler)
     }
 
     if (this.options.filterControl) {
-      $(this.$fixedColumns).off('keyup change').on('keyup change', e => {
-        const $target = $(e.target)
-        const value = $target.val()
-        const field = $target.parents('th').data('field')
-        const $coreTh = this.$header.find(`th[data-field="${field}"]`)
+      if (this._fixedColumnsFilterHandler) {
+        this.$fixedColumns.removeEventListener('keyup', this._fixedColumnsFilterHandler)
+        this.$fixedColumns.removeEventListener('change', this._fixedColumnsFilterHandler)
+      }
+      this._fixedColumnsFilterHandler = e => {
+        const target = e.target
+        const value = target.value
+        const field = target.closest('th')?.dataset.field
+        const coreTh = this.$header.querySelector(`th[data-field="${field}"]`)
 
-        if ($target.is('input')) {
-          $coreTh.find('input').val(value)
-        } else if ($target.is('select')) {
-          const $select = $coreTh.find('select')
+        if (!coreTh) return
 
-          $select.find('option[selected]').removeAttr('selected')
-          $select.find(`option[value="${value}"]`).attr('selected', true)
+        if (target.tagName === 'INPUT') {
+          const coreInput = coreTh.querySelector('input')
+
+          if (coreInput) coreInput.value = value
+        } else if (target.tagName === 'SELECT') {
+          const select = coreTh.querySelector('select')
+
+          if (select) {
+            select.querySelectorAll('option[selected]').forEach(opt => opt.removeAttribute('selected'))
+            const opt = select.querySelector(`option[value="${value}"]`)
+
+            if (opt) opt.setAttribute('selected', 'true')
+          }
         }
 
         this.triggerSearch()
-      })
+      }
+      this.$fixedColumns.addEventListener('keyup', this._fixedColumnsFilterHandler)
+      this.$fixedColumns.addEventListener('change', this._fixedColumnsFilterHandler)
     }
   }
 
@@ -392,23 +422,28 @@ $.BootstrapTable = class extends $.BootstrapTable {
       return
     }
 
-    this.$stickyContainer = this.$container.find('.sticky-header-container')
+    this.$stickyContainer = this.$container.querySelector('.sticky-header-container')
     super.renderStickyHeader()
 
     if (this.needFixedColumns && this.options.fixedNumber) {
-      this.$fixedColumns.css('z-index', 101)
-        .find('.sticky-header-container')
-        .css('right', '')
-        .width(this.$fixedColumns.outerWidth())
+      this.$fixedColumns.style.zIndex = 101
+      const stickyContainer = this.$fixedColumns.querySelector('.sticky-header-container')
+
+      if (stickyContainer) {
+        stickyContainer.style.right = ''
+        stickyContainer.style.width = `${this.$fixedColumns.offsetWidth}px`
+      }
     }
 
     if (this.needFixedColumns && this.options.fixedRightNumber) {
-      const $stickyHeaderContainerRight = this.$fixedColumnsRight.find('.sticky-header-container')
+      this.$fixedColumnsRight.style.zIndex = 101
+      const stickyContainerRight = this.$fixedColumnsRight.querySelector('.sticky-header-container')
 
-      this.$fixedColumnsRight.css('z-index', 101)
-      $stickyHeaderContainerRight.css('left', '')
-        .scrollLeft($stickyHeaderContainerRight.find('.table').outerWidth())
-        .width(this.$fixedColumnsRight.outerWidth())
+      if (stickyContainerRight) {
+        stickyContainerRight.style.left = ''
+        stickyContainerRight.scrollLeft = stickyContainerRight.querySelector('.table')?.offsetWidth || 0
+        stickyContainerRight.style.width = `${this.$fixedColumnsRight.offsetWidth}px`
+      }
     }
   }
 
@@ -417,6 +452,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
       return
     }
 
-    this.$stickyContainer.eq(0).scrollLeft(this.$tableBody.scrollLeft())
+    if (this.$stickyContainer) {
+      this.$stickyContainer.scrollLeft = this.$tableBody.scrollLeft
+    }
   }
 }

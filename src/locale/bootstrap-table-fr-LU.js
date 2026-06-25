@@ -4,7 +4,9 @@
  * Editor: David Morais Ferreira (https://github.com/DavidMoraisFerreira/)
  */
 
-$.fn.bootstrapTable.locales['fr-LU'] = {
+
+
+BootstrapTable.locales['fr-LU'] = {
   formatAddLevel () {
     return 'Ajouter un niveau'
   },
@@ -189,4 +191,4 @@ $.fn.bootstrapTable.locales['fr-LU'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fr-LU'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fr-LU'])

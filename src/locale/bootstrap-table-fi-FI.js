@@ -3,7 +3,9 @@
  * Author: Minna Lehtomäki <minna.j.lehtomaki@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['fi-FI'] = $.fn.bootstrapTable.locales['fi'] = {
+
+
+BootstrapTable.locales['fi-FI'] = BootstrapTable.locales['fi'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['fi-FI'] = $.fn.bootstrapTable.locales['fi'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fi-FI'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fi-FI'])

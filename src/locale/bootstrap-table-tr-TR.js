@@ -5,7 +5,9 @@
  * Update From: Sait KURT <bilgi@ientegre.com> <https://github.com/xDeSwa>
  */
 
-$.fn.bootstrapTable.locales['tr-TR'] = $.fn.bootstrapTable.locales['tr'] = {
+
+
+BootstrapTable.locales['tr-TR'] = BootstrapTable.locales['tr'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -190,4 +192,4 @@ $.fn.bootstrapTable.locales['tr-TR'] = $.fn.bootstrapTable.locales['tr'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['tr-TR'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['tr-TR'])

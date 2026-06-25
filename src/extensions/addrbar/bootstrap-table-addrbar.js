@@ -6,15 +6,17 @@
  * @update: zhixin wen <wenzhixin2010@gmail.com>
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Object.assign(BootstrapTable.defaults, {
   addrbar: false,
   addrPrefix: '',
   addrCustomParams: {}
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   init (...args) {
     if (
       this.options.pagination &&
@@ -32,12 +34,12 @@ $.BootstrapTable = class extends $.BootstrapTable {
    * If it is not obtained, the default value will be used.
    */
   getDefaultOptionValue (optionName, prefixName) {
-    if (this.options[optionName] !== $.BootstrapTable.DEFAULTS[optionName]) {
+    if (this.options[optionName] !== BootstrapTable.DEFAULTS[optionName]) {
       return this.options[optionName]
     }
 
     return this.searchParams.get(`${this.options.addrPrefix || ''}${prefixName}`) ||
-      $.BootstrapTable.DEFAULTS[optionName]
+      BootstrapTable.DEFAULTS[optionName]
   }
 
   initAddrbar () {

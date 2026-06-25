@@ -1,9 +1,62 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
+  function _arrayLikeToArray(r, a) {
+    (null == a || a > r.length) && (a = r.length);
+    for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+    return n;
+  }
+  function _arrayWithHoles(r) {
+    if (Array.isArray(r)) return r;
+  }
+  function _arrayWithoutHoles(r) {
+    if (Array.isArray(r)) return _arrayLikeToArray(r);
+  }
+  function _iterableToArray(r) {
+    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+  }
+  function _iterableToArrayLimit(r, l) {
+    var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+    if (null != t) {
+      var e,
+        n,
+        i,
+        u,
+        a = [],
+        f = true,
+        o = false;
+      try {
+        if (i = (t = t.call(r)).next, 0 === l) {
+          if (Object(t) !== t) return;
+          f = !1;
+        } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
+      } catch (r) {
+        o = true, n = r;
+      } finally {
+        try {
+          if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return;
+        } finally {
+          if (o) throw n;
+        }
+      }
+      return a;
+    }
+  }
+  function _nonIterableRest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  function _slicedToArray(r, e) {
+    return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
+  }
+  function _toConsumableArray(r) {
+    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
+  }
   function _typeof(o) {
     "@babel/helpers - typeof";
 
@@ -12,6 +65,13 @@
     } : function (o) {
       return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
     }, _typeof(o);
+  }
+  function _unsupportedIterableToArray(r, a) {
+    if (r) {
+      if ("string" == typeof r) return _arrayLikeToArray(r, a);
+      var t = {}.toString.call(r).slice(8, -1);
+      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+    }
   }
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -1875,127 +1935,7 @@
 
   requireEs_array_concat();
 
-  var es_array_find = {};
-
-  var functionUncurryThisClause;
-  var hasRequiredFunctionUncurryThisClause;
-
-  function requireFunctionUncurryThisClause () {
-  	if (hasRequiredFunctionUncurryThisClause) return functionUncurryThisClause;
-  	hasRequiredFunctionUncurryThisClause = 1;
-  	var classofRaw = requireClassofRaw();
-  	var uncurryThis = requireFunctionUncurryThis();
-
-  	functionUncurryThisClause = function (fn) {
-  	  // Nashorn bug:
-  	  //   https://github.com/zloirock/core-js/issues/1128
-  	  //   https://github.com/zloirock/core-js/issues/1130
-  	  if (classofRaw(fn) === 'Function') return uncurryThis(fn);
-  	};
-  	return functionUncurryThisClause;
-  }
-
-  var functionBindContext;
-  var hasRequiredFunctionBindContext;
-
-  function requireFunctionBindContext () {
-  	if (hasRequiredFunctionBindContext) return functionBindContext;
-  	hasRequiredFunctionBindContext = 1;
-  	var uncurryThis = requireFunctionUncurryThisClause();
-  	var aCallable = requireACallable();
-  	var NATIVE_BIND = requireFunctionBindNative();
-
-  	var bind = uncurryThis(uncurryThis.bind);
-
-  	// optional / simple context binding
-  	functionBindContext = function (fn, that) {
-  	  aCallable(fn);
-  	  return that === undefined ? fn : NATIVE_BIND ? bind(fn, that) : function (/* ...args */) {
-  	    return fn.apply(that, arguments);
-  	  };
-  	};
-  	return functionBindContext;
-  }
-
-  var arrayIteration;
-  var hasRequiredArrayIteration;
-
-  function requireArrayIteration () {
-  	if (hasRequiredArrayIteration) return arrayIteration;
-  	hasRequiredArrayIteration = 1;
-  	var bind = requireFunctionBindContext();
-  	var IndexedObject = requireIndexedObject();
-  	var toObject = requireToObject();
-  	var lengthOfArrayLike = requireLengthOfArrayLike();
-  	var arraySpeciesCreate = requireArraySpeciesCreate();
-  	var createProperty = requireCreateProperty();
-
-  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
-  	var createMethod = function (TYPE) {
-  	  var IS_MAP = TYPE === 1;
-  	  var IS_FILTER = TYPE === 2;
-  	  var IS_SOME = TYPE === 3;
-  	  var IS_EVERY = TYPE === 4;
-  	  var IS_FIND_INDEX = TYPE === 6;
-  	  var IS_FILTER_REJECT = TYPE === 7;
-  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
-  	  return function ($this, callbackfn, that) {
-  	    var O = toObject($this);
-  	    var self = IndexedObject(O);
-  	    var length = lengthOfArrayLike(self);
-  	    var boundFunction = bind(callbackfn, that);
-  	    var index = 0;
-  	    var resIndex = 0;
-  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
-  	    var value, result;
-  	    for (;length > index; index++) if (NO_HOLES || index in self) {
-  	      value = self[index];
-  	      result = boundFunction(value, index, O);
-  	      if (TYPE) {
-  	        if (IS_MAP) createProperty(target, index, result);    // map
-  	        else if (result) switch (TYPE) {
-  	          case 3: return true;                                // some
-  	          case 5: return value;                               // find
-  	          case 6: return index;                               // findIndex
-  	          case 2: createProperty(target, resIndex++, value);  // filter
-  	        } else switch (TYPE) {
-  	          case 4: return false;                               // every
-  	          case 7: createProperty(target, resIndex++, value);  // filterReject
-  	        }
-  	      }
-  	    }
-  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
-  	  };
-  	};
-
-  	arrayIteration = {
-  	  // `Array.prototype.forEach` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
-  	  forEach: createMethod(0),
-  	  // `Array.prototype.map` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.map
-  	  map: createMethod(1),
-  	  // `Array.prototype.filter` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
-  	  filter: createMethod(2),
-  	  // `Array.prototype.some` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.some
-  	  some: createMethod(3),
-  	  // `Array.prototype.every` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.every
-  	  every: createMethod(4),
-  	  // `Array.prototype.find` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.find
-  	  find: createMethod(5),
-  	  // `Array.prototype.findIndex` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
-  	  findIndex: createMethod(6),
-  	  // `Array.prototype.filterReject` method
-  	  // https://github.com/tc39/proposal-array-filtering
-  	  filterReject: createMethod(7)
-  	};
-  	return arrayIteration;
-  }
+  var es_array_includes = {};
 
   var objectDefineProperties = {};
 
@@ -2179,39 +2119,6 @@
   	return addToUnscopables;
   }
 
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_array_includes = {};
-
   var hasRequiredEs_array_includes;
 
   function requireEs_array_includes () {
@@ -2250,6 +2157,24 @@
   requireEs_array_includes();
 
   var es_array_indexOf = {};
+
+  var functionUncurryThisClause;
+  var hasRequiredFunctionUncurryThisClause;
+
+  function requireFunctionUncurryThisClause () {
+  	if (hasRequiredFunctionUncurryThisClause) return functionUncurryThisClause;
+  	hasRequiredFunctionUncurryThisClause = 1;
+  	var classofRaw = requireClassofRaw();
+  	var uncurryThis = requireFunctionUncurryThis();
+
+  	functionUncurryThisClause = function (fn) {
+  	  // Nashorn bug:
+  	  //   https://github.com/zloirock/core-js/issues/1128
+  	  //   https://github.com/zloirock/core-js/issues/1130
+  	  if (classofRaw(fn) === 'Function') return uncurryThis(fn);
+  	};
+  	return functionUncurryThisClause;
+  }
 
   var arrayMethodIsStrict;
   var hasRequiredArrayMethodIsStrict;
@@ -2303,6 +2228,108 @@
 
   var es_array_map = {};
 
+  var functionBindContext;
+  var hasRequiredFunctionBindContext;
+
+  function requireFunctionBindContext () {
+  	if (hasRequiredFunctionBindContext) return functionBindContext;
+  	hasRequiredFunctionBindContext = 1;
+  	var uncurryThis = requireFunctionUncurryThisClause();
+  	var aCallable = requireACallable();
+  	var NATIVE_BIND = requireFunctionBindNative();
+
+  	var bind = uncurryThis(uncurryThis.bind);
+
+  	// optional / simple context binding
+  	functionBindContext = function (fn, that) {
+  	  aCallable(fn);
+  	  return that === undefined ? fn : NATIVE_BIND ? bind(fn, that) : function (/* ...args */) {
+  	    return fn.apply(that, arguments);
+  	  };
+  	};
+  	return functionBindContext;
+  }
+
+  var arrayIteration;
+  var hasRequiredArrayIteration;
+
+  function requireArrayIteration () {
+  	if (hasRequiredArrayIteration) return arrayIteration;
+  	hasRequiredArrayIteration = 1;
+  	var bind = requireFunctionBindContext();
+  	var IndexedObject = requireIndexedObject();
+  	var toObject = requireToObject();
+  	var lengthOfArrayLike = requireLengthOfArrayLike();
+  	var arraySpeciesCreate = requireArraySpeciesCreate();
+  	var createProperty = requireCreateProperty();
+
+  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
+  	var createMethod = function (TYPE) {
+  	  var IS_MAP = TYPE === 1;
+  	  var IS_FILTER = TYPE === 2;
+  	  var IS_SOME = TYPE === 3;
+  	  var IS_EVERY = TYPE === 4;
+  	  var IS_FIND_INDEX = TYPE === 6;
+  	  var IS_FILTER_REJECT = TYPE === 7;
+  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
+  	  return function ($this, callbackfn, that) {
+  	    var O = toObject($this);
+  	    var self = IndexedObject(O);
+  	    var length = lengthOfArrayLike(self);
+  	    var boundFunction = bind(callbackfn, that);
+  	    var index = 0;
+  	    var resIndex = 0;
+  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
+  	    var value, result;
+  	    for (;length > index; index++) if (NO_HOLES || index in self) {
+  	      value = self[index];
+  	      result = boundFunction(value, index, O);
+  	      if (TYPE) {
+  	        if (IS_MAP) createProperty(target, index, result);    // map
+  	        else if (result) switch (TYPE) {
+  	          case 3: return true;                                // some
+  	          case 5: return value;                               // find
+  	          case 6: return index;                               // findIndex
+  	          case 2: createProperty(target, resIndex++, value);  // filter
+  	        } else switch (TYPE) {
+  	          case 4: return false;                               // every
+  	          case 7: createProperty(target, resIndex++, value);  // filterReject
+  	        }
+  	      }
+  	    }
+  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
+  	  };
+  	};
+
+  	arrayIteration = {
+  	  // `Array.prototype.forEach` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	  forEach: createMethod(0),
+  	  // `Array.prototype.map` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.map
+  	  map: createMethod(1),
+  	  // `Array.prototype.filter` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
+  	  filter: createMethod(2),
+  	  // `Array.prototype.some` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.some
+  	  some: createMethod(3),
+  	  // `Array.prototype.every` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.every
+  	  every: createMethod(4),
+  	  // `Array.prototype.find` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.find
+  	  find: createMethod(5),
+  	  // `Array.prototype.findIndex` method
+  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
+  	  findIndex: createMethod(6),
+  	  // `Array.prototype.filterReject` method
+  	  // https://github.com/tc39/proposal-array-filtering
+  	  filterReject: createMethod(7)
+  	};
+  	return arrayIteration;
+  }
+
   var hasRequiredEs_array_map;
 
   function requireEs_array_map () {
@@ -2326,79 +2353,6 @@
   }
 
   requireEs_array_map();
-
-  var es_array_slice = {};
-
-  var arraySlice;
-  var hasRequiredArraySlice;
-
-  function requireArraySlice () {
-  	if (hasRequiredArraySlice) return arraySlice;
-  	hasRequiredArraySlice = 1;
-  	var uncurryThis = requireFunctionUncurryThis();
-
-  	arraySlice = uncurryThis([].slice);
-  	return arraySlice;
-  }
-
-  var hasRequiredEs_array_slice;
-
-  function requireEs_array_slice () {
-  	if (hasRequiredEs_array_slice) return es_array_slice;
-  	hasRequiredEs_array_slice = 1;
-  	var $ = require_export();
-  	var isArray = requireIsArray();
-  	var isConstructor = requireIsConstructor();
-  	var isObject = requireIsObject();
-  	var toAbsoluteIndex = requireToAbsoluteIndex();
-  	var lengthOfArrayLike = requireLengthOfArrayLike();
-  	var toIndexedObject = requireToIndexedObject();
-  	var createProperty = requireCreateProperty();
-  	var setArrayLength = requireArraySetLength();
-  	var wellKnownSymbol = requireWellKnownSymbol();
-  	var arrayMethodHasSpeciesSupport = requireArrayMethodHasSpeciesSupport();
-  	var nativeSlice = requireArraySlice();
-
-  	var HAS_SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('slice');
-
-  	var SPECIES = wellKnownSymbol('species');
-  	var $Array = Array;
-  	var max = Math.max;
-
-  	// `Array.prototype.slice` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.slice
-  	// fallback for not array-like ES3 strings and DOM objects
-  	$({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT }, {
-  	  slice: function slice(start, end) {
-  	    var O = toIndexedObject(this);
-  	    var length = lengthOfArrayLike(O);
-  	    var k = toAbsoluteIndex(start, length);
-  	    var fin = toAbsoluteIndex(end === undefined ? length : end, length);
-  	    // inline `ArraySpeciesCreate` for usage native `Array#slice` where it's possible
-  	    var Constructor, result, n;
-  	    if (isArray(O)) {
-  	      Constructor = O.constructor;
-  	      // cross-realm fallback
-  	      if (isConstructor(Constructor) && (Constructor === $Array || isArray(Constructor.prototype))) {
-  	        Constructor = undefined;
-  	      } else if (isObject(Constructor)) {
-  	        Constructor = Constructor[SPECIES];
-  	        if (Constructor === null) Constructor = undefined;
-  	      }
-  	      if (Constructor === $Array || Constructor === undefined) {
-  	        return nativeSlice(O, k, fin);
-  	      }
-  	    }
-  	    result = new (Constructor === undefined ? $Array : Constructor)(max(fin - k, 0));
-  	    for (n = 0; k < fin; k++, n++) if (k in O) createProperty(result, n, O[k]);
-  	    setArrayLength(result, n);
-  	    return result;
-  	  }
-  	});
-  	return es_array_slice;
-  }
-
-  requireEs_array_slice();
 
   var es_array_sort = {};
 
@@ -2433,6 +2387,18 @@
   	  return $String(argument);
   	};
   	return toString;
+  }
+
+  var arraySlice;
+  var hasRequiredArraySlice;
+
+  function requireArraySlice () {
+  	if (hasRequiredArraySlice) return arraySlice;
+  	hasRequiredArraySlice = 1;
+  	var uncurryThis = requireFunctionUncurryThis();
+
+  	arraySlice = uncurryThis([].slice);
+  	return arraySlice;
   }
 
   var arraySort;
@@ -2807,6 +2773,132 @@
 
   requireEs_object_assign();
 
+  var es_object_entries = {};
+
+  var correctPrototypeGetter;
+  var hasRequiredCorrectPrototypeGetter;
+
+  function requireCorrectPrototypeGetter () {
+  	if (hasRequiredCorrectPrototypeGetter) return correctPrototypeGetter;
+  	hasRequiredCorrectPrototypeGetter = 1;
+  	var fails = requireFails();
+
+  	correctPrototypeGetter = !fails(function () {
+  	  function F() { /* empty */ }
+  	  F.prototype.constructor = null;
+  	  // eslint-disable-next-line es/no-object-getprototypeof -- required for testing
+  	  return Object.getPrototypeOf(new F()) !== F.prototype;
+  	});
+  	return correctPrototypeGetter;
+  }
+
+  var objectGetPrototypeOf;
+  var hasRequiredObjectGetPrototypeOf;
+
+  function requireObjectGetPrototypeOf () {
+  	if (hasRequiredObjectGetPrototypeOf) return objectGetPrototypeOf;
+  	hasRequiredObjectGetPrototypeOf = 1;
+  	var hasOwn = requireHasOwnProperty();
+  	var isCallable = requireIsCallable();
+  	var toObject = requireToObject();
+  	var sharedKey = requireSharedKey();
+  	var CORRECT_PROTOTYPE_GETTER = requireCorrectPrototypeGetter();
+
+  	var IE_PROTO = sharedKey('IE_PROTO');
+  	var $Object = Object;
+  	var ObjectPrototype = $Object.prototype;
+
+  	// `Object.getPrototypeOf` method
+  	// https://tc39.es/ecma262/#sec-object.getprototypeof
+  	// eslint-disable-next-line es/no-object-getprototypeof -- safe
+  	objectGetPrototypeOf = CORRECT_PROTOTYPE_GETTER ? $Object.getPrototypeOf : function (O) {
+  	  var object = toObject(O);
+  	  if (hasOwn(object, IE_PROTO)) return object[IE_PROTO];
+  	  var constructor = object.constructor;
+  	  if (isCallable(constructor) && object instanceof constructor) {
+  	    return constructor.prototype;
+  	  } return object instanceof $Object ? ObjectPrototype : null;
+  	};
+  	return objectGetPrototypeOf;
+  }
+
+  var objectToArray;
+  var hasRequiredObjectToArray;
+
+  function requireObjectToArray () {
+  	if (hasRequiredObjectToArray) return objectToArray;
+  	hasRequiredObjectToArray = 1;
+  	var DESCRIPTORS = requireDescriptors();
+  	var fails = requireFails();
+  	var uncurryThis = requireFunctionUncurryThis();
+  	var objectGetPrototypeOf = requireObjectGetPrototypeOf();
+  	var objectKeys = requireObjectKeys();
+  	var toIndexedObject = requireToIndexedObject();
+  	var $propertyIsEnumerable = requireObjectPropertyIsEnumerable().f;
+
+  	var propertyIsEnumerable = uncurryThis($propertyIsEnumerable);
+  	var push = uncurryThis([].push);
+
+  	// in some IE versions, `propertyIsEnumerable` returns incorrect result on integer keys
+  	// of `null` prototype objects
+  	var IE_BUG = DESCRIPTORS && fails(function () {
+  	  // eslint-disable-next-line es/no-object-create -- safe
+  	  var O = Object.create(null);
+  	  O[2] = 2;
+  	  return !propertyIsEnumerable(O, 2);
+  	});
+
+  	// `Object.{ entries, values }` methods implementation
+  	var createMethod = function (TO_ENTRIES) {
+  	  return function (it) {
+  	    var O = toIndexedObject(it);
+  	    var keys = objectKeys(O);
+  	    var IE_WORKAROUND = IE_BUG && objectGetPrototypeOf(O) === null;
+  	    var length = keys.length;
+  	    var i = 0;
+  	    var result = [];
+  	    var key;
+  	    while (length > i) {
+  	      key = keys[i++];
+  	      if (!DESCRIPTORS || (IE_WORKAROUND ? key in O : propertyIsEnumerable(O, key))) {
+  	        push(result, TO_ENTRIES ? [key, O[key]] : O[key]);
+  	      }
+  	    }
+  	    return result;
+  	  };
+  	};
+
+  	objectToArray = {
+  	  // `Object.entries` method
+  	  // https://tc39.es/ecma262/#sec-object.entries
+  	  entries: createMethod(true),
+  	  // `Object.values` method
+  	  // https://tc39.es/ecma262/#sec-object.values
+  	  values: createMethod(false)
+  	};
+  	return objectToArray;
+  }
+
+  var hasRequiredEs_object_entries;
+
+  function requireEs_object_entries () {
+  	if (hasRequiredEs_object_entries) return es_object_entries;
+  	hasRequiredEs_object_entries = 1;
+  	var $ = require_export();
+  	var $entries = requireObjectToArray().entries;
+
+  	// `Object.entries` method
+  	// https://tc39.es/ecma262/#sec-object.entries
+  	$({ target: 'Object', stat: true }, {
+  	  entries: function entries(O) {
+  	    return $entries(O);
+  	  }
+  	});
+  	return es_object_entries;
+  }
+
+  requireEs_object_entries();
+
   var es_object_toString = {};
 
   var objectToString;
@@ -2987,6 +3079,218 @@
 
   requireEs_regexp_toString();
 
+  var es_string_trim = {};
+
+  var whitespaces;
+  var hasRequiredWhitespaces;
+
+  function requireWhitespaces () {
+  	if (hasRequiredWhitespaces) return whitespaces;
+  	hasRequiredWhitespaces = 1;
+  	// a string of all valid unicode whitespaces
+  	whitespaces = '\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u2000\u2001\u2002' +
+  	  '\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+  	return whitespaces;
+  }
+
+  var stringTrim;
+  var hasRequiredStringTrim;
+
+  function requireStringTrim () {
+  	if (hasRequiredStringTrim) return stringTrim;
+  	hasRequiredStringTrim = 1;
+  	var uncurryThis = requireFunctionUncurryThis();
+  	var requireObjectCoercible = requireRequireObjectCoercible();
+  	var toString = requireToString();
+  	var whitespaces = requireWhitespaces();
+
+  	var replace = uncurryThis(''.replace);
+  	var ltrim = RegExp('^[' + whitespaces + ']+');
+  	var rtrim = RegExp('(^|[^' + whitespaces + '])[' + whitespaces + ']+$');
+
+  	// `String.prototype.{ trim, trimStart, trimEnd, trimLeft, trimRight }` methods implementation
+  	var createMethod = function (TYPE) {
+  	  return function ($this) {
+  	    var string = toString(requireObjectCoercible($this));
+  	    if (TYPE & 1) string = replace(string, ltrim, '');
+  	    if (TYPE & 2) string = replace(string, rtrim, '$1');
+  	    return string;
+  	  };
+  	};
+
+  	stringTrim = {
+  	  // `String.prototype.{ trimLeft, trimStart }` methods
+  	  // https://tc39.es/ecma262/#sec-string.prototype.trimstart
+  	  start: createMethod(1),
+  	  // `String.prototype.{ trimRight, trimEnd }` methods
+  	  // https://tc39.es/ecma262/#sec-string.prototype.trimend
+  	  end: createMethod(2),
+  	  // `String.prototype.trim` method
+  	  // https://tc39.es/ecma262/#sec-string.prototype.trim
+  	  trim: createMethod(3)
+  	};
+  	return stringTrim;
+  }
+
+  var stringTrimForced;
+  var hasRequiredStringTrimForced;
+
+  function requireStringTrimForced () {
+  	if (hasRequiredStringTrimForced) return stringTrimForced;
+  	hasRequiredStringTrimForced = 1;
+  	var PROPER_FUNCTION_NAME = requireFunctionName().PROPER;
+  	var fails = requireFails();
+  	var whitespaces = requireWhitespaces();
+
+  	var non = '\u200B\u0085\u180E';
+
+  	// check that a method works with the correct list
+  	// of whitespaces and has a correct name
+  	stringTrimForced = function (METHOD_NAME) {
+  	  return fails(function () {
+  	    return !!whitespaces[METHOD_NAME]()
+  	      || non[METHOD_NAME]() !== non
+  	      || (PROPER_FUNCTION_NAME && whitespaces[METHOD_NAME].name !== METHOD_NAME);
+  	  });
+  	};
+  	return stringTrimForced;
+  }
+
+  var hasRequiredEs_string_trim;
+
+  function requireEs_string_trim () {
+  	if (hasRequiredEs_string_trim) return es_string_trim;
+  	hasRequiredEs_string_trim = 1;
+  	var $ = require_export();
+  	var $trim = requireStringTrim().trim;
+  	var forcedStringTrimMethod = requireStringTrimForced();
+
+  	// `String.prototype.trim` method
+  	// https://tc39.es/ecma262/#sec-string.prototype.trim
+  	$({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
+  	  trim: function trim() {
+  	    return $trim(this);
+  	  }
+  	});
+  	return es_string_trim;
+  }
+
+  requireEs_string_trim();
+
+  var web_domCollections_forEach = {};
+
+  var domIterables;
+  var hasRequiredDomIterables;
+
+  function requireDomIterables () {
+  	if (hasRequiredDomIterables) return domIterables;
+  	hasRequiredDomIterables = 1;
+  	// iterable DOM collections
+  	// flag - `iterable` interface - 'entries', 'keys', 'values', 'forEach' methods
+  	domIterables = {
+  	  CSSRuleList: 0,
+  	  CSSStyleDeclaration: 0,
+  	  CSSValueList: 0,
+  	  ClientRectList: 0,
+  	  DOMRectList: 0,
+  	  DOMStringList: 0,
+  	  DOMTokenList: 1,
+  	  DataTransferItemList: 0,
+  	  FileList: 0,
+  	  HTMLAllCollection: 0,
+  	  HTMLCollection: 0,
+  	  HTMLFormElement: 0,
+  	  HTMLSelectElement: 0,
+  	  MediaList: 0,
+  	  MimeTypeArray: 0,
+  	  NamedNodeMap: 0,
+  	  NodeList: 1,
+  	  PaintRequestList: 0,
+  	  Plugin: 0,
+  	  PluginArray: 0,
+  	  SVGLengthList: 0,
+  	  SVGNumberList: 0,
+  	  SVGPathSegList: 0,
+  	  SVGPointList: 0,
+  	  SVGStringList: 0,
+  	  SVGTransformList: 0,
+  	  SourceBufferList: 0,
+  	  StyleSheetList: 0,
+  	  TextTrackCueList: 0,
+  	  TextTrackList: 0,
+  	  TouchList: 0
+  	};
+  	return domIterables;
+  }
+
+  var domTokenListPrototype;
+  var hasRequiredDomTokenListPrototype;
+
+  function requireDomTokenListPrototype () {
+  	if (hasRequiredDomTokenListPrototype) return domTokenListPrototype;
+  	hasRequiredDomTokenListPrototype = 1;
+  	// in old WebKit versions, `element.classList` is not an instance of global `DOMTokenList`
+  	var documentCreateElement = requireDocumentCreateElement();
+
+  	var classList = documentCreateElement('span').classList;
+  	var DOMTokenListPrototype = classList && classList.constructor && classList.constructor.prototype;
+
+  	domTokenListPrototype = DOMTokenListPrototype === Object.prototype ? undefined : DOMTokenListPrototype;
+  	return domTokenListPrototype;
+  }
+
+  var arrayForEach;
+  var hasRequiredArrayForEach;
+
+  function requireArrayForEach () {
+  	if (hasRequiredArrayForEach) return arrayForEach;
+  	hasRequiredArrayForEach = 1;
+  	var $forEach = requireArrayIteration().forEach;
+  	var arrayMethodIsStrict = requireArrayMethodIsStrict();
+
+  	var STRICT_METHOD = arrayMethodIsStrict('forEach');
+
+  	// `Array.prototype.forEach` method implementation
+  	// https://tc39.es/ecma262/#sec-array.prototype.foreach
+  	arrayForEach = !STRICT_METHOD ? function forEach(callbackfn /* , thisArg */) {
+  	  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  	// eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	} : [].forEach;
+  	return arrayForEach;
+  }
+
+  var hasRequiredWeb_domCollections_forEach;
+
+  function requireWeb_domCollections_forEach () {
+  	if (hasRequiredWeb_domCollections_forEach) return web_domCollections_forEach;
+  	hasRequiredWeb_domCollections_forEach = 1;
+  	var globalThis = requireGlobalThis();
+  	var DOMIterables = requireDomIterables();
+  	var DOMTokenListPrototype = requireDomTokenListPrototype();
+  	var forEach = requireArrayForEach();
+  	var createNonEnumerableProperty = requireCreateNonEnumerableProperty();
+
+  	var handlePrototype = function (CollectionPrototype) {
+  	  // some Chrome versions have non-configurable methods on DOMTokenList
+  	  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+  	    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  	  } catch (error) {
+  	    CollectionPrototype.forEach = forEach;
+  	  }
+  	};
+
+  	for (var COLLECTION_NAME in DOMIterables) {
+  	  if (DOMIterables[COLLECTION_NAME]) {
+  	    handlePrototype(globalThis[COLLECTION_NAME] && globalThis[COLLECTION_NAME].prototype);
+  	  }
+  	}
+
+  	handlePrototype(DOMTokenListPrototype);
+  	return web_domCollections_forEach;
+  }
+
+  requireWeb_domCollections_forEach();
+
   /**
    * @author Nadim Basalamah <dimbslmh@gmail.com>
    * @version: v1.1.0
@@ -2994,22 +3298,22 @@
    */
 
   var isSingleSort = false;
-  var Utils = $.fn.bootstrapTable.utils;
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'plus', {
+  var Utils = BootstrapTable.utils;
+  Utils.assignIcons(BootstrapTable.icons, 'plus', {
     glyphicon: 'glyphicon-plus',
     fa: 'fa-plus',
     bi: 'bi-plus',
     icon: 'icon-plus',
     'material-icons': 'plus'
   });
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'minus', {
+  Utils.assignIcons(BootstrapTable.icons, 'minus', {
     glyphicon: 'glyphicon-minus',
     fa: 'fa-minus',
     bi: 'bi-dash',
     icon: 'icon-minus',
     'material-icons': 'minus'
   });
-  Utils.assignIcons($.fn.bootstrapTable.icons, 'sort', {
+  Utils.assignIcons(BootstrapTable.icons, 'sort', {
     glyphicon: 'glyphicon-sort',
     fa: 'fa-sort',
     bi: 'bi-arrow-down-up',
@@ -3073,91 +3377,102 @@
         multipleSortSelect: '<select class="%s %s browser-default">'
       }
     }
-  }[$.fn.bootstrapTable.theme];
+  }[BootstrapTable.theme];
   var showSortModal = function showSortModal(that) {
     var _selector = that.sortModalSelector;
     var _id = "#".concat(_selector);
     var o = that.options;
-    if (!$(_id).hasClass('modal')) {
-      var sModal = Utils.sprintf(theme.html.multipleSortModal, _selector, _selector, _selector, that.options.formatMultipleSort(), Utils.sprintf(that.constants.html.icon, o.iconsPrefix, o.icons.plus), that.options.formatAddLevel(), Utils.sprintf(that.constants.html.icon, o.iconsPrefix, o.icons.minus), that.options.formatDeleteLevel(), that.options.formatColumn(), that.options.formatOrder(), that.options.formatCancel(), that.options.formatSort());
-      $('body').append($(sModal));
-      that.$sortModal = $(_id);
-      var $rows = that.$sortModal.find('tbody > tr');
-      that.$sortModal.off('click', '.toolbar-btn-add').on('click', '.toolbar-btn-add', function () {
-        var total = that.$sortModal.find('.multi-sort-name:first option').length;
-        var current = that.$sortModal.find('tbody tr').length;
+    var existingModal = document.querySelector(_id);
+    if (existingModal && existingModal.classList.contains('modal')) {
+      return;
+    }
+    var sModal = Utils.sprintf(theme.html.multipleSortModal, _selector, _selector, _selector, that.options.formatMultipleSort(), Utils.sprintf(that.constants.html.icon, o.iconsPrefix, o.icons.plus), that.options.formatAddLevel(), Utils.sprintf(that.constants.html.icon, o.iconsPrefix, o.icons.minus), that.options.formatDeleteLevel(), that.options.formatColumn(), that.options.formatOrder(), that.options.formatCancel(), that.options.formatSort());
+    var template = document.createElement('template');
+    template.innerHTML = sModal.trim();
+    document.body.appendChild(template.content.firstElementChild);
+    that.$sortModal = document.querySelector(_id);
+    that.$sortModal.addEventListener('click', function (e) {
+      if (e.target.closest('.toolbar-btn-add')) {
+        var _that$$sortModal$quer;
+        var total = ((_that$$sortModal$quer = that.$sortModal.querySelector('.multi-sort-name')) === null || _that$$sortModal$quer === void 0 ? void 0 : _that$$sortModal$quer.querySelectorAll('option').length) || 0;
+        var current = that.$sortModal.querySelectorAll('tbody tr').length;
         if (current < total) {
           that.addLevel();
           that.setButtonStates();
         }
-      });
-      that.$sortModal.off('click', '.toolbar-btn-delete').on('click', '.toolbar-btn-delete', function () {
-        var total = that.$sortModal.find('.multi-sort-name:first option').length;
-        var current = that.$sortModal.find('tbody tr').length;
-        if (current > 1 && current <= total) {
-          that.$sortModal.find('tbody tr:last').remove();
+      } else if (e.target.closest('.toolbar-btn-delete')) {
+        var _that$$sortModal$quer2;
+        var _total = ((_that$$sortModal$quer2 = that.$sortModal.querySelector('.multi-sort-name')) === null || _that$$sortModal$quer2 === void 0 ? void 0 : _that$$sortModal$quer2.querySelectorAll('option').length) || 0;
+        var _current = that.$sortModal.querySelectorAll('tbody tr').length;
+        if (_current > 1 && _current <= _total) {
+          var _that$$sortModal$quer3;
+          (_that$$sortModal$quer3 = that.$sortModal.querySelector('tbody tr:last-child')) === null || _that$$sortModal$quer3 === void 0 || _that$$sortModal$quer3.remove();
           that.setButtonStates();
         }
-      });
-      that.$sortModal.off('click', '.multi-sort-order-button').on('click', '.multi-sort-order-button', function () {
-        var $rows = that.$sortModal.find('tbody > tr');
-        var $alert = that.$sortModal.find('div.alert');
+      } else if (e.target.closest('.multi-sort-order-button')) {
+        var _rows = _toConsumableArray(that.$sortModal.querySelectorAll('tbody > tr'));
+        var alertEl = that.$sortModal.querySelector('div.alert');
         var fields = [];
         var results = [];
-        var sortPriority = $.map($rows, function (row) {
-          var $row = $(row);
-          var name = $row.find('.multi-sort-name').val();
-          var order = $row.find('.multi-sort-order').val();
+        var sortPriority = _rows.map(function (row) {
+          var _row$querySelector, _row$querySelector2;
+          var name = ((_row$querySelector = row.querySelector('.multi-sort-name')) === null || _row$querySelector === void 0 ? void 0 : _row$querySelector.value) || '';
+          var order = ((_row$querySelector2 = row.querySelector('.multi-sort-order')) === null || _row$querySelector2 === void 0 ? void 0 : _row$querySelector2.value) || '';
           fields.push(name);
           return {
             sortName: name,
             sortOrder: order
           };
         });
-        var sorted_fields = fields.sort();
+        var sortedFields = [].concat(fields).sort();
         for (var i = 0; i < fields.length - 1; i++) {
-          if (sorted_fields[i + 1] === sorted_fields[i]) {
-            results.push(sorted_fields[i]);
+          if (sortedFields[i + 1] === sortedFields[i]) {
+            results.push(sortedFields[i]);
           }
         }
         if (results.length > 0) {
-          if ($alert.length === 0) {
-            $alert = "<div class=\"alert alert-danger\" role=\"alert\"><strong>".concat(that.options.formatDuplicateAlertTitle(), "</strong> ").concat(that.options.formatDuplicateAlertDescription(), "</div>");
-            $($alert).insertBefore(that.$sortModal.find('.bars'));
+          if (!alertEl) {
+            var _that$$sortModal$quer4;
+            var alertHtml = "<div class=\"alert alert-danger\" role=\"alert\"><strong>".concat(that.options.formatDuplicateAlertTitle(), "</strong> ").concat(that.options.formatDuplicateAlertDescription(), "</div>");
+            (_that$$sortModal$quer4 = that.$sortModal.querySelector('.bars')) === null || _that$$sortModal$quer4 === void 0 || _that$$sortModal$quer4.insertAdjacentHTML('beforebegin', alertHtml);
           }
         } else {
-          if ($alert.length === 1) {
-            $($alert).remove();
-          }
-          if (['bootstrap3', 'bootstrap4', 'bootstrap5'].includes($.fn.bootstrapTable.theme)) {
-            that.$sortModal.modal('hide');
+          alertEl === null || alertEl === void 0 || alertEl.remove();
+          if (['bootstrap3', 'bootstrap4'].includes(BootstrapTable.theme)) {
+            if (typeof window.$ !== 'undefined') {
+              $(that.$sortModal).modal('hide');
+            }
+          } else if (BootstrapTable.theme === 'bootstrap5') {
+            var _window$bootstrap;
+            (_window$bootstrap = window.bootstrap) === null || _window$bootstrap === void 0 || (_window$bootstrap = _window$bootstrap.Modal.getInstance(that.$sortModal)) === null || _window$bootstrap === void 0 || _window$bootstrap.hide();
           }
           that.multiSort(sortPriority);
         }
-      });
-      if (that.options.sortPriority === null || that.options.sortPriority.length === 0) {
-        if (that.options.sortName) {
-          that.options.sortPriority = [{
-            sortName: that.options.sortName,
-            sortOrder: that.options.sortOrder
-          }];
-        }
       }
-      if (that.options.sortPriority !== null && that.options.sortPriority.length > 0) {
-        if ($rows.length < that.options.sortPriority.length && _typeof(that.options.sortPriority) === 'object') {
-          for (var i = 0; i < that.options.sortPriority.length; i++) {
-            that.addLevel(i, that.options.sortPriority[i]);
-          }
-        }
-      } else {
-        that.addLevel(0);
+    });
+    var rows = _toConsumableArray(that.$sortModal.querySelectorAll('tbody > tr'));
+    if (that.options.sortPriority === null || that.options.sortPriority.length === 0) {
+      if (that.options.sortName) {
+        that.options.sortPriority = [{
+          sortName: that.options.sortName,
+          sortOrder: that.options.sortOrder
+        }];
       }
-      that.setButtonStates();
     }
+    if (that.options.sortPriority !== null && that.options.sortPriority.length > 0) {
+      if (rows.length < that.options.sortPriority.length && _typeof(that.options.sortPriority) === 'object') {
+        for (var i = 0; i < that.options.sortPriority.length; i++) {
+          that.addLevel(i, that.options.sortPriority[i]);
+        }
+      }
+    } else {
+      that.addLevel(0);
+    }
+    that.setButtonStates();
   };
-  $.fn.bootstrapTable.methods.push('multipleSort');
-  $.fn.bootstrapTable.methods.push('multiSort');
-  Object.assign($.fn.bootstrapTable.defaults, {
+  BootstrapTable.methods.push('multipleSort');
+  BootstrapTable.methods.push('multiSort');
+  Object.assign(BootstrapTable.defaults, {
     showMultiSort: false,
     showMultiSortButton: true,
     multiSortStrictSort: false,
@@ -3166,10 +3481,10 @@
       return false;
     }
   });
-  Object.assign($.fn.bootstrapTable.events, {
+  Object.assign(BootstrapTable.events, {
     'multiple-sort.bs.table': 'onMultipleSort'
   });
-  Object.assign($.fn.bootstrapTable.locales, {
+  Object.assign(BootstrapTable.locales, {
     formatMultipleSort: function formatMultipleSort() {
       return 'Multiple Sort';
     },
@@ -3210,19 +3525,18 @@
       };
     }
   });
-  Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales);
-  var BootstrapTable = $.fn.bootstrapTable.Constructor;
+  Object.assign(BootstrapTable.defaults, BootstrapTable.locales);
   var _initToolbar = BootstrapTable.prototype.initToolbar;
   var _destroy = BootstrapTable.prototype.destroy;
   BootstrapTable.prototype.initToolbar = function () {
     var _this = this;
     this.showToolbar = this.showToolbar || this.options.showMultiSort;
     var that = this;
-    var sortModalSelector = Utils.getEventName('sort-modal', this.$el.attr('id'));
+    var sortModalSelector = Utils.getEventName('sort-modal', this.$el.getAttribute('id'));
     var sortModalId = "#".concat(sortModalSelector);
-    var $multiSortBtn = this.$toolbar.find('div.multi-sort');
+    var multiSortBtn = this.$toolbar.querySelector('div.multi-sort');
     var o = this.options;
-    this.$sortModal = $(sortModalId);
+    this.$sortModal = document.querySelector(sortModalId);
     this.sortModalSelector = sortModalSelector;
     if (that.options.sortPriority !== null) {
       that.onMultipleSort();
@@ -3237,7 +3551,7 @@
     for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
     }
-    _initToolbar.apply(this, Array.prototype.slice.apply(args));
+    _initToolbar.apply(this, args);
     if (that.options.sidePagination === 'server' && !isSingleSort && that.options.sortPriority !== null) {
       var t = that.options.queryParams;
       that.options.queryParams = function (params) {
@@ -3246,63 +3560,82 @@
       };
     }
     if (this.options.showMultiSort) {
-      if (!$multiSortBtn.length && this.options.showMultiSortButton) {
-        if ($.fn.bootstrapTable.theme === 'semantic') {
-          this.$toolbar.find('.multi-sort').on('click', function () {
-            $(sortModalId).modal('show');
-          });
-        } else if ($.fn.bootstrapTable.theme === 'materialize') {
-          this.$toolbar.find('.multi-sort').on('click', function () {
-            $(sortModalId).modal();
-          });
-        } else if ($.fn.bootstrapTable.theme === 'bootstrap-table') {
-          this.$toolbar.find('.multi-sort').on('click', function () {
-            $(sortModalId).addClass('show');
-          });
-        } else if ($.fn.bootstrapTable.theme === 'foundation') {
-          this.$toolbar.find('.multi-sort').on('click', function () {
-            if (!_this.foundationModal) {
-              // eslint-disable-next-line no-undef
-              _this.foundationModal = new Foundation.Reveal($(sortModalId));
-            }
-            _this.foundationModal.open();
-          });
-        } else if ($.fn.bootstrapTable.theme === 'bulma') {
-          this.$toolbar.find('.multi-sort').on('click', function () {
-            $('html').toggleClass('is-clipped');
-            $(sortModalId).toggleClass('is-active');
-            $('button[data-close]').one('click', function () {
-              $('html').toggleClass('is-clipped');
-              $(sortModalId).toggleClass('is-active');
+      if (!multiSortBtn && this.options.showMultiSortButton) {
+        var multiSortBtnEl = this.$toolbar.querySelector('.multi-sort');
+        if (multiSortBtnEl) {
+          if (BootstrapTable.theme === 'semantic') {
+            multiSortBtnEl.addEventListener('click', function () {
+              if (typeof window.$ !== 'undefined') {
+                $(sortModalId).modal('show');
+              }
             });
-          });
+          } else if (BootstrapTable.theme === 'materialize') {
+            multiSortBtnEl.addEventListener('click', function () {
+              if (typeof window.$ !== 'undefined') {
+                $(sortModalId).modal();
+              }
+            });
+          } else if (BootstrapTable.theme === 'bootstrap-table') {
+            multiSortBtnEl.addEventListener('click', function () {
+              var _document$querySelect;
+              (_document$querySelect = document.querySelector(sortModalId)) === null || _document$querySelect === void 0 || _document$querySelect.classList.add('show');
+            });
+          } else if (BootstrapTable.theme === 'foundation') {
+            multiSortBtnEl.addEventListener('click', function () {
+              if (!_this.foundationModal) {
+                // eslint-disable-next-line no-undef
+                _this.foundationModal = new Foundation.Reveal($(sortModalId));
+              }
+              _this.foundationModal.open();
+            });
+          } else if (BootstrapTable.theme === 'bulma') {
+            multiSortBtnEl.addEventListener('click', function () {
+              var _document$querySelect2;
+              document.documentElement.classList.toggle('is-clipped');
+              (_document$querySelect2 = document.querySelector(sortModalId)) === null || _document$querySelect2 === void 0 || _document$querySelect2.classList.toggle('is-active');
+              var closeBtn = document.querySelector("".concat(sortModalId, " [data-close]"));
+              if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                  var _document$querySelect3;
+                  document.documentElement.classList.toggle('is-clipped');
+                  (_document$querySelect3 = document.querySelector(sortModalId)) === null || _document$querySelect3 === void 0 || _document$querySelect3.classList.toggle('is-active');
+                }, {
+                  once: true
+                });
+              }
+            });
+          }
         }
         showSortModal(that);
       }
-      this.$el.on('sort.bs.table', function () {
+      this.$el.addEventListener('sort.bs.table', function () {
         isSingleSort = true;
       });
-      this.$el.on('multiple-sort.bs.table', function () {
+      this.$el.addEventListener('multiple-sort.bs.table', function () {
         isSingleSort = false;
       });
-      this.$el.on('load-success.bs.table', function () {
+      this.$el.addEventListener('load-success.bs.table', function () {
         if (!isSingleSort && that.options.sortPriority !== null && _typeof(that.options.sortPriority) === 'object' && that.options.sidePagination !== 'server') {
           that.onMultipleSort();
         }
       });
-      this.$el.on('column-switch.bs.table', function (field, checked) {
+      this.$el.addEventListener('column-switch.bs.table', function (e) {
+        var _that$$sortModal;
+        var _ref = e.detail || [],
+          _ref2 = _slicedToArray(_ref, 1),
+          columnField = _ref2[0];
         if (that.options.sortPriority !== null && that.options.sortPriority.length > 0) {
           for (var i = 0; i < that.options.sortPriority.length; i++) {
-            if (that.options.sortPriority[i].sortName === checked) {
+            if (that.options.sortPriority[i].sortName === columnField) {
               that.options.sortPriority.splice(i, 1);
             }
           }
           that.assignSortableArrows();
         }
-        that.$sortModal.remove();
+        (_that$$sortModal = that.$sortModal) === null || _that$$sortModal === void 0 || _that$$sortModal.remove();
         showSortModal(that);
       });
-      this.$el.on('reset-view.bs.table', function () {
+      this.$el.addEventListener('reset-view.bs.table', function () {
         if (!isSingleSort && that.options.sortPriority !== null && _typeof(that.options.sortPriority) === 'object') {
           that.assignSortableArrows();
         }
@@ -3313,10 +3646,11 @@
     for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
       args[_key2] = arguments[_key2];
     }
-    _destroy.apply(this, Array.prototype.slice.apply(args));
+    _destroy.apply(this, args);
     if (this.options.showMultiSort) {
+      var _this$$sortModal;
       this.enableCustomSort = false;
-      this.$sortModal.remove();
+      (_this$$sortModal = this.$sortModal) === null || _this$$sortModal === void 0 || _this$$sortModal.remove();
     }
   };
   BootstrapTable.prototype.multipleSort = function () {
@@ -3343,8 +3677,8 @@
         var order = that.options.sortPriority[i].sortOrder === 'desc' ? -1 : 1;
         var aa = Utils.getItemField(a, fieldName);
         var bb = Utils.getItemField(b, fieldName);
-        var value1 = $.fn.bootstrapTable.utils.calculateObjectValue(that.header, sorterName, [aa, bb, a, b]);
-        var value2 = $.fn.bootstrapTable.utils.calculateObjectValue(that.header, sorterName, [bb, aa, b, a]);
+        var value1 = Utils.calculateObjectValue(that.header, sorterName, [aa, bb, a, b]);
+        var value2 = Utils.calculateObjectValue(that.header, sorterName, [bb, aa, b, a]);
         if (value1 !== undefined && value2 !== undefined) {
           arr1.push(order * value1);
           arr2.push(order * value2);
@@ -3352,7 +3686,7 @@
         }
         if (aa === undefined || aa === null) aa = '';
         if (bb === undefined || bb === null) bb = '';
-        if ($.isNumeric(aa) && $.isNumeric(bb)) {
+        if (!isNaN(parseFloat(aa)) && isFinite(aa) && !isNaN(parseFloat(bb)) && isFinite(bb)) {
           aa = parseFloat(aa);
           bb = parseFloat(bb);
         } else {
@@ -3378,49 +3712,69 @@
   };
   BootstrapTable.prototype.addLevel = function (index, sortPriority) {
     var text = index === 0 ? this.options.formatSortBy() : this.options.formatThenBy();
-    this.$sortModal.find('tbody').append($('<tr>').append($('<td>').text(text)).append($('<td>').append($(Utils.sprintf(theme.html.multipleSortSelect, this.constants.classes.paginationDropdown, 'multi-sort-name')))).append($('<td>').append($(Utils.sprintf(theme.html.multipleSortSelect, this.constants.classes.paginationDropdown, 'multi-sort-order')))));
-    var $multiSortName = this.$sortModal.find('.multi-sort-name').last();
-    var $multiSortOrder = this.$sortModal.find('.multi-sort-order').last();
-    $.each(this.columns, function (i, column) {
+    var tbody = this.$sortModal.querySelector('tbody');
+    var tr = document.createElement('tr');
+    var td1 = document.createElement('td');
+    td1.textContent = text;
+    var nameSelectHtml = "".concat(Utils.sprintf(theme.html.multipleSortSelect, this.constants.classes.paginationDropdown, 'multi-sort-name'), "</select>");
+    var orderSelectHtml = "".concat(Utils.sprintf(theme.html.multipleSortSelect, this.constants.classes.paginationDropdown, 'multi-sort-order'), "</select>");
+    var nameTmpl = document.createElement('template');
+    var orderTmpl = document.createElement('template');
+    nameTmpl.innerHTML = nameSelectHtml;
+    orderTmpl.innerHTML = orderSelectHtml;
+    var td2 = document.createElement('td');
+    var td3 = document.createElement('td');
+    td2.appendChild(nameTmpl.content.firstElementChild);
+    td3.appendChild(orderTmpl.content.firstElementChild);
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    tr.appendChild(td3);
+    tbody.appendChild(tr);
+    var multiSortName = this.$sortModal.querySelector('.multi-sort-name:last-of-type') || this.$sortModal.querySelectorAll('.multi-sort-name')[this.$sortModal.querySelectorAll('.multi-sort-name').length - 1];
+    var multiSortOrder = this.$sortModal.querySelector('.multi-sort-order:last-of-type') || this.$sortModal.querySelectorAll('.multi-sort-order')[this.$sortModal.querySelectorAll('.multi-sort-order').length - 1];
+    this.columns.forEach(function (column) {
       if (column.sortable === false || column.visible === false) {
-        return true;
+        return;
       }
-      $multiSortName.append("<option value=\"".concat(column.field, "\">").concat(column.title, "</option>"));
+      multiSortName.insertAdjacentHTML('beforeend', "<option value=\"".concat(column.field, "\">").concat(column.title, "</option>"));
     });
-    $.each(this.options.formatSortOrders(), function (value, order) {
-      $multiSortOrder.append("<option value=\"".concat(value, "\">").concat(order, "</option>"));
+    Object.entries(this.options.formatSortOrders()).forEach(function (_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2),
+        value = _ref4[0],
+        order = _ref4[1];
+      multiSortOrder.insertAdjacentHTML('beforeend', "<option value=\"".concat(value, "\">").concat(order, "</option>"));
     });
     if (sortPriority !== undefined) {
-      $multiSortName.find("option[value=\"".concat(sortPriority.sortName, "\"]")).attr('selected', true);
-      $multiSortOrder.find("option[value=\"".concat(sortPriority.sortOrder, "\"]")).attr('selected', true);
+      var nameOpt = multiSortName.querySelector("option[value=\"".concat(sortPriority.sortName, "\"]"));
+      if (nameOpt) nameOpt.selected = true;
+      var orderOpt = multiSortOrder.querySelector("option[value=\"".concat(sortPriority.sortOrder, "\"]"));
+      if (orderOpt) orderOpt.selected = true;
     }
   };
   BootstrapTable.prototype.assignSortableArrows = function () {
-    var that = this;
-    var headers = that.$header.find('th');
+    var headers = _toConsumableArray(this.$header.querySelectorAll('th'));
     for (var i = 0; i < headers.length; i++) {
-      for (var c = 0; c < that.options.sortPriority.length; c++) {
-        if ($(headers[i]).data('field') === that.options.sortPriority[c].sortName) {
-          $(headers[i]).find('.sortable').removeClass('desc asc').addClass(that.options.sortPriority[c].sortOrder);
+      for (var c = 0; c < this.options.sortPriority.length; c++) {
+        if (headers[i].dataset.field === this.options.sortPriority[c].sortName) {
+          var sortable = headers[i].querySelector('.sortable');
+          if (sortable) {
+            sortable.classList.remove('desc', 'asc');
+            sortable.classList.add(this.options.sortPriority[c].sortOrder);
+          }
         }
       }
     }
   };
   BootstrapTable.prototype.setButtonStates = function () {
-    var total = this.$sortModal.find('.multi-sort-name:first option').length;
-    var current = this.$sortModal.find('tbody tr').length;
-    if (current === total) {
-      this.$sortModal.find('.toolbar-btn-add').attr('disabled', 'disabled');
-    }
-    if (current > 1) {
-      this.$sortModal.find('.toolbar-btn-delete').removeAttr('disabled');
-    }
-    if (current < total) {
-      this.$sortModal.find('.toolbar-btn-add').removeAttr('disabled');
-    }
-    if (current === 1) {
-      this.$sortModal.find('.toolbar-btn-delete').attr('disabled', 'disabled');
-    }
+    var _this$$sortModal$quer;
+    var total = ((_this$$sortModal$quer = this.$sortModal.querySelector('.multi-sort-name')) === null || _this$$sortModal$quer === void 0 ? void 0 : _this$$sortModal$quer.querySelectorAll('option').length) || 0;
+    var current = this.$sortModal.querySelectorAll('tbody tr').length;
+    var addBtn = this.$sortModal.querySelector('.toolbar-btn-add');
+    var deleteBtn = this.$sortModal.querySelector('.toolbar-btn-delete');
+    if (current === total) addBtn === null || addBtn === void 0 || addBtn.setAttribute('disabled', 'disabled');
+    if (current > 1) deleteBtn === null || deleteBtn === void 0 || deleteBtn.removeAttribute('disabled');
+    if (current < total) addBtn === null || addBtn === void 0 || addBtn.removeAttribute('disabled');
+    if (current === 1) deleteBtn === null || deleteBtn === void 0 || deleteBtn.setAttribute('disabled', 'disabled');
   };
   BootstrapTable.prototype.multiSort = function (sortPriority) {
     var _this2 = this;
@@ -3430,12 +3784,14 @@
       var queryParams = this.options.queryParams;
       this.options.queryParams = function (params) {
         params.multiSort = _this2.options.sortPriority;
-        return $.fn.bootstrapTable.utils.calculateObjectValue(_this2.options, queryParams, [params]);
+        return Utils.calculateObjectValue(_this2.options, queryParams, [params]);
       };
       isSingleSort = false;
       this.initServer(this.options.silentSort);
     }
     this.onMultipleSort();
   };
+
+  return BootstrapTable;
 
 }));

@@ -3,6 +3,8 @@
  * @update zhixin wen <wenzhixin2010@gmail.com>
  */
 
+
+
 const debounce = (func, wait) => {
   let timeout = 0
 
@@ -17,7 +19,7 @@ const debounce = (func, wait) => {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, {
+Object.assign(BootstrapTable.defaults, {
   mobileResponsive: false,
   minWidth: 562,
   minHeight: undefined,
@@ -26,7 +28,7 @@ Object.assign($.fn.bootstrapTable.defaults, {
   columnsHidden: []
 })
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   init (...args) {
     super.init(...args)
 
@@ -40,17 +42,17 @@ $.BootstrapTable = class extends $.BootstrapTable {
     }
 
     let old = {
-      width: $(window).width(),
-      height: $(window).height()
+      width: window.innerWidth,
+      height: window.innerHeight
     }
 
-    $(window).on('resize orientationchange', debounce(() => {
+    const resizeHandler = debounce(() => {
       // reset view if height has only changed by at least the threshold.
-      const width = $(window).width()
-      const height = $(window).height()
-      const $activeElement = $(document.activeElement)
+      const width = window.innerWidth
+      const height = window.innerHeight
+      const activeEl = document.activeElement
 
-      if ($activeElement.length && ['INPUT', 'SELECT', 'TEXTAREA'].includes($activeElement.prop('nodeName'))) {
+      if (activeEl && ['INPUT', 'SELECT', 'TEXTAREA'].includes(activeEl.nodeName)) {
         return
       }
 
@@ -64,11 +66,14 @@ $.BootstrapTable = class extends $.BootstrapTable {
           height
         }
       }
-    }, 200))
+    }, 200)
+
+    window.addEventListener('resize', resizeHandler)
+    window.addEventListener('orientationchange', resizeHandler)
 
     if (this.options.checkOnInit) {
-      const width = $(window).width()
-      const height = $(window).height()
+      const width = window.innerWidth
+      const height = window.innerHeight
 
       this.changeView(width, height)
       old = {

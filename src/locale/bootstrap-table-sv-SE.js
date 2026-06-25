@@ -3,7 +3,9 @@
  * Author: C Bratt <bratt@inix.se>
  */
 
-$.fn.bootstrapTable.locales['sv-SE'] = $.fn.bootstrapTable.locales['sv'] = {
+
+
+BootstrapTable.locales['sv-SE'] = BootstrapTable.locales['sv'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['sv-SE'] = $.fn.bootstrapTable.locales['sv'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['sv-SE'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['sv-SE'])

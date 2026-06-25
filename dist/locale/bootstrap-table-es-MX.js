@@ -1,8 +1,5 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+(function (BootstrapTable) {
+	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1978,7 +1975,7 @@
 	 * Revisión: Ricardo González (rickygzz85@gmail.com) (20/Oct/2021)
 	 */
 
-	$.fn.bootstrapTable.locales['es-MX'] = {
+	BootstrapTable.locales['es-MX'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Add Level';
 	  },
@@ -2118,6 +2115,6 @@
 	    return 'Mostrar vista';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-MX']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-MX']);
 
-}));
+})(BootstrapTable);

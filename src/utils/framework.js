@@ -1,5 +1,3 @@
-import DOMHelper from '../helpers/dom.js'
-
 /**
  * Framework detection and icon utilities.
  *
@@ -55,24 +53,13 @@ export function assignIcons (icons, icon, values) {
 /**
  * Gets the Bootstrap version.
  *
- * @returns {number|undefined} The Bootstrap version number (3, 4, or 5), or undefined for non-Bootstrap themes.
+ * @returns {number} The Bootstrap version number (3, 4, or 5), defaulting to 5.
  */
 export function getBootstrapVersion () {
-  // Check if using a non-Bootstrap theme
-  if (typeof $ !== 'undefined' && $.fn?.bootstrapTable?.theme) {
-    const theme = $.fn.bootstrapTable.theme
-
-    if (!theme.startsWith('bootstrap')) {
-      return
-    }
-  }
-
   let bootstrapVersion = 5
 
   if (typeof window !== 'undefined' && window.bootstrap?.Tooltip?.VERSION) {
     bootstrapVersion = parseInt(window.bootstrap.Tooltip.VERSION, 10)
-  } else if (typeof $ !== 'undefined' && $.fn?.dropdown?.Constructor?.VERSION) {
-    bootstrapVersion = parseInt($.fn.dropdown.Constructor.VERSION, 10)
   }
 
   return bootstrapVersion
@@ -86,16 +73,8 @@ export function getBootstrapVersion () {
  */
 export function getSearchInput (that) {
   if (typeof that.options.searchSelector === 'string') {
-    return DOMHelper.$(that.options.searchSelector)
+    return document.querySelector(that.options.searchSelector)
   }
 
-  const toolbar = that.$toolbar ? that.$toolbar[0] : null
-
-  if (!toolbar) {
-    return null
-  }
-
-  const result = DOMHelper.find(toolbar, '.search input')
-
-  return result.length > 0 ? result[0] : null
+  return that.$toolbar?.querySelector('.search input') ?? null
 }

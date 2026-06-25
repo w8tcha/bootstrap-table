@@ -4,7 +4,9 @@
  * Edited by: DarkThinking (https://github.com/DarkThinking)
  */
 
-$.fn.bootstrapTable.locales['es-AR'] = {
+
+
+BootstrapTable.locales['es-AR'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -189,4 +191,4 @@ $.fn.bootstrapTable.locales['es-AR'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-AR'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-AR'])

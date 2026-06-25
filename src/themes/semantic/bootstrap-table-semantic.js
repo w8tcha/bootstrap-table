@@ -4,17 +4,19 @@
  * theme: https://github.com/Semantic-Org/Semantic-UI
  */
 
-const Utils = $.fn.bootstrapTable.utils
 
-Utils.extend($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Utils.extend(BootstrapTable.defaults, {
   classes: 'ui selectable celled table unstackable',
   buttonsPrefix: '',
   buttonsClass: 'ui button'
 })
 
-$.fn.bootstrapTable.theme = 'semantic'
+BootstrapTable.theme = 'semantic'
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   initConstants () {
     super.initConstants()
 
@@ -40,13 +42,15 @@ $.BootstrapTable = class extends $.BootstrapTable {
   }
 
   handleToolbar () {
-    this.$toolbar.find('.button.dropdown').dropdown()
+    // TODO: use Semantic UI native API without jQuery:
+    // Array.from(this.$toolbar.querySelectorAll('.button.dropdown')).forEach(el => $(el).dropdown())
   }
 
   initPagination () {
     super.initPagination()
     if (this.options.pagination && this.paginationParts.includes('pageSize')) {
-      this.$pagination.find('.dropdown').dropdown()
+      // TODO: use Semantic UI native API without jQuery:
+      // this.$pagination.flatMap(p => [...p.querySelectorAll('.dropdown')]).forEach(el => $(el).dropdown())
     }
   }
 }

@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -1718,47 +1718,62 @@
   /**
    * @author: Dennis Hernández
    * @version: v2.0.0
+   *
+   * Note: this extension depends on the resizableColumns jQuery plugin.
+   * jQuery must be available and the plugin loaded for this to work.
    */
 
+  // resizableColumns stores its state via jQuery .data() so we check for it there
   var isInit = function isInit(that) {
-    return that.$el.data('resizableColumns') !== undefined;
+    if (typeof window.$ !== 'undefined') {
+      return $(that.$el).data('resizableColumns') !== undefined;
+    }
+    return false;
   };
   var initResizable = function initResizable(that) {
-    if (that.options.resizable && !that.options.cardView && !isInit(that) && that.$el.is(':visible')) {
-      that.$el.resizableColumns({
-        store: window.store
-      });
+    if (that.options.resizable && !that.options.cardView && !isInit(that) && that.$el.offsetParent !== null) {
+      if (typeof window.$ !== 'undefined') {
+        $(that.$el).resizableColumns({
+          store: window.store
+        });
+      }
     }
   };
   var destroy = function destroy(that) {
-    if (isInit(that)) {
-      that.$el.data('resizableColumns').destroy();
+    if (isInit(that) && typeof window.$ !== 'undefined') {
+      $(that.$el).data('resizableColumns').destroy();
     }
   };
   var reInitResizable = function reInitResizable(that) {
     destroy(that);
     initResizable(that);
   };
-  Object.assign($.fn.bootstrapTable.defaults, {
+  Object.assign(BootstrapTable.defaults, {
     resizable: false
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "initBody",
       value: function initBody() {
         var _this = this;
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "initBody", this)(args);
-        this.$el.off('column-switch.bs.table page-change.bs.table').on('column-switch.bs.table page-change.bs.table', function () {
-          reInitResizable(_this);
-        });
+        _superPropGet(_default, "initBody", this)(args);
+        if (this._resizableHandler) {
+          this.$el.removeEventListener('column-switch.bs.table', this._resizableHandler);
+          this.$el.removeEventListener('page-change.bs.table', this._resizableHandler);
+        }
+        this._resizableHandler = function () {
+          return reInitResizable(_this);
+        };
+        this.$el.addEventListener('column-switch.bs.table', this._resizableHandler);
+        this.$el.addEventListener('page-change.bs.table', this._resizableHandler);
         reInitResizable(this);
       }
     }, {
@@ -1767,7 +1782,7 @@
         for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
           args[_key2] = arguments[_key2];
         }
-        _superPropGet(_class, "toggleView", this)(args);
+        _superPropGet(_default, "toggleView", this)(args);
         if (this.options.resizable && this.options.cardView) {
           // Destroy the plugin
           destroy(this);
@@ -1780,7 +1795,7 @@
         for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
           args[_key3] = arguments[_key3];
         }
-        _superPropGet(_class, "resetView", this)(args);
+        _superPropGet(_default, "resetView", this)(args);
         if (this.options.resizable) {
           // because in fitHeader function, we use setTimeout(func, 100);
           setTimeout(function () {
@@ -1789,6 +1804,8 @@
         }
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

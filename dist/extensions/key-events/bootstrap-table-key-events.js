@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-  typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('bootstrap-table')) :
+  typeof define === 'function' && define.amd ? define(['bootstrap-table'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory(global.BootstrapTable));
+})(this, (function (BootstrapTable) { 'use strict';
 
   function _assertThisInitialized(e) {
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -96,7 +96,7 @@
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-  var es_array_find = {};
+  var es_object_assign = {};
 
   var globalThis_1;
   var hasRequiredGlobalThis;
@@ -1612,62 +1612,110 @@
   	return _export;
   }
 
-  var functionUncurryThisClause;
-  var hasRequiredFunctionUncurryThisClause;
+  var objectKeys;
+  var hasRequiredObjectKeys;
 
-  function requireFunctionUncurryThisClause () {
-  	if (hasRequiredFunctionUncurryThisClause) return functionUncurryThisClause;
-  	hasRequiredFunctionUncurryThisClause = 1;
-  	var classofRaw = requireClassofRaw();
+  function requireObjectKeys () {
+  	if (hasRequiredObjectKeys) return objectKeys;
+  	hasRequiredObjectKeys = 1;
+  	var internalObjectKeys = requireObjectKeysInternal();
+  	var enumBugKeys = requireEnumBugKeys();
+
+  	// `Object.keys` method
+  	// https://tc39.es/ecma262/#sec-object.keys
+  	// eslint-disable-next-line es/no-object-keys -- safe
+  	objectKeys = Object.keys || function keys(O) {
+  	  return internalObjectKeys(O, enumBugKeys);
+  	};
+  	return objectKeys;
+  }
+
+  var objectAssign;
+  var hasRequiredObjectAssign;
+
+  function requireObjectAssign () {
+  	if (hasRequiredObjectAssign) return objectAssign;
+  	hasRequiredObjectAssign = 1;
+  	var DESCRIPTORS = requireDescriptors();
   	var uncurryThis = requireFunctionUncurryThis();
+  	var call = requireFunctionCall();
+  	var fails = requireFails();
+  	var objectKeys = requireObjectKeys();
+  	var getOwnPropertySymbolsModule = requireObjectGetOwnPropertySymbols();
+  	var propertyIsEnumerableModule = requireObjectPropertyIsEnumerable();
+  	var toObject = requireToObject();
+  	var IndexedObject = requireIndexedObject();
 
-  	functionUncurryThisClause = function (fn) {
-  	  // Nashorn bug:
-  	  //   https://github.com/zloirock/core-js/issues/1128
-  	  //   https://github.com/zloirock/core-js/issues/1130
-  	  if (classofRaw(fn) === 'Function') return uncurryThis(fn);
-  	};
-  	return functionUncurryThisClause;
+  	// eslint-disable-next-line es/no-object-assign -- safe
+  	var $assign = Object.assign;
+  	// eslint-disable-next-line es/no-object-defineproperty -- required for testing
+  	var defineProperty = Object.defineProperty;
+  	var concat = uncurryThis([].concat);
+
+  	// `Object.assign` method
+  	// https://tc39.es/ecma262/#sec-object.assign
+  	objectAssign = !$assign || fails(function () {
+  	  // should have correct order of operations (Edge bug)
+  	  if (DESCRIPTORS && $assign({ b: 1 }, $assign(defineProperty({}, 'a', {
+  	    enumerable: true,
+  	    get: function () {
+  	      defineProperty(this, 'b', {
+  	        value: 3,
+  	        enumerable: false
+  	      });
+  	    }
+  	  }), { b: 2 })).b !== 1) return true;
+  	  // should work with symbols and should have deterministic property order (V8 bug)
+  	  var A = {};
+  	  var B = {};
+  	  // eslint-disable-next-line es/no-symbol -- safe
+  	  var symbol = Symbol('assign detection');
+  	  var alphabet = 'abcdefghijklmnopqrst';
+  	  A[symbol] = 7;
+  	  // eslint-disable-next-line es/no-array-prototype-foreach -- safe
+  	  alphabet.split('').forEach(function (chr) { B[chr] = chr; });
+  	  return $assign({}, A)[symbol] !== 7 || objectKeys($assign({}, B)).join('') !== alphabet;
+  	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars -- required for `.length`
+  	  var T = toObject(target);
+  	  var argumentsLength = arguments.length;
+  	  var index = 1;
+  	  var getOwnPropertySymbols = getOwnPropertySymbolsModule.f;
+  	  var propertyIsEnumerable = propertyIsEnumerableModule.f;
+  	  while (argumentsLength > index) {
+  	    var S = IndexedObject(arguments[index++]);
+  	    var keys = getOwnPropertySymbols ? concat(objectKeys(S), getOwnPropertySymbols(S)) : objectKeys(S);
+  	    var length = keys.length;
+  	    var j = 0;
+  	    var key;
+  	    while (length > j) {
+  	      key = keys[j++];
+  	      if (!DESCRIPTORS || call(propertyIsEnumerable, S, key)) T[key] = S[key];
+  	    }
+  	  } return T;
+  	} : $assign;
+  	return objectAssign;
   }
 
-  var functionBindContext;
-  var hasRequiredFunctionBindContext;
+  var hasRequiredEs_object_assign;
 
-  function requireFunctionBindContext () {
-  	if (hasRequiredFunctionBindContext) return functionBindContext;
-  	hasRequiredFunctionBindContext = 1;
-  	var uncurryThis = requireFunctionUncurryThisClause();
-  	var aCallable = requireACallable();
-  	var NATIVE_BIND = requireFunctionBindNative();
+  function requireEs_object_assign () {
+  	if (hasRequiredEs_object_assign) return es_object_assign;
+  	hasRequiredEs_object_assign = 1;
+  	var $ = require_export();
+  	var assign = requireObjectAssign();
 
-  	var bind = uncurryThis(uncurryThis.bind);
-
-  	// optional / simple context binding
-  	functionBindContext = function (fn, that) {
-  	  aCallable(fn);
-  	  return that === undefined ? fn : NATIVE_BIND ? bind(fn, that) : function (/* ...args */) {
-  	    return fn.apply(that, arguments);
-  	  };
-  	};
-  	return functionBindContext;
+  	// `Object.assign` method
+  	// https://tc39.es/ecma262/#sec-object.assign
+  	// eslint-disable-next-line es/no-object-assign -- required for testing
+  	$({ target: 'Object', stat: true, arity: 2, forced: Object.assign !== assign }, {
+  	  assign: assign
+  	});
+  	return es_object_assign;
   }
 
-  var isArray;
-  var hasRequiredIsArray;
+  requireEs_object_assign();
 
-  function requireIsArray () {
-  	if (hasRequiredIsArray) return isArray;
-  	hasRequiredIsArray = 1;
-  	var classof = requireClassofRaw();
-
-  	// `IsArray` abstract operation
-  	// https://tc39.es/ecma262/#sec-isarray
-  	// eslint-disable-next-line es/no-array-isarray -- safe
-  	isArray = Array.isArray || function isArray(argument) {
-  	  return classof(argument) === 'Array';
-  	};
-  	return isArray;
-  }
+  var es_regexp_exec = {};
 
   var toStringTagSupport;
   var hasRequiredToStringTagSupport;
@@ -1724,229 +1772,89 @@
   	return classof;
   }
 
-  var isConstructor;
-  var hasRequiredIsConstructor;
+  var toString;
+  var hasRequiredToString;
 
-  function requireIsConstructor () {
-  	if (hasRequiredIsConstructor) return isConstructor;
-  	hasRequiredIsConstructor = 1;
-  	var uncurryThis = requireFunctionUncurryThis();
-  	var fails = requireFails();
-  	var isCallable = requireIsCallable();
+  function requireToString () {
+  	if (hasRequiredToString) return toString;
+  	hasRequiredToString = 1;
   	var classof = requireClassof();
-  	var getBuiltIn = requireGetBuiltIn();
-  	var inspectSource = requireInspectSource();
 
-  	var noop = function () { /* empty */ };
-  	var construct = getBuiltIn('Reflect', 'construct');
-  	var constructorRegExp = /^\s*(?:class|function)\b/;
-  	var exec = uncurryThis(constructorRegExp.exec);
-  	var INCORRECT_TO_STRING = !constructorRegExp.test(noop);
+  	var $String = String;
 
-  	var isConstructorModern = function isConstructor(argument) {
-  	  if (!isCallable(argument)) return false;
-  	  try {
-  	    construct(noop, [], argument);
-  	    return true;
-  	  } catch (error) {
-  	    return false;
-  	  }
+  	toString = function (argument) {
+  	  if (classof(argument) === 'Symbol') throw new TypeError('Cannot convert a Symbol value to a string');
+  	  return $String(argument);
   	};
-
-  	var isConstructorLegacy = function isConstructor(argument) {
-  	  if (!isCallable(argument)) return false;
-  	  switch (classof(argument)) {
-  	    case 'AsyncFunction':
-  	    case 'GeneratorFunction':
-  	    case 'AsyncGeneratorFunction': return false;
-  	  }
-  	  try {
-  	    // we can't check .prototype since constructors produced by .bind haven't it
-  	    // `Function#toString` throws on some built-it function in some legacy engines
-  	    // (for example, `DOMQuad` and similar in FF41-)
-  	    return INCORRECT_TO_STRING || !!exec(constructorRegExp, inspectSource(argument));
-  	  } catch (error) {
-  	    return true;
-  	  }
-  	};
-
-  	isConstructorLegacy.sham = true;
-
-  	// `IsConstructor` abstract operation
-  	// https://tc39.es/ecma262/#sec-isconstructor
-  	isConstructor = !construct || fails(function () {
-  	  var called;
-  	  return isConstructorModern(isConstructorModern.call)
-  	    || !isConstructorModern(Object)
-  	    || !isConstructorModern(function () { called = true; })
-  	    || called;
-  	}) ? isConstructorLegacy : isConstructorModern;
-  	return isConstructor;
+  	return toString;
   }
 
-  var arraySpeciesConstructor;
-  var hasRequiredArraySpeciesConstructor;
+  var regexpFlags;
+  var hasRequiredRegexpFlags;
 
-  function requireArraySpeciesConstructor () {
-  	if (hasRequiredArraySpeciesConstructor) return arraySpeciesConstructor;
-  	hasRequiredArraySpeciesConstructor = 1;
-  	var isArray = requireIsArray();
-  	var isConstructor = requireIsConstructor();
-  	var isObject = requireIsObject();
-  	var wellKnownSymbol = requireWellKnownSymbol();
+  function requireRegexpFlags () {
+  	if (hasRequiredRegexpFlags) return regexpFlags;
+  	hasRequiredRegexpFlags = 1;
+  	var anObject = requireAnObject();
 
-  	var SPECIES = wellKnownSymbol('species');
-  	var $Array = Array;
-
-  	// a part of `ArraySpeciesCreate` abstract operation
-  	// https://tc39.es/ecma262/#sec-arrayspeciescreate
-  	arraySpeciesConstructor = function (originalArray) {
-  	  var C;
-  	  if (isArray(originalArray)) {
-  	    C = originalArray.constructor;
-  	    // cross-realm fallback
-  	    if (isConstructor(C) && (C === $Array || isArray(C.prototype))) C = undefined;
-  	    else if (isObject(C)) {
-  	      C = C[SPECIES];
-  	      if (C === null) C = undefined;
-  	    }
-  	  } return C === undefined ? $Array : C;
+  	// `RegExp.prototype.flags` getter implementation
+  	// https://tc39.es/ecma262/#sec-get-regexp.prototype.flags
+  	regexpFlags = function () {
+  	  var that = anObject(this);
+  	  var result = '';
+  	  if (that.hasIndices) result += 'd';
+  	  if (that.global) result += 'g';
+  	  if (that.ignoreCase) result += 'i';
+  	  if (that.multiline) result += 'm';
+  	  if (that.dotAll) result += 's';
+  	  if (that.unicode) result += 'u';
+  	  if (that.unicodeSets) result += 'v';
+  	  if (that.sticky) result += 'y';
+  	  return result;
   	};
-  	return arraySpeciesConstructor;
+  	return regexpFlags;
   }
 
-  var arraySpeciesCreate;
-  var hasRequiredArraySpeciesCreate;
+  var regexpStickyHelpers;
+  var hasRequiredRegexpStickyHelpers;
 
-  function requireArraySpeciesCreate () {
-  	if (hasRequiredArraySpeciesCreate) return arraySpeciesCreate;
-  	hasRequiredArraySpeciesCreate = 1;
-  	var arraySpeciesConstructor = requireArraySpeciesConstructor();
+  function requireRegexpStickyHelpers () {
+  	if (hasRequiredRegexpStickyHelpers) return regexpStickyHelpers;
+  	hasRequiredRegexpStickyHelpers = 1;
+  	var fails = requireFails();
+  	var globalThis = requireGlobalThis();
 
-  	// `ArraySpeciesCreate` abstract operation
-  	// https://tc39.es/ecma262/#sec-arrayspeciescreate
-  	arraySpeciesCreate = function (originalArray, length) {
-  	  return new (arraySpeciesConstructor(originalArray))(length === 0 ? 0 : length);
+  	// babel-minify and Closure Compiler transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError
+  	var $RegExp = globalThis.RegExp;
+
+  	var UNSUPPORTED_Y = fails(function () {
+  	  var re = $RegExp('a', 'y');
+  	  re.lastIndex = 2;
+  	  return re.exec('abcd') !== null;
+  	});
+
+  	// UC Browser bug
+  	// https://github.com/zloirock/core-js/issues/1008
+  	var MISSED_STICKY = UNSUPPORTED_Y || fails(function () {
+  	  return !$RegExp('a', 'y').sticky;
+  	});
+
+  	var BROKEN_CARET = UNSUPPORTED_Y || fails(function () {
+  	  // https://bugzilla.mozilla.org/show_bug.cgi?id=773687
+  	  var re = $RegExp('^r', 'gy');
+  	  re.lastIndex = 2;
+  	  return re.exec('str') !== null;
+  	});
+
+  	regexpStickyHelpers = {
+  	  BROKEN_CARET: BROKEN_CARET,
+  	  MISSED_STICKY: MISSED_STICKY,
+  	  UNSUPPORTED_Y: UNSUPPORTED_Y
   	};
-  	return arraySpeciesCreate;
-  }
-
-  var createProperty;
-  var hasRequiredCreateProperty;
-
-  function requireCreateProperty () {
-  	if (hasRequiredCreateProperty) return createProperty;
-  	hasRequiredCreateProperty = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var definePropertyModule = requireObjectDefineProperty();
-  	var createPropertyDescriptor = requireCreatePropertyDescriptor();
-
-  	createProperty = function (object, key, value) {
-  	  if (DESCRIPTORS) definePropertyModule.f(object, key, createPropertyDescriptor(0, value));
-  	  else object[key] = value;
-  	};
-  	return createProperty;
-  }
-
-  var arrayIteration;
-  var hasRequiredArrayIteration;
-
-  function requireArrayIteration () {
-  	if (hasRequiredArrayIteration) return arrayIteration;
-  	hasRequiredArrayIteration = 1;
-  	var bind = requireFunctionBindContext();
-  	var IndexedObject = requireIndexedObject();
-  	var toObject = requireToObject();
-  	var lengthOfArrayLike = requireLengthOfArrayLike();
-  	var arraySpeciesCreate = requireArraySpeciesCreate();
-  	var createProperty = requireCreateProperty();
-
-  	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
-  	var createMethod = function (TYPE) {
-  	  var IS_MAP = TYPE === 1;
-  	  var IS_FILTER = TYPE === 2;
-  	  var IS_SOME = TYPE === 3;
-  	  var IS_EVERY = TYPE === 4;
-  	  var IS_FIND_INDEX = TYPE === 6;
-  	  var IS_FILTER_REJECT = TYPE === 7;
-  	  var NO_HOLES = TYPE === 5 || IS_FIND_INDEX;
-  	  return function ($this, callbackfn, that) {
-  	    var O = toObject($this);
-  	    var self = IndexedObject(O);
-  	    var length = lengthOfArrayLike(self);
-  	    var boundFunction = bind(callbackfn, that);
-  	    var index = 0;
-  	    var resIndex = 0;
-  	    var target = IS_MAP ? arraySpeciesCreate($this, length) : IS_FILTER || IS_FILTER_REJECT ? arraySpeciesCreate($this, 0) : undefined;
-  	    var value, result;
-  	    for (;length > index; index++) if (NO_HOLES || index in self) {
-  	      value = self[index];
-  	      result = boundFunction(value, index, O);
-  	      if (TYPE) {
-  	        if (IS_MAP) createProperty(target, index, result);    // map
-  	        else if (result) switch (TYPE) {
-  	          case 3: return true;                                // some
-  	          case 5: return value;                               // find
-  	          case 6: return index;                               // findIndex
-  	          case 2: createProperty(target, resIndex++, value);  // filter
-  	        } else switch (TYPE) {
-  	          case 4: return false;                               // every
-  	          case 7: createProperty(target, resIndex++, value);  // filterReject
-  	        }
-  	      }
-  	    }
-  	    return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
-  	  };
-  	};
-
-  	arrayIteration = {
-  	  // `Array.prototype.forEach` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.foreach
-  	  forEach: createMethod(0),
-  	  // `Array.prototype.map` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.map
-  	  map: createMethod(1),
-  	  // `Array.prototype.filter` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.filter
-  	  filter: createMethod(2),
-  	  // `Array.prototype.some` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.some
-  	  some: createMethod(3),
-  	  // `Array.prototype.every` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.every
-  	  every: createMethod(4),
-  	  // `Array.prototype.find` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.find
-  	  find: createMethod(5),
-  	  // `Array.prototype.findIndex` method
-  	  // https://tc39.es/ecma262/#sec-array.prototype.findIndex
-  	  findIndex: createMethod(6),
-  	  // `Array.prototype.filterReject` method
-  	  // https://github.com/tc39/proposal-array-filtering
-  	  filterReject: createMethod(7)
-  	};
-  	return arrayIteration;
+  	return regexpStickyHelpers;
   }
 
   var objectDefineProperties = {};
-
-  var objectKeys;
-  var hasRequiredObjectKeys;
-
-  function requireObjectKeys () {
-  	if (hasRequiredObjectKeys) return objectKeys;
-  	hasRequiredObjectKeys = 1;
-  	var internalObjectKeys = requireObjectKeysInternal();
-  	var enumBugKeys = requireEnumBugKeys();
-
-  	// `Object.keys` method
-  	// https://tc39.es/ecma262/#sec-object.keys
-  	// eslint-disable-next-line es/no-object-keys -- safe
-  	objectKeys = Object.keys || function keys(O) {
-  	  return internalObjectKeys(O, enumBugKeys);
-  	};
-  	return objectKeys;
-  }
 
   var hasRequiredObjectDefineProperties;
 
@@ -2079,275 +1987,6 @@
   	  return Properties === undefined ? result : definePropertiesModule.f(result, Properties);
   	};
   	return objectCreate;
-  }
-
-  var addToUnscopables;
-  var hasRequiredAddToUnscopables;
-
-  function requireAddToUnscopables () {
-  	if (hasRequiredAddToUnscopables) return addToUnscopables;
-  	hasRequiredAddToUnscopables = 1;
-  	var wellKnownSymbol = requireWellKnownSymbol();
-  	var create = requireObjectCreate();
-  	var defineProperty = requireObjectDefineProperty().f;
-
-  	var UNSCOPABLES = wellKnownSymbol('unscopables');
-  	var ArrayPrototype = Array.prototype;
-
-  	// Array.prototype[@@unscopables]
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	if (ArrayPrototype[UNSCOPABLES] === undefined) {
-  	  defineProperty(ArrayPrototype, UNSCOPABLES, {
-  	    configurable: true,
-  	    value: create(null)
-  	  });
-  	}
-
-  	// add a key to Array.prototype[@@unscopables]
-  	addToUnscopables = function (key) {
-  	  ArrayPrototype[UNSCOPABLES][key] = true;
-  	};
-  	return addToUnscopables;
-  }
-
-  var hasRequiredEs_array_find;
-
-  function requireEs_array_find () {
-  	if (hasRequiredEs_array_find) return es_array_find;
-  	hasRequiredEs_array_find = 1;
-  	var $ = require_export();
-  	var $find = requireArrayIteration().find;
-  	var addToUnscopables = requireAddToUnscopables();
-
-  	var FIND = 'find';
-  	var SKIPS_HOLES = true;
-
-  	// Shouldn't skip holes
-  	// eslint-disable-next-line es/no-array-prototype-find -- testing
-  	if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-  	// `Array.prototype.find` method
-  	// https://tc39.es/ecma262/#sec-array.prototype.find
-  	$({ target: 'Array', proto: true, forced: SKIPS_HOLES }, {
-  	  find: function find(callbackfn /* , that = undefined */) {
-  	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  	  }
-  	});
-
-  	// https://tc39.es/ecma262/#sec-array.prototype-@@unscopables
-  	addToUnscopables(FIND);
-  	return es_array_find;
-  }
-
-  requireEs_array_find();
-
-  var es_object_assign = {};
-
-  var objectAssign;
-  var hasRequiredObjectAssign;
-
-  function requireObjectAssign () {
-  	if (hasRequiredObjectAssign) return objectAssign;
-  	hasRequiredObjectAssign = 1;
-  	var DESCRIPTORS = requireDescriptors();
-  	var uncurryThis = requireFunctionUncurryThis();
-  	var call = requireFunctionCall();
-  	var fails = requireFails();
-  	var objectKeys = requireObjectKeys();
-  	var getOwnPropertySymbolsModule = requireObjectGetOwnPropertySymbols();
-  	var propertyIsEnumerableModule = requireObjectPropertyIsEnumerable();
-  	var toObject = requireToObject();
-  	var IndexedObject = requireIndexedObject();
-
-  	// eslint-disable-next-line es/no-object-assign -- safe
-  	var $assign = Object.assign;
-  	// eslint-disable-next-line es/no-object-defineproperty -- required for testing
-  	var defineProperty = Object.defineProperty;
-  	var concat = uncurryThis([].concat);
-
-  	// `Object.assign` method
-  	// https://tc39.es/ecma262/#sec-object.assign
-  	objectAssign = !$assign || fails(function () {
-  	  // should have correct order of operations (Edge bug)
-  	  if (DESCRIPTORS && $assign({ b: 1 }, $assign(defineProperty({}, 'a', {
-  	    enumerable: true,
-  	    get: function () {
-  	      defineProperty(this, 'b', {
-  	        value: 3,
-  	        enumerable: false
-  	      });
-  	    }
-  	  }), { b: 2 })).b !== 1) return true;
-  	  // should work with symbols and should have deterministic property order (V8 bug)
-  	  var A = {};
-  	  var B = {};
-  	  // eslint-disable-next-line es/no-symbol -- safe
-  	  var symbol = Symbol('assign detection');
-  	  var alphabet = 'abcdefghijklmnopqrst';
-  	  A[symbol] = 7;
-  	  // eslint-disable-next-line es/no-array-prototype-foreach -- safe
-  	  alphabet.split('').forEach(function (chr) { B[chr] = chr; });
-  	  return $assign({}, A)[symbol] !== 7 || objectKeys($assign({}, B)).join('') !== alphabet;
-  	}) ? function assign(target, source) { // eslint-disable-line no-unused-vars -- required for `.length`
-  	  var T = toObject(target);
-  	  var argumentsLength = arguments.length;
-  	  var index = 1;
-  	  var getOwnPropertySymbols = getOwnPropertySymbolsModule.f;
-  	  var propertyIsEnumerable = propertyIsEnumerableModule.f;
-  	  while (argumentsLength > index) {
-  	    var S = IndexedObject(arguments[index++]);
-  	    var keys = getOwnPropertySymbols ? concat(objectKeys(S), getOwnPropertySymbols(S)) : objectKeys(S);
-  	    var length = keys.length;
-  	    var j = 0;
-  	    var key;
-  	    while (length > j) {
-  	      key = keys[j++];
-  	      if (!DESCRIPTORS || call(propertyIsEnumerable, S, key)) T[key] = S[key];
-  	    }
-  	  } return T;
-  	} : $assign;
-  	return objectAssign;
-  }
-
-  var hasRequiredEs_object_assign;
-
-  function requireEs_object_assign () {
-  	if (hasRequiredEs_object_assign) return es_object_assign;
-  	hasRequiredEs_object_assign = 1;
-  	var $ = require_export();
-  	var assign = requireObjectAssign();
-
-  	// `Object.assign` method
-  	// https://tc39.es/ecma262/#sec-object.assign
-  	// eslint-disable-next-line es/no-object-assign -- required for testing
-  	$({ target: 'Object', stat: true, arity: 2, forced: Object.assign !== assign }, {
-  	  assign: assign
-  	});
-  	return es_object_assign;
-  }
-
-  requireEs_object_assign();
-
-  var es_object_toString = {};
-
-  var objectToString;
-  var hasRequiredObjectToString;
-
-  function requireObjectToString () {
-  	if (hasRequiredObjectToString) return objectToString;
-  	hasRequiredObjectToString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var classof = requireClassof();
-
-  	// `Object.prototype.toString` method implementation
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	objectToString = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
-  	  return '[object ' + classof(this) + ']';
-  	};
-  	return objectToString;
-  }
-
-  var hasRequiredEs_object_toString;
-
-  function requireEs_object_toString () {
-  	if (hasRequiredEs_object_toString) return es_object_toString;
-  	hasRequiredEs_object_toString = 1;
-  	var TO_STRING_TAG_SUPPORT = requireToStringTagSupport();
-  	var defineBuiltIn = requireDefineBuiltIn();
-  	var toString = requireObjectToString();
-
-  	// `Object.prototype.toString` method
-  	// https://tc39.es/ecma262/#sec-object.prototype.tostring
-  	if (!TO_STRING_TAG_SUPPORT) {
-  	  defineBuiltIn(Object.prototype, 'toString', toString, { unsafe: true });
-  	}
-  	return es_object_toString;
-  }
-
-  requireEs_object_toString();
-
-  var es_regexp_exec = {};
-
-  var toString;
-  var hasRequiredToString;
-
-  function requireToString () {
-  	if (hasRequiredToString) return toString;
-  	hasRequiredToString = 1;
-  	var classof = requireClassof();
-
-  	var $String = String;
-
-  	toString = function (argument) {
-  	  if (classof(argument) === 'Symbol') throw new TypeError('Cannot convert a Symbol value to a string');
-  	  return $String(argument);
-  	};
-  	return toString;
-  }
-
-  var regexpFlags;
-  var hasRequiredRegexpFlags;
-
-  function requireRegexpFlags () {
-  	if (hasRequiredRegexpFlags) return regexpFlags;
-  	hasRequiredRegexpFlags = 1;
-  	var anObject = requireAnObject();
-
-  	// `RegExp.prototype.flags` getter implementation
-  	// https://tc39.es/ecma262/#sec-get-regexp.prototype.flags
-  	regexpFlags = function () {
-  	  var that = anObject(this);
-  	  var result = '';
-  	  if (that.hasIndices) result += 'd';
-  	  if (that.global) result += 'g';
-  	  if (that.ignoreCase) result += 'i';
-  	  if (that.multiline) result += 'm';
-  	  if (that.dotAll) result += 's';
-  	  if (that.unicode) result += 'u';
-  	  if (that.unicodeSets) result += 'v';
-  	  if (that.sticky) result += 'y';
-  	  return result;
-  	};
-  	return regexpFlags;
-  }
-
-  var regexpStickyHelpers;
-  var hasRequiredRegexpStickyHelpers;
-
-  function requireRegexpStickyHelpers () {
-  	if (hasRequiredRegexpStickyHelpers) return regexpStickyHelpers;
-  	hasRequiredRegexpStickyHelpers = 1;
-  	var fails = requireFails();
-  	var globalThis = requireGlobalThis();
-
-  	// babel-minify and Closure Compiler transpiles RegExp('a', 'y') -> /a/y and it causes SyntaxError
-  	var $RegExp = globalThis.RegExp;
-
-  	var UNSUPPORTED_Y = fails(function () {
-  	  var re = $RegExp('a', 'y');
-  	  re.lastIndex = 2;
-  	  return re.exec('abcd') !== null;
-  	});
-
-  	// UC Browser bug
-  	// https://github.com/zloirock/core-js/issues/1008
-  	var MISSED_STICKY = UNSUPPORTED_Y || fails(function () {
-  	  return !$RegExp('a', 'y').sticky;
-  	});
-
-  	var BROKEN_CARET = UNSUPPORTED_Y || fails(function () {
-  	  // https://bugzilla.mozilla.org/show_bug.cgi?id=773687
-  	  var re = $RegExp('^r', 'gy');
-  	  re.lastIndex = 2;
-  	  return re.exec('str') !== null;
-  	});
-
-  	regexpStickyHelpers = {
-  	  BROKEN_CARET: BROKEN_CARET,
-  	  MISSED_STICKY: MISSED_STICKY,
-  	  UNSUPPORTED_Y: UNSUPPORTED_Y
-  	};
-  	return regexpStickyHelpers;
   }
 
   var regexpUnsupportedDotAll;
@@ -2724,23 +2363,23 @@
    * @update zhixin wen <wenzhixin2010@gmail.com>
    */
 
-  var Utils = $.fn.bootstrapTable.utils;
-  Object.assign($.fn.bootstrapTable.defaults, {
+  var Utils = BootstrapTable.utils;
+  Object.assign(BootstrapTable.defaults, {
     keyEvents: false
   });
-  $.BootstrapTable = /*#__PURE__*/function (_$$BootstrapTable) {
-    function _class() {
-      _classCallCheck(this, _class);
-      return _callSuper(this, _class, arguments);
+  var _default = /*#__PURE__*/function (_BootstrapTable) {
+    function _default() {
+      _classCallCheck(this, _default);
+      return _callSuper(this, _default, arguments);
     }
-    _inherits(_class, _$$BootstrapTable);
-    return _createClass(_class, [{
+    _inherits(_default, _BootstrapTable);
+    return _createClass(_default, [{
       key: "init",
       value: function init() {
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
         }
-        _superPropGet(_class, "init", this)(args);
+        _superPropGet(_default, "init", this)(args);
         if (this.options.keyEvents) {
           this.initKeyEvents();
         }
@@ -2749,12 +2388,16 @@
       key: "initKeyEvents",
       value: function initKeyEvents() {
         var _this = this;
-        $(document).off('keydown').on('keydown', function (e) {
+        if (this._keydownHandler) {
+          document.removeEventListener('keydown', this._keydownHandler);
+        }
+        this._keydownHandler = function (e) {
+          var _document$activeEleme;
           var search = Utils.getSearchInput(_this);
-          var $refresh = _this.$toolbar.find('button[name="refresh"]');
-          var $toggle = _this.$toolbar.find('button[name="toggle"]');
-          var $paginationSwitch = _this.$toolbar.find('button[name="paginationSwitch"]');
-          if (document.activeElement === search || !$.contains(document.activeElement, _this.$toolbar.get(0))) {
+          var refresh = _this.$toolbar.querySelector('button[name="refresh"]');
+          var toggle = _this.$toolbar.querySelector('button[name="toggle"]');
+          var paginationSwitch = _this.$toolbar.querySelector('button[name="paginationSwitch"]');
+          if (document.activeElement === search || !((_document$activeEleme = document.activeElement) !== null && _document$activeEleme !== void 0 && _document$activeEleme.contains(_this.$toolbar))) {
             return true;
           }
           switch (e.keyCode) {
@@ -2763,28 +2406,28 @@
               if (!_this.options.search) {
                 return;
               }
-              $(search).focus();
+              search === null || search === void 0 || search.focus();
               return false;
             case 82:
               // r
               if (!_this.options.showRefresh) {
                 return;
               }
-              $refresh.click();
+              refresh === null || refresh === void 0 || refresh.click();
               return false;
             case 84:
               // t
               if (!_this.options.showToggle) {
                 return;
               }
-              $toggle.click();
+              toggle === null || toggle === void 0 || toggle.click();
               return false;
             case 80:
               // p
               if (!_this.options.showPaginationSwitch) {
                 return;
               }
-              $paginationSwitch.click();
+              paginationSwitch === null || paginationSwitch === void 0 || paginationSwitch.click();
               return false;
             case 37:
               // left
@@ -2801,9 +2444,12 @@
               _this.nextPage();
               return;
           }
-        });
+        };
+        document.addEventListener('keydown', this._keydownHandler);
       }
     }]);
-  }($.BootstrapTable);
+  }(BootstrapTable);
+
+  return _default;
 
 }));

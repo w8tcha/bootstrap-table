@@ -3,7 +3,9 @@
  * Author: David Morais Ferreira (https://github.com/DavidMoraisFerreira)
  */
 
-$.fn.bootstrapTable.locales['lb-LU'] = $.fn.bootstrapTable.locales['lb'] = {
+
+
+BootstrapTable.locales['lb-LU'] = BootstrapTable.locales['lb'] = {
   formatAddLevel () {
     return 'Add Level'
   },
@@ -188,4 +190,4 @@ $.fn.bootstrapTable.locales['lb-LU'] = $.fn.bootstrapTable.locales['lb'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['lb-LU'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['lb-LU'])

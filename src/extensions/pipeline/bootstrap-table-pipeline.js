@@ -47,9 +47,11 @@
  *
  **/
 
-const Utils = $.fn.bootstrapTable.utils
 
-Object.assign($.fn.bootstrapTable.defaults, {
+
+const Utils = BootstrapTable.utils
+
+Object.assign(BootstrapTable.defaults, {
   usePipeline: false,
   pipelineSize: 1000,
   // eslint-disable-next-line no-unused-vars
@@ -62,14 +64,14 @@ Object.assign($.fn.bootstrapTable.defaults, {
   }
 })
 
-Object.assign($.fn.bootstrapTable.events, {
+Object.assign(BootstrapTable.events, {
   'cached-data-hit.bs.table': 'onCachedDataHit',
   'cached-data-reset.bs.table': 'onCachedDataReset'
 })
 
-$.fn.bootstrapTable.methods.push('resetPipelineCache')
+BootstrapTable.methods.push('resetPipelineCache')
 
-$.BootstrapTable = class extends $.BootstrapTable {
+export default class extends BootstrapTable {
   // needs to be called before initServer
   init (...args) {
     if (this.options.usePipeline) {
@@ -103,8 +105,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
   // rebuild cache window on page size change
   onPageListChange (event) {
-    const target = $(event.currentTarget)
-    const newPageSize = parseInt(target.text(), 10)
+    const target = event.currentTarget
+    const newPageSize = parseInt(target.textContent, 10)
 
     this.options.pipelineSize = this.calculatePipelineSize(this.options.pipelineSize, newPageSize)
     this.resetCache = true
@@ -188,10 +190,6 @@ $.BootstrapTable = class extends $.BootstrapTable {
 
         // case 1: reset cache but stay within current window (e.g. column sort)
         // case 2: move outside of the current window (e.g. search or paging)
-        //  since each cache window is aligned with the current page size
-        //  checking if params.offset is outside the current window is sufficient.
-        //  need to re-query for preceding or succeeding cache window
-        //  also handle case
         if (this.resetCache || (params.offset < w.lower || params.offset > w.upper)) {
           useAjax = true
           this.setCurrWindow(params.offset)
@@ -233,8 +231,8 @@ $.BootstrapTable = class extends $.BootstrapTable {
     if (!this.pipelineResponseHandler) {
       this.pipelineResponseHandler = this.options.responseHandler
 
-      this.options.responseHandler = (_res, jqXHR) => {
-        let res = Utils.calculateObjectValue(this.options, this.pipelineResponseHandler, [_res, jqXHR], _res)
+      this.options.responseHandler = (_res, response) => {
+        let res = Utils.calculateObjectValue(this.options, this.pipelineResponseHandler, [_res, response], _res)
 
         // store entire request in cache
         this.cacheRequestJSON = Utils.extend(true, {}, res)

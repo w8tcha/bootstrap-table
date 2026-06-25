@@ -1,8 +1,5 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jQuery));
-})(this, (function ($) { 'use strict';
+(function (BootstrapTable) {
+	'use strict';
 
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1976,7 +1973,7 @@
 	 * Update: @misteregis <misteregis@gmail.com>
 	 */
 
-	$.fn.bootstrapTable.locales['es-ES'] = $.fn.bootstrapTable.locales['es'] = {
+	BootstrapTable.locales['es-ES'] = BootstrapTable.locales['es'] = {
 	  formatAddLevel: function formatAddLevel() {
 	    return 'Agregar nivel';
 	  },
@@ -2117,6 +2114,6 @@
 	    return 'Mostrar vista de carta';
 	  }
 	};
-	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['es-ES']);
+	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['es-ES']);
 
-}));
+})(BootstrapTable);

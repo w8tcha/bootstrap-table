@@ -4,7 +4,9 @@
  *         Nevets82 <Nevets82@gmail.com>
  */
 
-$.fn.bootstrapTable.locales['fr-BE'] = {
+
+
+BootstrapTable.locales['fr-BE'] = {
   formatAddLevel () {
     return 'Ajouter un niveau'
   },
@@ -189,4 +191,4 @@ $.fn.bootstrapTable.locales['fr-BE'] = {
   }
 }
 
-Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['fr-BE'])
+Object.assign(BootstrapTable.defaults, BootstrapTable.locales['fr-BE'])

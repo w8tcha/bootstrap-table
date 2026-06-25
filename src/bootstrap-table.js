@@ -16,15 +16,34 @@ import SearchModule from './modules/search.js'
 import ToolbarModule from './modules/toolbar.js'
 import Utils from './utils/index.js'
 
-class BootstrapTable {
+const _instanceMap = new WeakMap()
+
+function getDataAttrs (el) {
+  const data = {}
+
+  for (const key in el.dataset) {
+    const value = el.dataset[key]
+
+    try {
+      data[key] = JSON.parse(value)
+    } catch {
+      data[key] = value
+    }
+  }
+  return data
+}
+
+export default class BootstrapTable {
   constructor (el, options) {
     this.options = options
-    this.$el = $(el)
-    this.$el_ = this.$el.clone()
+    this.$el = typeof el === 'string' ? document.querySelector(el) : el
+    this.$el_ = this.$el.cloneNode(true)
     this._timeoutId = {
       header: 0,
       footer: 0
     }
+    this._resizeHandler = null
+    this._thDataMap = new WeakMap()
   }
 
   init () {
@@ -46,14 +65,19 @@ class BootstrapTable {
     const name = `${_name}.bs.table`
 
     this.options[BootstrapTable.EVENTS[name]](...[...args, this])
-    this.$el.trigger($.Event(name, { sender: this }), args)
+    this.$el.dispatchEvent(new CustomEvent(name, {
+      bubbles: true,
+      detail: args
+    }))
 
     this.options.onAll(name, ...[...args, this])
-    this.$el.trigger($.Event('all.bs.table', { sender: this }), [name, args])
+    this.$el.dispatchEvent(new CustomEvent('all.bs.table', {
+      bubbles: true,
+      detail: [name, args]
+    }))
   }
 
   getOptions () {
-    // deep copy and remove data
     const options = Utils.extend({}, this.options)
 
     delete options.data
@@ -61,7 +85,6 @@ class BootstrapTable {
   }
 
   refreshOptions (options) {
-    // If the objects are equivalent then avoid the call of destroy / init methods
     if (Utils.compareObjects(this.options, options, true)) {
       return
     }
@@ -81,17 +104,38 @@ class BootstrapTable {
     for (const type of Object.keys(this._timeoutId)) {
       clearTimeout(this._timeoutId[type])
     }
-    this.$el.insertBefore(this.$container)
-    $(this.options.toolbar).insertBefore(this.$el)
-    this.$container.next().remove()
-    this.$container.remove()
-    this.$el.html(this.$el_.html())
-      .css('margin-top', '0')
-      .attr('class', this.$el_.attr('class') || '') // reset the class
 
-    const resizeEvent = Utils.getEventName('resize.bootstrap-table', this.$el.attr('id'))
+    if (this.$container && this.$container.parentNode) {
+      this.$container.parentNode.insertBefore(this.$el, this.$container)
+    }
 
-    $(window).off(resizeEvent)
+    if (this.options.toolbar) {
+      const toolbarEl = typeof this.options.toolbar === 'string' ?
+        document.querySelector(this.options.toolbar) :
+        this.options.toolbar
+
+      if (toolbarEl && this.$el.parentNode) {
+        this.$el.parentNode.insertBefore(toolbarEl, this.$el)
+      }
+    }
+
+    const nextSibling = this.$container && this.$container.nextElementSibling
+
+    if (nextSibling) {
+      nextSibling.remove()
+    }
+    if (this.$container) {
+      this.$container.remove()
+    }
+
+    this.$el.innerHTML = this.$el_.innerHTML
+    this.$el.style.marginTop = '0'
+    this.$el.setAttribute('class', this.$el_.getAttribute('class') || '')
+
+    if (this._resizeHandler) {
+      window.removeEventListener('resize', this._resizeHandler)
+      this._resizeHandler = null
+    }
   }
 
   updateFormatText (formatName, text) {
@@ -125,16 +169,28 @@ BootstrapTable.LOCALES = Constants.LOCALES
 BootstrapTable.COLUMN_DEFAULTS = Constants.COLUMN_DEFAULTS
 BootstrapTable.METHODS = Constants.METHODS
 BootstrapTable.EVENTS = Constants.EVENTS
+// Convenience aliases used by extensions and locale files
+BootstrapTable.defaults = BootstrapTable.DEFAULTS
+BootstrapTable.locales = BootstrapTable.LOCALES
+BootstrapTable.columnDefaults = BootstrapTable.COLUMN_DEFAULTS
+BootstrapTable.events = BootstrapTable.EVENTS
+BootstrapTable.methods = BootstrapTable.METHODS
+BootstrapTable.utils = Utils
+BootstrapTable.icons = Constants.ICONS
+BootstrapTable.theme = Constants.THEME
 
-// BOOTSTRAP TABLE PLUGIN DEFINITION
+// BOOTSTRAP TABLE PUBLIC API
 // =======================
 
-$.BootstrapTable = BootstrapTable
-$.fn.bootstrapTable = function (option, ...args) {
+function initBootstrapTable (elements, option, ...args) {
+  const els = typeof elements === 'string' ?
+    Array.from(document.querySelectorAll(elements)) :
+    Array.isArray(elements) ? elements : [elements]
+
   let value
 
-  this.each((i, el) => {
-    let data = $(el).data('bootstrap.table')
+  for (const el of els) {
+    let data = _instanceMap.get(el)
 
     if (typeof option === 'string') {
       if (!Constants.METHODS.includes(option)) {
@@ -142,49 +198,42 @@ $.fn.bootstrapTable = function (option, ...args) {
       }
 
       if (!data) {
-        return
+        continue
       }
 
       value = data[option](...args)
 
       if (option === 'destroy') {
-        $(el).removeData('bootstrap.table')
+        _instanceMap.delete(el)
       }
-      return
+      continue
     }
 
     if (data) {
       console.warn('You cannot initialize the table more than once!')
-      return
+      continue
     }
 
-    const options = Utils.extend(true, {}, BootstrapTable.DEFAULTS, $(el).data(),
+    const options = Utils.extend(true, {}, BootstrapTable.DEFAULTS, getDataAttrs(el),
       typeof option === 'object' && option)
 
-    data = new $.BootstrapTable(el, options)
-    $(el).data('bootstrap.table', data)
+    data = new BootstrapTable(el, options)
+    _instanceMap.set(el, data)
     data.init()
-  })
+  }
 
-  return typeof value === 'undefined' ? this : value
+  return typeof value === 'undefined' ? els.length === 1 ? els[0] : els : value
 }
-
-$.fn.bootstrapTable.Constructor = BootstrapTable
-$.fn.bootstrapTable.theme = Constants.THEME
-$.fn.bootstrapTable.VERSION = Constants.VERSION
-$.fn.bootstrapTable.icons = Constants.ICONS
-$.fn.bootstrapTable.defaults = BootstrapTable.DEFAULTS
-$.fn.bootstrapTable.columnDefaults = BootstrapTable.COLUMN_DEFAULTS
-$.fn.bootstrapTable.events = BootstrapTable.EVENTS
-$.fn.bootstrapTable.locales = BootstrapTable.LOCALES
-$.fn.bootstrapTable.methods = BootstrapTable.METHODS
-$.fn.bootstrapTable.utils = Utils
 
 // BOOTSTRAP TABLE INIT
 // =======================
 
-$(() => {
-  $('[data-toggle="table"]').bootstrapTable()
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-toggle="table"]').forEach(el => {
+    initBootstrapTable(el)
+  })
 })
 
-export default BootstrapTable
+BootstrapTable.initBootstrapTable = initBootstrapTable
+
+
