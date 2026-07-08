@@ -33,7 +33,7 @@ function getDataAttrs (el) {
   return data
 }
 
-export default class BootstrapTable {
+class BootstrapTable {
   constructor (el, options) {
     this.options = options
     this.$el = typeof el === 'string' ? document.querySelector(el) : el
@@ -234,6 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 })
 
-BootstrapTable.initBootstrapTable = initBootstrapTable
+export { initBootstrapTable }
 
-
+export default BootstrapTable

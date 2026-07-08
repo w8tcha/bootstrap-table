@@ -23,10 +23,8 @@
     "doc": "site"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.1",
     "@babel/preset-env": "^8.0.2",
     "@eslint/js": "^10.0.1",
-    "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-multi-entry": "^7.1.0",
@@ -37,10 +35,10 @@
     "core-js": "^3.49.0",
     "cross-env": "^10.1.0",
     "cspell": "^10.0.1",
-    "cypress": "^15.18.0",
+    "cypress": "^15.18.1",
     "editorconfig-checker": "^6.1.1",
     "eslint": "^10.6.0",
-    "eslint-plugin-import-x": "^4.17.0",
+    "eslint-plugin-import-x": "^4.17.1",
     "foreach-cli": "^1.8.1",
     "glob": "^13.0.6",
     "globals": "^17.7.0",
@@ -54,7 +52,7 @@
     "shelljs": "^0.10.0",
     "stylelint": "^17.14.0",
     "stylelint-config-standard-scss": "^17.0.0",
-    "vite": "^8.1.0",
+    "vite": "^8.1.3",
     "vitest": "^4.1.9"
   },
   "scripts": {
@@ -83,7 +81,6 @@
     "pre-commit": "run-s lint docs:check",
     "update-deps": "npx npm-check-updates -u"
   },
-  "peerDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wenzhixin/bootstrap-table.git"
