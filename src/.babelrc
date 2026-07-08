@@ -3,9 +3,16 @@
     [
       "@babel/env",
       {
-        "modules": false,
-        "useBuiltIns": "usage",
-        "corejs": 3
+        "modules": false
+      }
+    ]
+  ],
+  "plugins": [
+    [
+      "polyfill-corejs3",
+      {
+        "method": "usage-global",
+        "version": "3.49"
       }
     ]
   ]
