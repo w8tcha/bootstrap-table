@@ -458,10 +458,10 @@ div.fixed-table-scroll-outer {
   cursor: pointer;
 }
 .bootstrap-table .btn.active {
-  background-color: rgb(234.6, 234.6, 234.6);
+  background-color: rgb(92%, 92%, 92%);
 }
 .bootstrap-table .btn:focus, .bootstrap-table .btn:hover {
-  background-color: rgb(244.8, 244.8, 244.8);
+  background-color: rgb(96%, 96%, 96%);
 }
 .bootstrap-table .caret {
   display: inline-block;
@@ -479,7 +479,7 @@ div.fixed-table-scroll-outer {
   color: #3679e4;
 }
 .bootstrap-table .detail-icon:hover {
-  color: rgb(21.3157894737, 74.2105263158, 158.6842105263);
+  color: rgb(8.3591331269%, 29.1021671827%, 62.2291021672%);
 }
 .bootstrap-table .fixed-table-toolbar .columns,
 .bootstrap-table .fixed-table-toolbar .columns .btn-group {
@@ -555,14 +555,14 @@ div.fixed-table-scroll-outer {
   white-space: nowrap;
 }
 .bootstrap-table .dropdown-menu .dropdown-item:hover {
-  background-color: rgb(244.8, 244.8, 244.8);
+  background-color: rgb(96%, 96%, 96%);
 }
 .bootstrap-table .dropdown-menu .dropdown-item.active {
   background-color: #3679e4;
   color: #fff;
 }
 .bootstrap-table .dropdown-menu .dropdown-item.active:hover {
-  background-color: rgb(27.3552631579, 95.2368421053, 203.6447368421);
+  background-color: rgb(10.7275541796%, 37.3477812178%, 79.8606811146%);
 }
 .bootstrap-table .columns-left .dropdown-menu {
   left: 0;
@@ -613,7 +613,7 @@ div.fixed-table-scroll-outer {
   padding: 5px 2px;
 }
 .bootstrap-table .pagination .page-item:hover {
-  background-color: rgb(244.8, 244.8, 244.8);
+  background-color: rgb(96%, 96%, 96%);
 }
 .bootstrap-table .pagination .page-item .page-link {
   padding: 6px 12px;
@@ -624,13 +624,13 @@ div.fixed-table-scroll-outer {
 }
 .bootstrap-table .pagination .page-item.active {
   background-color: #3679e4;
-  border: 1px solid rgb(31.5197368421, 106.0131578947, 224.9802631579);
+  border: 1px solid rgb(12.3606811146%, 41.5737874097%, 88.2275541796%);
 }
 .bootstrap-table .pagination .page-item.active .page-link {
   color: #fff;
 }
 .bootstrap-table .pagination .page-item.active:hover {
-  background-color: rgb(27.3552631579, 95.2368421053, 203.6447368421);
+  background-color: rgb(10.7275541796%, 37.3477812178%, 79.8606811146%);
 }
 .bootstrap-table .pagination .btn-group {
   display: inline-block;

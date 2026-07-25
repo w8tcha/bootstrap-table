@@ -1,10 +1,11 @@
+import fs from 'fs'
+import path from 'path'
 import { globSync } from 'glob'
 import { babel } from '@rollup/plugin-babel'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import terser from '@rollup/plugin-terser'
 import inject from '@rollup/plugin-inject'
-import copy from 'rollup-plugin-copy'
 import multiEntry from '@rollup/plugin-multi-entry'
 
 // Custom plugin to replace @ in core-js comments to avoid email detection
@@ -15,6 +16,21 @@ function removeCoreJsAtSymbol () {
       // Replace any core-js@... occurrence with core-js [at] ...
       // to avoid email detection by security scanners
       return code.replace(/core-js@([^\s]+)/g, 'core-js [at] $1')
+    }
+  }
+}
+
+// Custom plugin to copy static assets into dist, replacing rollup-plugin-copy
+function copyAssets (targets) {
+  return {
+    name: 'copy-assets',
+    buildStart () {
+      for (const { src, dest } of targets) {
+        fs.mkdirSync(dest, { recursive: true })
+        for (const file of globSync(src)) {
+          fs.copyFileSync(file, path.join(dest, path.basename(file)))
+        }
+      }
     }
   }
 }
@@ -40,11 +56,9 @@ const basePlugins = [
     babelHelpers: 'bundled',
     exclude: 'node_modules/**'
   }),
-  copy({
-    targets: [
-      { src: 'src/themes/bootstrap-table/fonts/*', dest: 'dist/themes/bootstrap-table/fonts' }
-    ]
-  }),
+  copyAssets([
+    { src: 'src/themes/bootstrap-table/fonts/*', dest: 'dist/themes/bootstrap-table/fonts' }
+  ]),
   removeCoreJsAtSymbol()
 ]
 
