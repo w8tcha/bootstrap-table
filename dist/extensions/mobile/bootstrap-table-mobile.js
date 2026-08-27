@@ -645,10 +645,10 @@
   	var store = sharedStore.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
   	(store.versions || (store.versions = [])).push({
-  	  version: '3.49.0',
+  	  version: '3.50.0',
   	  mode: IS_PURE ? 'pure' : 'global',
   	  copyright: '© 2013–2025 Denis Pushkarev (zloirock.ru), 2025–2026 CoreJS Company (core-js.io). All rights reserved.',
-  	  license: 'https://github.com/zloirock/core-js/blob/v3.49.0/LICENSE',
+  	  license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
   	  source: 'https://github.com/zloirock/core-js'
   	});
   	return sharedStore.exports;
@@ -661,9 +661,11 @@
   	if (hasRequiredShared) return shared;
   	hasRequiredShared = 1;
   	var store = requireSharedStore();
+  	// eslint-disable-next-line es/no-object-create -- safe
+  	var create = Object.create || Object;
 
   	shared = function (key, value) {
-  	  return store[key] || (store[key] = value || {});
+  	  return store[key] || (store[key] = value || create(null));
   	};
   	return shared;
   }
@@ -2546,6 +2548,20 @@
   	return iteratorCloseAll;
   }
 
+  var iteratorCleanupState;
+  var hasRequiredIteratorCleanupState;
+
+  function requireIteratorCleanupState () {
+  	if (hasRequiredIteratorCleanupState) return iteratorCleanupState;
+  	hasRequiredIteratorCleanupState = 1;
+  	// release references held by exhausted / closed iterator helpers to allow GC of the source chain
+  	iteratorCleanupState = function (state) {
+  	  state.iterator = state.next = state.nextHandler = state.mapper = state.predicate = state.inner =
+  	    state.iterables = state.iters = state.openIters = state.padding = state.finishResults = state.buffer = null;
+  	};
+  	return iteratorCleanupState;
+  }
+
   var iteratorCreateProxy;
   var hasRequiredIteratorCreateProxy;
 
@@ -2563,6 +2579,7 @@
   	var createIterResultObject = requireCreateIterResultObject();
   	var iteratorClose = requireIteratorClose();
   	var iteratorCloseAll = requireIteratorCloseAll();
+  	var cleanupState = requireIteratorCleanupState();
 
   	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
   	var ITERATOR_HELPER = 'IteratorHelper';
@@ -2584,29 +2601,34 @@
   	      if (state.done) return createIterResultObject(undefined, true);
   	      try {
   	        var result = state.nextHandler();
+  	        if (state.done) cleanupState(state);
   	        return state.returnHandlerResult ? result : createIterResultObject(result, state.done);
   	      } catch (error) {
   	        state.done = true;
+  	        cleanupState(state);
   	        throw error;
   	      }
   	    },
   	    'return': function () {
   	      var state = getInternalState(this);
   	      var iterator = state.iterator;
+  	      var inner = state.inner;
+  	      var openIters = state.openIters;
   	      var done = state.done;
   	      state.done = true;
   	      if (IS_ITERATOR) {
   	        var returnMethod = getMethod(iterator, 'return');
   	        return returnMethod ? call(returnMethod, iterator) : createIterResultObject(undefined, true);
   	      }
+  	      cleanupState(state);
   	      if (done) return createIterResultObject(undefined, true);
-  	      if (state.inner) try {
-  	        iteratorClose(state.inner.iterator, NORMAL);
+  	      if (inner) try {
+  	        iteratorClose(inner.iterator, NORMAL);
   	      } catch (error) {
   	        return iteratorClose(iterator, THROW, error);
   	      }
-  	      if (state.openIters) try {
-  	        iteratorCloseAll(state.openIters, NORMAL);
+  	      if (openIters) try {
+  	        iteratorCloseAll(openIters, NORMAL);
   	      } catch (error) {
   	        if (iterator) return iteratorClose(iterator, THROW, error);
   	        throw error;

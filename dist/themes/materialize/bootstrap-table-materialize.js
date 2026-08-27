@@ -669,10 +669,10 @@
   	var store = sharedStore.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
   	(store.versions || (store.versions = [])).push({
-  	  version: '3.49.0',
+  	  version: '3.50.0',
   	  mode: IS_PURE ? 'pure' : 'global',
   	  copyright: '© 2013–2025 Denis Pushkarev (zloirock.ru), 2025–2026 CoreJS Company (core-js.io). All rights reserved.',
-  	  license: 'https://github.com/zloirock/core-js/blob/v3.49.0/LICENSE',
+  	  license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
   	  source: 'https://github.com/zloirock/core-js'
   	});
   	return sharedStore.exports;
@@ -685,9 +685,11 @@
   	if (hasRequiredShared) return shared;
   	hasRequiredShared = 1;
   	var store = requireSharedStore();
+  	// eslint-disable-next-line es/no-object-create -- safe
+  	var create = Object.create || Object;
 
   	shared = function (key, value) {
-  	  return store[key] || (store[key] = value || {});
+  	  return store[key] || (store[key] = value || create(null));
   	};
   	return shared;
   }
@@ -2021,7 +2023,7 @@
   function requireIterators () {
   	if (hasRequiredIterators) return iterators;
   	hasRequiredIterators = 1;
-  	iterators = {};
+  	iterators = Object.create ? Object.create(null) : {};
   	return iterators;
   }
 
@@ -2079,48 +2081,48 @@
   	return arraySetLength;
   }
 
-  var getIteratorMethod;
-  var hasRequiredGetIteratorMethod;
+  var getIteratorMethodInternal;
+  var hasRequiredGetIteratorMethodInternal;
 
-  function requireGetIteratorMethod () {
-  	if (hasRequiredGetIteratorMethod) return getIteratorMethod;
-  	hasRequiredGetIteratorMethod = 1;
-  	var classof = requireClassof();
-  	var getMethod = requireGetMethod();
+  function requireGetIteratorMethodInternal () {
+  	if (hasRequiredGetIteratorMethodInternal) return getIteratorMethodInternal;
+  	hasRequiredGetIteratorMethodInternal = 1;
+  	var classof = requireClassofRaw();
   	var isNullOrUndefined = requireIsNullOrUndefined();
-  	var Iterators = requireIterators();
+  	var getMethod = requireGetMethod();
   	var wellKnownSymbol = requireWellKnownSymbol();
 
   	var ITERATOR = wellKnownSymbol('iterator');
+  	var ArrayPrototype = Array.prototype;
 
-  	getIteratorMethod = function (it) {
+  	getIteratorMethodInternal = function (it) {
   	  if (!isNullOrUndefined(it)) return getMethod(it, ITERATOR)
   	    || getMethod(it, '@@iterator')
-  	    || Iterators[classof(it)];
+  	    || (classof(it) === 'Arguments' ? ArrayPrototype[ITERATOR] : undefined);
   	};
-  	return getIteratorMethod;
+  	return getIteratorMethodInternal;
   }
 
-  var getIterator;
-  var hasRequiredGetIterator;
+  var getIteratorInternal;
+  var hasRequiredGetIteratorInternal;
 
-  function requireGetIterator () {
-  	if (hasRequiredGetIterator) return getIterator;
-  	hasRequiredGetIterator = 1;
+  function requireGetIteratorInternal () {
+  	if (hasRequiredGetIteratorInternal) return getIteratorInternal;
+  	hasRequiredGetIteratorInternal = 1;
   	var call = requireFunctionCall();
-  	var aCallable = requireACallable();
+  	var isCallable = requireIsCallable();
   	var anObject = requireAnObject();
   	var tryToString = requireTryToString();
-  	var getIteratorMethod = requireGetIteratorMethod();
+  	var getIteratorMethod = requireGetIteratorMethodInternal();
 
   	var $TypeError = TypeError;
 
-  	getIterator = function (argument, usingIterator) {
+  	getIteratorInternal = function (argument, usingIterator) {
   	  var iteratorMethod = arguments.length < 2 ? getIteratorMethod(argument) : usingIterator;
-  	  if (aCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument));
+  	  if (isCallable(iteratorMethod)) return anObject(call(iteratorMethod, argument));
   	  throw new $TypeError(tryToString(argument) + ' is not iterable');
   	};
-  	return getIterator;
+  	return getIteratorInternal;
   }
 
   var arrayFrom;
@@ -2138,9 +2140,10 @@
   	var lengthOfArrayLike = requireLengthOfArrayLike();
   	var createProperty = requireCreateProperty();
   	var setArrayLength = requireArraySetLength();
-  	var getIterator = requireGetIterator();
-  	var getIteratorMethod = requireGetIteratorMethod();
+  	var getIterator = requireGetIteratorInternal();
+  	var getIteratorMethod = requireGetIteratorMethodInternal();
   	var iteratorClose = requireIteratorClose();
+  	var doesNotExceedSafeInteger = requireDoesNotExceedSafeInteger();
 
   	var $Array = Array;
 
@@ -2162,6 +2165,11 @@
   	    iterator = getIterator(O, iteratorMethod);
   	    next = iterator.next;
   	    for (;!(step = call(next, iterator)).done; index++) {
+  	      try {
+  	        doesNotExceedSafeInteger(index);
+  	      } catch (error) {
+  	        iteratorClose(iterator, 'throw', error);
+  	      }
   	      value = mapping ? callWithSafeIterationClosing(iterator, mapfn, [step.value, index], true) : step.value;
   	      try {
   	        createProperty(result, index, value);
@@ -2740,7 +2748,7 @@
   	var call = requireFunctionCall();
   	var anObject = requireAnObject();
   	var getIteratorDirect = requireGetIteratorDirect();
-  	var getIteratorMethod = requireGetIteratorMethod();
+  	var getIteratorMethod = requireGetIteratorMethodInternal();
 
   	getIteratorFlattenable = function (obj, stringHandling) {
   	  if (!stringHandling || typeof obj !== 'string') anObject(obj);
@@ -2803,6 +2811,20 @@
   	return iteratorCloseAll;
   }
 
+  var iteratorCleanupState;
+  var hasRequiredIteratorCleanupState;
+
+  function requireIteratorCleanupState () {
+  	if (hasRequiredIteratorCleanupState) return iteratorCleanupState;
+  	hasRequiredIteratorCleanupState = 1;
+  	// release references held by exhausted / closed iterator helpers to allow GC of the source chain
+  	iteratorCleanupState = function (state) {
+  	  state.iterator = state.next = state.nextHandler = state.mapper = state.predicate = state.inner =
+  	    state.iterables = state.iters = state.openIters = state.padding = state.finishResults = state.buffer = null;
+  	};
+  	return iteratorCleanupState;
+  }
+
   var iteratorCreateProxy;
   var hasRequiredIteratorCreateProxy;
 
@@ -2820,6 +2842,7 @@
   	var createIterResultObject = requireCreateIterResultObject();
   	var iteratorClose = requireIteratorClose();
   	var iteratorCloseAll = requireIteratorCloseAll();
+  	var cleanupState = requireIteratorCleanupState();
 
   	var TO_STRING_TAG = wellKnownSymbol('toStringTag');
   	var ITERATOR_HELPER = 'IteratorHelper';
@@ -2841,29 +2864,34 @@
   	      if (state.done) return createIterResultObject(undefined, true);
   	      try {
   	        var result = state.nextHandler();
+  	        if (state.done) cleanupState(state);
   	        return state.returnHandlerResult ? result : createIterResultObject(result, state.done);
   	      } catch (error) {
   	        state.done = true;
+  	        cleanupState(state);
   	        throw error;
   	      }
   	    },
   	    'return': function () {
   	      var state = getInternalState(this);
   	      var iterator = state.iterator;
+  	      var inner = state.inner;
+  	      var openIters = state.openIters;
   	      var done = state.done;
   	      state.done = true;
   	      if (IS_ITERATOR) {
   	        var returnMethod = getMethod(iterator, 'return');
   	        return returnMethod ? call(returnMethod, iterator) : createIterResultObject(undefined, true);
   	      }
+  	      cleanupState(state);
   	      if (done) return createIterResultObject(undefined, true);
-  	      if (state.inner) try {
-  	        iteratorClose(state.inner.iterator, NORMAL);
+  	      if (inner) try {
+  	        iteratorClose(inner.iterator, NORMAL);
   	      } catch (error) {
   	        return iteratorClose(iterator, THROW, error);
   	      }
-  	      if (state.openIters) try {
-  	        iteratorCloseAll(state.openIters, NORMAL);
+  	      if (openIters) try {
+  	        iteratorCloseAll(openIters, NORMAL);
   	      } catch (error) {
   	        if (iterator) return iteratorClose(iterator, THROW, error);
   	        throw error;
@@ -2964,30 +2992,28 @@
   	var getIteratorFlattenable = requireGetIteratorFlattenable();
   	var createIteratorProxy = requireIteratorCreateProxy();
   	var iteratorClose = requireIteratorClose();
+  	var fails = requireFails();
   	var IS_PURE = requireIsPure();
   	var iteratorHelperThrowsOnInvalidIterator = requireIteratorHelperThrowsOnInvalidIterator();
   	var iteratorHelperWithoutClosingOnEarlyError = requireIteratorHelperWithoutClosingOnEarlyError();
 
   	// Should not throw an error for an iterator without `return` method. Fixed in Safari 26.2
   	// https://bugs.webkit.org/show_bug.cgi?id=297532
-  	function throwsOnIteratorWithoutReturn() {
-  	  try {
-  	    // eslint-disable-next-line es/no-map, es/no-iterator, es/no-iterator-prototype-flatmap -- required for testing
-  	    var it = Iterator.prototype.flatMap.call(new Map([[4, 5]]).entries(), function (v) { return v; });
-  	    it.next();
-  	    it['return']();
-  	  } catch (error) {
-  	    return true;
-  	  }
-  	}
+  	var THROWS_ON_ITERATOR_WITHOUT_RETURN = !IS_PURE && fails(function () {
+  	  // eslint-disable-next-line es/no-array-prototype-values, es/no-iterator-prototype-flatmap, es/no-iterator-prototype-find -- testing
+  	  return [1].values()
+  	    .flatMap(function () { return [1]; })
+  	    .find(function () { return true; }) !== 1;
+  	});
 
-  	var FLAT_MAP_WITHOUT_THROWING_ON_INVALID_ITERATOR = !IS_PURE
+  	var FLAT_MAP_WITHOUT_THROWING_ON_INVALID_ITERATOR = !IS_PURE && !THROWS_ON_ITERATOR_WITHOUT_RETURN
   	  && !iteratorHelperThrowsOnInvalidIterator('flatMap', function () { /* empty */ });
-  	var flatMapWithoutClosingOnEarlyError = !IS_PURE && !FLAT_MAP_WITHOUT_THROWING_ON_INVALID_ITERATOR
+
+  	var flatMapWithoutClosingOnEarlyError = !IS_PURE && !THROWS_ON_ITERATOR_WITHOUT_RETURN && !FLAT_MAP_WITHOUT_THROWING_ON_INVALID_ITERATOR
   	  && iteratorHelperWithoutClosingOnEarlyError('flatMap', TypeError);
 
-  	var FORCED = IS_PURE || FLAT_MAP_WITHOUT_THROWING_ON_INVALID_ITERATOR || flatMapWithoutClosingOnEarlyError
-  	  || throwsOnIteratorWithoutReturn();
+  	var FORCED = IS_PURE || THROWS_ON_ITERATOR_WITHOUT_RETURN || FLAT_MAP_WITHOUT_THROWING_ON_INVALID_ITERATOR
+  	  || flatMapWithoutClosingOnEarlyError;
 
   	var IteratorProxy = createIteratorProxy(function () {
   	  var iterator = this.iterator;
@@ -3050,8 +3076,8 @@
   	var isArrayIteratorMethod = requireIsArrayIteratorMethod();
   	var lengthOfArrayLike = requireLengthOfArrayLike();
   	var isPrototypeOf = requireObjectIsPrototypeOf();
-  	var getIterator = requireGetIterator();
-  	var getIteratorMethod = requireGetIteratorMethod();
+  	var getIterator = requireGetIteratorInternal();
+  	var getIteratorMethod = requireGetIteratorMethodInternal();
   	var iteratorClose = requireIteratorClose();
 
   	var $TypeError = TypeError;
