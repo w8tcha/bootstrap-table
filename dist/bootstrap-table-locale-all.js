@@ -7723,6 +7723,152 @@
 	Object.assign(BootstrapTable.defaults, BootstrapTable.locales['nl-NL']);
 
 	/**
+	 * Bootstrap Table Norwegian Nynorsk translation
+	 */
+
+	$.fn.bootstrapTable.locales['nn-NO'] = $.fn.bootstrapTable.locales['nn'] = {
+	  formatAddLevel: function formatAddLevel() {
+	    return 'Legg til nivå';
+	  },
+	  formatAdvancedCloseButton: function formatAdvancedCloseButton() {
+	    return 'Lukk';
+	  },
+	  formatAdvancedSearch: function formatAdvancedSearch() {
+	    return 'Avansert søk';
+	  },
+	  formatAllRows: function formatAllRows() {
+	    return 'Alle';
+	  },
+	  formatAutoRefresh: function formatAutoRefresh() {
+	    return 'Automatisk oppdatering';
+	  },
+	  formatCancel: function formatCancel() {
+	    return 'Avbryt';
+	  },
+	  formatClearSearch: function formatClearSearch() {
+	    return 'Tøm søk';
+	  },
+	  formatColumn: function formatColumn() {
+	    return 'Kolonne';
+	  },
+	  formatColumns: function formatColumns() {
+	    return 'Kolonnar';
+	  },
+	  formatColumnsToggleAll: function formatColumnsToggleAll() {
+	    return 'Vis/skjul alle';
+	  },
+	  formatCopyRows: function formatCopyRows() {
+	    return 'Kopier rader';
+	  },
+	  formatDeleteLevel: function formatDeleteLevel() {
+	    return 'Slett nivå';
+	  },
+	  formatDetailPagination: function formatDetailPagination(totalRows) {
+	    return "Viser ".concat(totalRows, " rader");
+	  },
+	  formatDuplicateAlertDescription: function formatDuplicateAlertDescription() {
+	    return 'Fjern eller endre eventuelle duplikatkolonnar.';
+	  },
+	  formatDuplicateAlertTitle: function formatDuplicateAlertTitle() {
+	    return 'Duplikat oppdaga!';
+	  },
+	  formatExport: function formatExport() {
+	    return 'Eksporter data';
+	  },
+	  formatFilterControlSwitch: function formatFilterControlSwitch() {
+	    return 'Vis/skjul kontrollar';
+	  },
+	  formatFilterControlSwitchHide: function formatFilterControlSwitchHide() {
+	    return 'Skjul kontrollar';
+	  },
+	  formatFilterControlSwitchShow: function formatFilterControlSwitchShow() {
+	    return 'Vis kontrollar';
+	  },
+	  formatFullscreen: function formatFullscreen() {
+	    return 'Fullskjerm';
+	  },
+	  formatJumpTo: function formatJumpTo() {
+	    return 'GÅ';
+	  },
+	  formatLoadingMessage: function formatLoadingMessage() {
+	    return 'Lastar, vent litt';
+	  },
+	  formatMultipleSort: function formatMultipleSort() {
+	    return 'Fleire sorteringar';
+	  },
+	  formatNoMatches: function formatNoMatches() {
+	    return 'Ingen treff funne';
+	  },
+	  formatOrder: function formatOrder() {
+	    return 'Rekkjefølgje';
+	  },
+	  formatPaginationSwitch: function formatPaginationSwitch() {
+	    return 'Vis/skjul sideinndeling';
+	  },
+	  formatPaginationSwitchDown: function formatPaginationSwitchDown() {
+	    return 'Vis sideinndeling';
+	  },
+	  formatPaginationSwitchUp: function formatPaginationSwitchUp() {
+	    return 'Skjul sideinndeling';
+	  },
+	  formatPrint: function formatPrint() {
+	    return 'Skriv ut';
+	  },
+	  formatRecordsPerPage: function formatRecordsPerPage(pageNumber) {
+	    return "".concat(pageNumber, " rader per side");
+	  },
+	  formatRefresh: function formatRefresh() {
+	    return 'Oppdater';
+	  },
+	  formatSRPaginationNextText: function formatSRPaginationNextText() {
+	    return 'neste side';
+	  },
+	  formatSRPaginationPageText: function formatSRPaginationPageText(page) {
+	    return "til side ".concat(page);
+	  },
+	  formatSRPaginationPreText: function formatSRPaginationPreText() {
+	    return 'førre side';
+	  },
+	  formatSearch: function formatSearch() {
+	    return 'Søk';
+	  },
+	  formatShowingRows: function formatShowingRows(pageFrom, pageTo, totalRows, totalNotFiltered) {
+	    if (totalNotFiltered !== undefined && totalNotFiltered > 0 && totalNotFiltered > totalRows) {
+	      return "Viser ".concat(pageFrom, " til ").concat(pageTo, " av ").concat(totalRows, " rader (filtrert fr\xE5 ").concat(totalNotFiltered, " rader totalt)");
+	    }
+	    return "Viser ".concat(pageFrom, " til ").concat(pageTo, " av ").concat(totalRows, " rader");
+	  },
+	  formatSort: function formatSort() {
+	    return 'Sorter';
+	  },
+	  formatSortBy: function formatSortBy() {
+	    return 'Sorter etter';
+	  },
+	  formatSortOrders: function formatSortOrders() {
+	    return {
+	      asc: 'Stigande',
+	      desc: 'Synkande'
+	    };
+	  },
+	  formatThenBy: function formatThenBy() {
+	    return 'Deretter etter';
+	  },
+	  formatToggleCustomViewOff: function formatToggleCustomViewOff() {
+	    return 'Skjul tilpassa visning';
+	  },
+	  formatToggleCustomViewOn: function formatToggleCustomViewOn() {
+	    return 'Vis tilpassa visning';
+	  },
+	  formatToggleOff: function formatToggleOff() {
+	    return 'Skjul kortvisning';
+	  },
+	  formatToggleOn: function formatToggleOn() {
+	    return 'Vis kortvisning';
+	  }
+	};
+	Object.assign($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['nn-NO']);
+
+	/**
 	 * Bootstrap Table Polish translation
 	 * Author: zergu <michal.zagdan @ gmail com>
 	 * Update: kerogos <kerog @ wp pl>

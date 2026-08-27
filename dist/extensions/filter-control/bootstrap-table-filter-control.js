@@ -8098,6 +8098,9 @@
           this._initialized = false;
         }
         _superPropGet(_default, "_toggleColumns", this)([fields, checked, needUpdate]);
+        // initHeader only runs when a column really changed visibility, so restore
+        // the flag here to stop it latching to false (#8216).
+        this._initialized = true;
         syncHeaders(this);
       }
     }]);

@@ -10784,6 +10784,42 @@
    */
 
   /**
+   * Normalizes an `orderList` value into a clean array of `'asc'` / `'desc'` tokens.
+   *
+   * Accepts either an array (e.g. `['desc', 'asc']`) or a comma-separated string
+   * (e.g. `'desc, asc'`). Tokens are trimmed and lowercased; anything that is not
+   * `'asc'` or `'desc'` is silently dropped. Returns the normalized array, or
+   * `undefined` when the input is `undefined`/empty or contains no valid token —
+   * in which case callers fall back to the legacy column `order` cycle.
+   *
+   * @param {undefined|string|string[]} input - The raw `orderList` value.
+   * @returns {string[]|undefined} The normalized list, or `undefined`.
+   */
+  function normalizeOrderList(input) {
+    if (input === undefined || input === null) {
+      return undefined;
+    }
+    var tokens = Array.isArray(input) ? input : String(input).split(',');
+    var list = [];
+    var _iterator = _createForOfIteratorHelper(tokens),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var token = _step.value;
+        var normalized = String(token).trim().toLowerCase();
+        if (normalized === 'asc' || normalized === 'desc') {
+          list.push(normalized);
+        }
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+    return list.length ? list : undefined;
+  }
+
+  /**
    * Compares a value against a search pattern using regex.
    * Supports both plain text search and regex patterns (e.g., /pattern/flags).
    *
@@ -10904,17 +10940,17 @@
         if (child.nodeType === document.TEXT_NODE) {
           var elements = replaceTextWithDom(child.data, regExp);
           if (elements) {
-            var _iterator = _createForOfIteratorHelper(elements),
-              _step;
+            var _iterator2 = _createForOfIteratorHelper(elements),
+              _step2;
             try {
-              for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                var el = _step.value;
+              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+                var el = _step2.value;
                 node.insertBefore(el, child);
               }
             } catch (err) {
-              _iterator.e(err);
+              _iterator2.e(err);
             } finally {
-              _iterator.f();
+              _iterator2.f();
             }
             node.removeChild(child);
             i += elements.length - 1;
@@ -10934,6 +10970,7 @@
 
   var searchSort = /*#__PURE__*/Object.freeze({
     __proto__: null,
+    normalizeOrderList: normalizeOrderList,
     regexCompare: regexCompare,
     replaceSearchMark: replaceSearchMark,
     sort: sort
@@ -10980,16 +11017,15 @@
     var valueAttr = value !== undefined && value !== '' ? " value=\"".concat(escapeAttr(value), "\"") : '';
     var classAttr = extraClass ? " ".concat(extraClass) : '';
     var escapedName = escapeAttr(name);
-    var escapedLabel = escapeHTML(label);
     if (getBootstrapVersion() === 5) {
       if (withLabel) {
-        return "<label class=\"dropdown-item dropdown-item-marker d-flex align-items-center gap-2\">\n        <input class=\"form-check-input m-0".concat(classAttr, "\" type=\"checkbox\" name=\"").concat(escapedName, "\"").concat(valueAttr).concat(checkedAttr).concat(disabledAttr, " />\n        <span>").concat(escapedLabel, "</span>\n      </label>");
+        return "<label class=\"dropdown-item dropdown-item-marker d-flex align-items-center gap-2\">\n        <input class=\"form-check-input m-0".concat(classAttr, "\" type=\"checkbox\" name=\"").concat(escapedName, "\"").concat(valueAttr).concat(checkedAttr).concat(disabledAttr, " />\n        <span>").concat(label, "</span>\n      </label>");
       }
       var centerClass = centered ? ' d-flex justify-content-center' : '';
       return "<div class=\"form-check".concat(centerClass, "\">\n      <input class=\"form-check-input").concat(classAttr, "\" type=\"checkbox\" name=\"").concat(escapedName, "\"").concat(valueAttr).concat(checkedAttr).concat(disabledAttr, " />\n    </div>");
     }
     if (withLabel) {
-      return "<label><input type=\"checkbox\" name=\"".concat(escapedName, "\"").concat(valueAttr).concat(checkedAttr).concat(disabledAttr).concat(classAttr, "> <span>").concat(escapedLabel, "</span></label>");
+      return "<label><input type=\"checkbox\" name=\"".concat(escapedName, "\"").concat(valueAttr).concat(checkedAttr).concat(disabledAttr).concat(classAttr, "> <span>").concat(label, "</span></label>");
     }
     return "<label><input type=\"checkbox\" name=\"".concat(escapedName, "\"").concat(valueAttr).concat(checkedAttr).concat(disabledAttr).concat(classAttr, " /><span></span></label>");
   }
@@ -11064,11 +11100,10 @@
       label = options.label;
     var checkedAttr = checked ? ' checked="checked"' : '';
     var disabledAttr = disabled ? ' disabled="disabled"' : '';
-    var escapedLabel = escapeHTML(label);
     if (getBootstrapVersion() === 5) {
-      return "<label class=\"dropdown-item dropdown-item-marker d-flex align-items-center gap-2\">\n      <input class=\"form-check-input m-0\" type=\"checkbox\" data-field=\"".concat(escapeAttr(dataField), "\" value=\"").concat(escapeAttr(value), "\"").concat(checkedAttr).concat(disabledAttr, " />\n      <span>").concat(escapedLabel, "</span>\n    </label>");
+      return "<label class=\"dropdown-item dropdown-item-marker d-flex align-items-center gap-2\">\n      <input class=\"form-check-input m-0\" type=\"checkbox\" data-field=\"".concat(escapeAttr(dataField), "\" value=\"").concat(escapeAttr(value), "\"").concat(checkedAttr).concat(disabledAttr, " />\n      <span>").concat(label, "</span>\n    </label>");
     }
-    return "<input type=\"checkbox\" data-field=\"".concat(escapeAttr(dataField), "\" value=\"").concat(escapeAttr(value), "\"").concat(checkedAttr).concat(disabledAttr, "> <span>").concat(escapedLabel, "</span>");
+    return "<input type=\"checkbox\" data-field=\"".concat(escapeAttr(dataField), "\" value=\"").concat(escapeAttr(value), "\"").concat(checkedAttr).concat(disabledAttr, "> <span>").concat(label, "</span>");
   }
 
   var checkbox = /*#__PURE__*/Object.freeze({
@@ -11357,6 +11392,8 @@
     rowStyle: function rowStyle(row, index) {
       return {};
     },
+    rtl: false,
+    // false, true, 'ltr', 'rtl', 'auto'
     search: false,
     searchable: false,
     searchAccentNeutralise: false,
@@ -11390,6 +11427,8 @@
     sortable: true,
     sortClass: undefined,
     sortEmptyLast: false,
+    orderList: undefined,
+    // ['asc','desc'] | ['desc','asc'] | 'asc,desc'; undefined => legacy column `order` fallback
     sortName: undefined,
     sortOrder: undefined,
     sortReset: false,
@@ -11601,6 +11640,8 @@
     // left, right, center
     order: 'asc',
     // asc, desc
+    orderList: undefined,
+    // overrides the table-level orderList for this column
     radio: false,
     rowspan: undefined,
     // number
@@ -11692,6 +11733,9 @@
       opts.iconsPrefix = opts.iconsPrefix || BootstrapTable.iconsPrefix || iconsPrefix;
       opts.icons = Object.assign(Utils.getIcons(Constants.ICONS, opts.iconsPrefix), BootstrapTable.icons, opts.icons);
 
+      // normalize orderList once at init so the click hot path deals only with arrays
+      opts.orderList = Utils.normalizeOrderList(opts.orderList);
+
       // init buttons class
       var buttonsPrefix = opts.buttonsPrefix ? "".concat(opts.buttonsPrefix, "-") : '';
       this.constants.buttonsClass = [opts.buttonsPrefix, buttonsPrefix + opts.buttonsClass, Utils.sprintf("".concat(buttonsPrefix, "%s"), opts.iconSize)].join(' ').trim();
@@ -11730,11 +11774,32 @@
         }
       }
     },
+    // Resolve the `rtl` option into a normalized internal value: 'ltr' or 'rtl'.
+    // Called during initContainer (after initConstants), before rendering the root container.
+    getRtlDirection: function getRtlDirection() {
+      var rtl = this.options.rtl;
+      if (rtl === 'auto') {
+        // Probe priority: the table element ($el) first, then <html>, else ltr.
+        var dir = (this.$el.getAttribute('dir') || document.documentElement.getAttribute('dir') || '').toLowerCase();
+        return dir === 'rtl' ? 'rtl' : 'ltr';
+      }
+      if (rtl === true || rtl === 'rtl') {
+        return 'rtl';
+      }
+      return 'ltr';
+    },
     initContainer: function initContainer() {
       var topPagination = ['top', 'both'].includes(this.options.paginationVAlign) ? '<div class="fixed-table-pagination clearfix"></div>' : '';
       var bottomPagination = ['bottom', 'both'].includes(this.options.paginationVAlign) ? '<div class="fixed-table-pagination"></div>' : '';
       var loadingTemplate = Utils.calculateObjectValue(this.options, this.options.loadingTemplate, [this.options.formatLoadingMessage()]);
-      var containerHtml = "\n      <div class=\"bootstrap-table ".concat(this.constants.theme, "\">\n      <div class=\"fixed-table-toolbar\"></div>\n      ").concat(topPagination, "\n      <div class=\"fixed-table-container\">\n      <div class=\"fixed-table-header\"><table></table></div>\n      <div class=\"fixed-table-body\">\n      <div class=\"fixed-table-loading\">\n      ").concat(loadingTemplate, "\n      </div>\n      </div>\n      <div class=\"fixed-table-footer\"></div>\n      </div>\n      ").concat(bottomPagination, "\n      </div>\n    ");
+
+      // Normalize the table direction once; only the root container carries it
+      // (inherited by the table/toolbar/pagination). The original <table> dir is
+      // left untouched so existing extensions (print, filter-control) keep working.
+      var isRtl = this.getRtlDirection() === 'rtl';
+      var rtlClass = isRtl ? ' bootstrap-table-rtl' : '';
+      var rtlDir = isRtl ? ' dir="rtl"' : '';
+      var containerHtml = "\n      <div class=\"bootstrap-table ".concat(this.constants.theme).concat(rtlClass, "\"").concat(rtlDir, ">\n      <div class=\"fixed-table-toolbar\"></div>\n      ").concat(topPagination, "\n      <div class=\"fixed-table-container\">\n      <div class=\"fixed-table-header\"><table></table></div>\n      <div class=\"fixed-table-body\">\n      <div class=\"fixed-table-loading\">\n      ").concat(loadingTemplate, "\n      </div>\n      </div>\n      <div class=\"fixed-table-footer\"></div>\n      </div>\n      ").concat(bottomPagination, "\n      </div>\n    ");
       var template = document.createElement('template');
       template.innerHTML = containerHtml.trim();
       this.$container = template.content.firstChild;
@@ -11865,6 +11930,7 @@
           var column = Utils.extend({}, Constants.COLUMN_DEFAULTS, _column, {
             passed: _column
           });
+          column.orderList = Utils.normalizeOrderList(column.orderList);
           if (typeof column.fieldIndex !== 'undefined') {
             _this.columns[column.fieldIndex] = column;
             _this.fieldsColumnsIndex[column.field] = column.fieldIndex;
@@ -12839,11 +12905,20 @@
       this.trigger('post-body', data);
     },
     resetView: function resetView(params) {
+      var _this4 = this;
       var padding = 0;
       if (params && params.height) {
         this.options.height = params.height;
       }
       this.$tableContainer.classList.toggle('has-card-view', this.options.cardView);
+      if (this.options.height && !this.$el.offsetWidth && !this.$el.offsetHeight) {
+        if (!this._resizeObserver) {
+          this._setDelayTimeout('resetView', function () {
+            return _this4.resetView();
+          }, 100);
+        }
+        return;
+      }
       if (this.options.height) {
         var fixedBody = this.$tableBody;
         this.hasScrollBar = fixedBody.scrollWidth > fixedBody.clientWidth;
@@ -13081,7 +13156,7 @@
       this._toggleAllColumns(false);
     },
     _toggleAllColumns: function _toggleAllColumns(visible) {
-      var _this4 = this;
+      var _this5 = this;
       var _iterator4 = _createForOfIteratorHelper(this.columns.slice().reverse()),
         _step4;
       try {
@@ -13119,7 +13194,7 @@
             var checkedItems = items.filter(function (el) {
               return el.checked;
             });
-            if (checkedItems.length > _this4.options.minimumCountColumns) {
+            if (checkedItems.length > _this5.options.minimumCountColumns) {
               item.checked = visible;
             }
           });
@@ -13160,9 +13235,9 @@
       }
     },
     getVisibleColumns: function getVisibleColumns() {
-      var _this5 = this;
+      var _this6 = this;
       return this.columns.filter(function (column) {
-        return column.visible && !_this5.isSelectionColumn(column);
+        return column.visible && !_this6.isSelectionColumn(column);
       });
     },
     getHiddenColumns: function getHiddenColumns() {
@@ -14842,32 +14917,44 @@
       var thEl = type === 'keypress' ? currentTarget : currentTarget.parentElement;
       var field = thEl.dataset.field;
       var headers = [this.$header, this.$header_].filter(Boolean);
+      var column = this.columns[this.fieldsColumnsIndex[field]];
       headers.forEach(function (h) {
         return h.querySelectorAll('span.order').forEach(function (s) {
           return s.remove();
         });
       });
+
+      // Resolve the effective sort-direction cycle for this column:
+      //   column orderList  >  global orderList  >  legacy [order, opposite(order)]
+      // orderList values are normalized to arrays at init time; an unset/invalid
+      // value stays undefined so the legacy column `order` fallback takes over.
+      // The only deliberate change vs. the old cycle: order 'desc' with sortReset
+      // previously got stuck (asc <-> undefined) and now cycles
+      // desc -> asc -> undefined -> desc.
+      var orderList = column.orderList || this.options.orderList;
+      if (!orderList) {
+        var order = column.sortOrder || column.order || 'asc';
+        orderList = [order, order === 'asc' ? 'desc' : 'asc'];
+      }
       if (this.options.sortName === field) {
-        var currentSortOrder = this.options.sortOrder;
-        var col = this.columns[this.fieldsColumnsIndex[field]];
-        var initialSortOrder = (col === null || col === void 0 ? void 0 : col.sortOrder) || (col === null || col === void 0 ? void 0 : col.order);
-        if (currentSortOrder === undefined) {
-          this.options.sortOrder = 'asc';
-        } else if (currentSortOrder === 'asc') {
-          this.options.sortOrder = this.options.sortReset ? initialSortOrder === 'asc' ? 'desc' : undefined : 'desc';
-        } else if (this.options.sortOrder === 'desc') {
-          this.options.sortOrder = this.options.sortReset ? initialSortOrder === 'desc' ? 'asc' : undefined : 'asc';
-        }
+        // Same column clicked again: advance one step through the cycle. With
+        // sortReset, a trailing "unsorted" state (handled inline to avoid an
+        // array allocation) clears the sort entirely.
+        var len = orderList.length;
+        var nextIndex = (orderList.indexOf(this.options.sortOrder) + 1) % (this.options.sortReset ? len + 1 : len);
+        this.options.sortOrder = nextIndex === len ? undefined : orderList[nextIndex];
         if (this.options.sortOrder === undefined) {
           this.options.sortName = undefined;
         }
       } else {
+        // New column: start at the first direction, or — under rememberOrder —
+        // advance one step from the column's last direction (legacy behavior,
+        // now respecting a custom orderList too).
         this.options.sortName = field;
         if (this.options.rememberOrder) {
-          this.options.sortOrder = thEl.dataset.order === 'asc' ? 'desc' : 'asc';
+          this.options.sortOrder = orderList[(orderList.indexOf(thEl.dataset.order) + 1) % orderList.length];
         } else {
-          var _col = this.columns[this.fieldsColumnsIndex[field]];
-          this.options.sortOrder = (_col === null || _col === void 0 ? void 0 : _col.sortOrder) || (_col === null || _col === void 0 ? void 0 : _col.order);
+          this.options.sortOrder = orderList[0];
         }
       }
       var orderVal = (_this$options$sortOrd = this.options.sortOrder) !== null && _this$options$sortOrd !== void 0 ? _this$options$sortOrd : '';
@@ -15465,14 +15552,45 @@
           _this.updateSelected();
         });
       }
+      if (this.options.height && typeof ResizeObserver !== 'undefined') {
+        if (!this.$el.offsetWidth && !this.$el.offsetHeight) {
+          if (this._resizeObserver) {
+            this._resizeObserver.disconnect();
+            this._resizeObserver = null;
+          }
+          var observer = new ResizeObserver(function (entries) {
+            var _iterator = _createForOfIteratorHelper(entries),
+              _step;
+            try {
+              for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                var entry = _step.value;
+                if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+                  observer.disconnect();
+                  if (_this._resizeObserver === observer) {
+                    _this._resizeObserver = null;
+                  }
+                  _this.resetView();
+                  return;
+                }
+              }
+            } catch (err) {
+              _iterator.e(err);
+            } finally {
+              _iterator.f();
+            }
+          });
+          this._resizeObserver = observer;
+          observer.observe(this.$el);
+        }
+      }
     },
     getVisibleFields: function getVisibleFields() {
       var visibleFields = [];
-      var _iterator = _createForOfIteratorHelper(this.header.fields),
-        _step;
+      var _iterator2 = _createForOfIteratorHelper(this.header.fields),
+        _step2;
       try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var field = _step.value;
+        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+          var field = _step2.value;
           var column = this.columns[this.fieldsColumnsIndex[field]];
           if (!column || !column.visible || this.options.cardView && !column.cardVisible) {
             continue;
@@ -15480,9 +15598,9 @@
           visibleFields.push(field);
         }
       } catch (err) {
-        _iterator.e(err);
+        _iterator2.e(err);
       } finally {
-        _iterator.f();
+        _iterator2.f();
       }
       return visibleFields;
     },
@@ -15629,11 +15747,11 @@
       if (detailTemplate && this.options.detailViewAlign !== 'right') {
         html.push(detailTemplate);
       }
-      var _iterator2 = _createForOfIteratorHelper(this.columns),
-        _step2;
+      var _iterator3 = _createForOfIteratorHelper(this.columns),
+        _step3;
       try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var column = _step2.value;
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var column = _step3.value;
           var hasData = this.footerData && this.footerData.length > 0;
           if (!column.visible || hasData && !(column.field in this.footerData[0])) {
             continue;
@@ -15660,9 +15778,9 @@
           })]));
         }
       } catch (err) {
-        _iterator2.e(err);
+        _iterator3.e(err);
       } finally {
-        _iterator2.f();
+        _iterator3.f();
       }
       if (detailTemplate && this.options.detailViewAlign === 'right') {
         html.push(detailTemplate);
@@ -15677,11 +15795,11 @@
       var trEl = (_this$$tableFooter = this.$tableFooter) === null || _this$$tableFooter === void 0 ? void 0 : _this$$tableFooter.querySelector('tr');
       if (trEl) {
         trEl.innerHTML = '';
-        var _iterator3 = _createForOfIteratorHelper(html),
-          _step3;
+        var _iterator4 = _createForOfIteratorHelper(html),
+          _step4;
         try {
-          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-            var node = _step3.value;
+          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+            var node = _step4.value;
             if (node instanceof Node) {
               trEl.appendChild(node);
             } else if (typeof node === 'string') {
@@ -15689,9 +15807,9 @@
             }
           }
         } catch (err) {
-          _iterator3.e(err);
+          _iterator4.e(err);
         } finally {
-          _iterator3.f();
+          _iterator4.f();
         }
       }
       this.trigger('post-footer', this.$tableFooter);
@@ -15772,11 +15890,11 @@
       }
       this.columns[this.fieldsColumnsIndex[params.field]].title = this.options.escape && this.options.escapeTitle ? Utils.escapeHTML(params.title) : params.title;
       if (this.columns[this.fieldsColumnsIndex[params.field]].visible) {
-        var _iterator4 = _createForOfIteratorHelper(this.$header.querySelectorAll('th[data-field]')),
-          _step4;
+        var _iterator5 = _createForOfIteratorHelper(this.$header.querySelectorAll('th[data-field]')),
+          _step5;
         try {
-          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-            var el = _step4.value;
+          for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+            var el = _step5.value;
             if (el.dataset.field === params.field) {
               var thInner = el.querySelector('.th-inner');
               if (thInner) thInner.innerHTML = params.title;
@@ -15784,9 +15902,9 @@
             }
           }
         } catch (err) {
-          _iterator4.e(err);
+          _iterator5.e(err);
         } finally {
-          _iterator4.f();
+          _iterator5.f();
         }
         this.resetView();
       }
@@ -16880,12 +16998,12 @@
             var currentTarget = _ref3.currentTarget;
             var searchValue = currentTarget.value.toLowerCase();
             listItems.forEach(function (el) {
-              el.style.display = '';
+              el.style.removeProperty('display');
             });
             checkboxes.forEach(function (cb) {
               var listItem = cb.closest('.dropdown-item-marker');
               if (listItem && !listItem.textContent.toLowerCase().includes(searchValue)) {
-                listItem.style.display = 'none';
+                listItem.style.setProperty('display', 'none', 'important');
               }
             });
           });
@@ -17010,7 +17128,8 @@
       this.$el_ = this.$el.cloneNode(true);
       this._timeoutId = {
         header: 0,
-        footer: 0
+        footer: 0,
+        resetView: 0
       };
       this._resizeHandler = null;
       this._thDataMap = new WeakMap();
@@ -17081,6 +17200,10 @@
         for (var _i = 0, _Object$keys = Object.keys(this._timeoutId); _i < _Object$keys.length; _i++) {
           var type = _Object$keys[_i];
           clearTimeout(this._timeoutId[type]);
+        }
+        if (this._resizeObserver) {
+          this._resizeObserver.disconnect();
+          this._resizeObserver = null;
         }
         if (this.$container && this.$container.parentNode) {
           this.$container.parentNode.insertBefore(this.$el, this.$container);
