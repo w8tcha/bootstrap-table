@@ -1,0 +1,97 @@
+<script>
+init({
+  title: 'Buttons Order',
+  desc: 'Use `buttonsOrder` option to custom order of the toolbar buttons.',
+  links: [
+    'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css',
+    'bootstrap-table.min.css'
+  ],
+  scripts: [
+    'https://code.jquery.com/ui/1.12.1/jquery-ui.js',
+    'bootstrap-table.min.js'
+  ]
+})
+</script>
+
+<template>
+  <ul id="sortable">
+    <li data-value="fullscreen">
+      fullscreen
+    </li>
+    <li data-value="paginationSwitch">
+      paginationSwitch
+    </li>
+    <li data-value="refresh">
+      refresh
+    </li>
+    <li data-value="toggle">
+      toggle
+    </li>
+    <li data-value="columns">
+      columns
+    </li>
+  </ul>
+
+  <table
+    id="table"
+    data-toolbar="#sortable"
+    data-height="460"
+    data-show-pagination-switch="true"
+    data-show-refresh="true"
+    data-show-toggle="true"
+    data-show-fullscreen="true"
+    data-show-columns="true"
+    data-url="json/data1.json"
+  >
+    <thead>
+      <tr>
+        <th data-field="id">
+          ID
+        </th>
+        <th data-field="name">
+          Item Name
+        </th>
+        <th data-field="price">
+          Item Price
+        </th>
+      </tr>
+    </thead>
+  </table>
+</template>
+
+<script>
+  function mounted () {
+    const table = document.getElementById('table')
+
+    const getButtonsOrder = () => [...document.querySelectorAll('#sortable li')]
+      .map(li => li.textContent.trim())
+
+    $('#sortable').sortable({
+      stop () {
+        BootstrapTable.init(table, 'refreshOptions', {
+          buttonsOrder: getButtonsOrder()
+        })
+      }
+    })
+
+    BootstrapTable.init(table, {
+      buttonsOrder: getButtonsOrder()
+    })
+  }
+</script>
+
+<style>
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    margin-right: 10px;
+    padding: 0 10px;
+    display: inline-block;
+    border: 1px solid #c5c5c5;
+    background: #f6f6f6;
+    cursor: move;
+  }
+</style>

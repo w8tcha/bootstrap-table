@@ -1,0 +1,88 @@
+<script>
+init({
+  title: 'Large data',
+  desc: 'Use `virtualScroll` to enable the virtual scroll to play with large data sets (10000 rows).',
+  links: ['bootstrap-table.min.css'],
+  scripts: ['bootstrap-table.min.js']
+})
+</script>
+
+<template>
+  <div class="toolbar">
+    <button
+      id="load"
+      class="btn btn-secondary"
+    >
+      Load 10000 Rows
+    </button>
+    <button
+      id="append"
+      class="btn btn-secondary"
+    >
+      Append 10000 Rows
+    </button>
+    Total rows: <span id="total"></span>
+  </div>
+
+  <table
+    id="table"
+    data-toolbar=".toolbar"
+    data-height="400"
+    data-virtual-scroll="true"
+    data-show-columns="true"
+  >
+    <thead>
+      <tr>
+        <th data-field="id">
+          ID
+        </th>
+        <th data-field="name">
+          Item Name
+        </th>
+        <th data-field="price">
+          Item Price
+        </th>
+      </tr>
+    </thead>
+  </table>
+</template>
+
+<script>
+  let total = 0
+
+  function getData (number, isAppend) {
+    if (!isAppend) {
+      total = 0
+    }
+    const data = []
+
+    for (let i = total; i < total + number; i++) {
+      data.push({
+        id: i,
+        name: `Item ${i}`,
+        price: `$${i}`
+      })
+    }
+    if (isAppend) {
+      total += number
+    } else {
+      total = number
+    }
+    document.getElementById('total').textContent = total
+    return data
+  }
+
+  function mounted () {
+    const table = document.getElementById('table')
+
+    BootstrapTable.init(table, { data: getData(20) })
+
+    document.getElementById('load').addEventListener('click', () => {
+      BootstrapTable.init(table, 'load', getData(10000))
+    })
+
+    document.getElementById('append').addEventListener('click', () => {
+      BootstrapTable.init(table, 'append', getData(10000, true))
+    })
+  }
+</script>

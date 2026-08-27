@@ -187,6 +187,17 @@ BootstrapTable.theme = Constants.THEME
 // BOOTSTRAP TABLE PUBLIC API
 // =======================
 
+// Extensions are UMD bundles that replace window.BootstrapTable with a
+// subclass (`class extends BootstrapTable`) when their <script> tag loads.
+// That reassignment only changes the window property - it can't reach back
+// into this module's own closure-captured `BootstrapTable` binding. So the
+// dispatcher must resolve the constructor to use at call time, once all
+// extension scripts have had a chance to load, rather than capturing it
+// once up front - otherwise loaded extensions would never actually apply.
+function getConstructor () {
+  return (typeof window !== 'undefined' && window.BootstrapTable) || BootstrapTable
+}
+
 function initBootstrapTable (elements, option, ...args) {
   const els = typeof elements === 'string' ?
     Array.from(document.querySelectorAll(elements)) :
@@ -222,13 +233,20 @@ function initBootstrapTable (elements, option, ...args) {
     const options = Utils.extend(true, {}, BootstrapTable.DEFAULTS, getDataAttrs(el),
       typeof option === 'object' && option)
 
-    data = new BootstrapTable(el, options)
+    data = new (getConstructor())(el, options)
     _instanceMap.set(el, data)
     data.init()
   }
 
   return typeof value === 'undefined' ? els.length === 1 ? els[0] : els : value
 }
+
+function getInstance (el) {
+  return _instanceMap.get(typeof el === 'string' ? document.querySelector(el) : el)
+}
+
+BootstrapTable.init = initBootstrapTable
+BootstrapTable.getInstance = getInstance
 
 // BOOTSTRAP TABLE INIT
 // =======================
@@ -238,7 +256,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initBootstrapTable(el)
   })
 })
-
-export { initBootstrapTable }
 
 export default BootstrapTable

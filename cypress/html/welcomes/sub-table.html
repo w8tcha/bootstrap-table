@@ -1,0 +1,54 @@
+<script>
+init({
+  title: 'Sub Table',
+  desc: 'Supports sub tables with `detailView` option and `onExpandRow` event.',
+  links: ['bootstrap-table.min.css'],
+  scripts: ['bootstrap-table.min.js']
+})
+</script>
+
+<template>
+  <table id="table"></table>
+</template>
+
+<script>
+  function buildTable (el, cells, rows) {
+    let i
+    let j
+    let row
+    const columns = []
+    const data = []
+
+    for (i = 0; i < cells; i++) {
+      columns.push({
+        field: `field${i}`,
+        title: `Cell${i}`,
+        sortable: true
+      })
+    }
+    for (i = 0; i < rows; i++) {
+      row = {}
+      for (j = 0; j < cells; j++) {
+        row[`field${j}`] = `Row-${i}-${j}`
+      }
+      data.push(row)
+    }
+    BootstrapTable.init(el, {
+      columns,
+      data,
+      detailView: cells > 1,
+      onExpandRow (index, row, tdEl) {
+        expandTable(tdEl, cells - 1)
+      }
+    })
+  }
+
+  function expandTable (tdEl, cells) {
+    tdEl.innerHTML = '<table></table>'
+    buildTable(tdEl.querySelector('table'), cells, 1)
+  }
+
+  function mounted () {
+    buildTable(document.getElementById('table'), 8, 1)
+  }
+</script>

@@ -9,13 +9,13 @@ module.exports = (theme = '') => {
 
       // Hover a row in the main table body
       cy.get('.fixed-table-container > .fixed-table-body tr[data-index="0"]')
-        .invoke('trigger', 'mouseenter')
+        .trigger('mouseenter')
       cy.get('.fixed-columns .fixed-table-body tr[data-index="0"]')
         .should('have.class', 'hover-row')
 
       // Leave the row - hover-row should be removed from the synced fixed row
       cy.get('.fixed-table-container > .fixed-table-body tr[data-index="0"]')
-        .invoke('trigger', 'mouseleave')
+        .trigger('mouseleave')
       cy.get('.fixed-columns .fixed-table-body tr[data-index="0"]')
         .should('not.have.class', 'hover-row')
     })
@@ -27,7 +27,7 @@ module.exports = (theme = '') => {
 
       // Hover a row in the fixed columns body
       cy.get('.fixed-columns .fixed-table-body tr[data-index="1"]')
-        .invoke('trigger', 'mouseenter')
+        .trigger('mouseenter', { force: true })
       cy.get('.fixed-columns .fixed-table-body tr[data-index="1"]')
         .should('have.class', 'hover-row')
       cy.get('.fixed-table-container > .fixed-table-body tr[data-index="1"]')
@@ -35,7 +35,7 @@ module.exports = (theme = '') => {
 
       // Leave the row
       cy.get('.fixed-columns .fixed-table-body tr[data-index="1"]')
-        .invoke('trigger', 'mouseleave')
+        .trigger('mouseleave', { force: true })
       cy.get('.fixed-columns .fixed-table-body tr[data-index="1"]')
         .should('not.have.class', 'hover-row')
       cy.get('.fixed-table-container > .fixed-table-body tr[data-index="1"]')

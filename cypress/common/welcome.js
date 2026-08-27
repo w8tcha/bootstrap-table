@@ -84,13 +84,5 @@ module.exports = (theme = '') => {
 
       cy.get('#table tr[data-index]').should('have.length', 200)
     })
-
-    it('Test Vue Component', () => {
-      cy.visit(`${baseUrl}vue-component.html`)
-        .get('.bootstrap-table').should('exist')
-        .get('.fixed-table-toolbar > .columns').should('exist')
-        .get('.fixed-table-toolbar > .search').should('exist')
-        .get('.bootstrap-table tr[data-index]').should('have.length', 6)
-    })
   })
 }

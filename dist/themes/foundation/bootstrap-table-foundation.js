@@ -4053,9 +4053,11 @@
             el.setAttribute('data-toggle', id);
             next.setAttribute('data-position', 'bottom');
             next.setAttribute('data-alignment', 'right');
-            // TODO: replace with Foundation native API when jQuery is not available
-            if ((_window$Foundation = window.Foundation) !== null && _window$Foundation !== void 0 && _window$Foundation.Dropdown) {
-              new window.Foundation.Dropdown(next);
+            // Foundation's Dropdown expects a jQuery-wrapped element (it calls
+            // this.$element.data(...) internally) - it's a hard jQuery-based
+            // dependency of the theme itself, not something we can avoid here.
+            if ((_window$Foundation = window.Foundation) !== null && _window$Foundation !== void 0 && _window$Foundation.Dropdown && window.$) {
+              new window.Foundation.Dropdown(window.$(next));
             }
           });
           this._initDropdown();
@@ -4079,9 +4081,11 @@
             var _window$Foundation2;
             pane.setAttribute('data-position', 'top');
             pane.setAttribute('data-alignment', 'left');
-            // TODO: replace with Foundation native API when jQuery is not available
-            if ((_window$Foundation2 = window.Foundation) !== null && _window$Foundation2 !== void 0 && _window$Foundation2.Dropdown) {
-              new window.Foundation.Dropdown(pane);
+            // Foundation's Dropdown expects a jQuery-wrapped element (it calls
+            // this.$element.data(...) internally) - it's a hard jQuery-based
+            // dependency of the theme itself, not something we can avoid here.
+            if ((_window$Foundation2 = window.Foundation) !== null && _window$Foundation2 !== void 0 && _window$Foundation2.Dropdown && window.$) {
+              new window.Foundation.Dropdown(window.$(pane));
             }
           }
           this._initDropdown();

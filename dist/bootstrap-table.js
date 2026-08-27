@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.BootstrapTable = {}));
-})(this, (function (exports) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BootstrapTable = factory());
+})(this, (function () { 'use strict';
 
   function _arrayLikeToArray(r, a) {
     (null == a || a > r.length) && (a = r.length);
@@ -6490,10 +6490,15 @@
    * @returns {number} The Bootstrap version number (3, 4, or 5), defaulting to 5.
    */
   function getBootstrapVersion() {
-    var _window$bootstrap;
+    var _window$bootstrap, _window$$;
     var bootstrapVersion = 5;
     if (typeof window !== 'undefined' && (_window$bootstrap = window.bootstrap) !== null && _window$bootstrap !== void 0 && (_window$bootstrap = _window$bootstrap.Tooltip) !== null && _window$bootstrap !== void 0 && _window$bootstrap.VERSION) {
       bootstrapVersion = parseInt(window.bootstrap.Tooltip.VERSION, 10);
+    } else if (typeof window !== 'undefined' && (_window$$ = window.$) !== null && _window$$ !== void 0 && (_window$$ = _window$$.fn) !== null && _window$$ !== void 0 && (_window$$ = _window$$.tooltip) !== null && _window$$ !== void 0 && (_window$$ = _window$$.Constructor) !== null && _window$$ !== void 0 && _window$$.VERSION) {
+      // Bootstrap 3 has no window.bootstrap namespace (it's jQuery-plugin-only),
+      // so it's indistinguishable from "no Bootstrap JS at all" above. Its
+      // jQuery plugins do expose a version the same way Bootstrap 4's did.
+      bootstrapVersion = parseInt(window.$.fn.tooltip.Constructor.VERSION, 10);
     }
     return bootstrapVersion;
   }
@@ -11731,7 +11736,12 @@
         opts.icons = Utils.calculateObjectValue(null, opts.icons);
       }
       opts.iconsPrefix = opts.iconsPrefix || BootstrapTable.iconsPrefix || iconsPrefix;
-      opts.icons = Object.assign(Utils.getIcons(Constants.ICONS, opts.iconsPrefix), BootstrapTable.icons, opts.icons);
+      // Merge into a fresh object: Constants.ICONS[prefix] is the shared, per-theme
+      // icon map (mutated in place by extensions via Utils.assignIcons), so it must
+      // not be used as the Object.assign target - that would both leak per-instance
+      // opts.icons overrides into shared global state, and (since BootstrapTable.icons
+      // is the full multi-theme ICONS map) create a self-reference, e.g. icons.bi = icons.
+      opts.icons = Object.assign({}, Utils.getIcons(Constants.ICONS, opts.iconsPrefix), opts.icons);
 
       // normalize orderList once at init so the click hot path deals only with arrays
       opts.orderList = Utils.normalizeOrderList(opts.orderList);
@@ -14803,6 +14813,14 @@
         if (request.contentType) {
           headers['Content-Type'] = request.contentType;
         }
+        Object.assign(headers, request.headers);
+        if (typeof request.beforeSend === 'function') {
+          request.beforeSend({
+            setRequestHeader: function setRequestHeader(name, value) {
+              headers[name] = value;
+            }
+          });
+        }
         if (method === 'GET') {
           if (request.data && _typeof(request.data) === 'object') {
             var searchParams = new URLSearchParams();
@@ -17276,6 +17294,16 @@
   // BOOTSTRAP TABLE PUBLIC API
   // =======================
 
+  // Extensions are UMD bundles that replace window.BootstrapTable with a
+  // subclass (`class extends BootstrapTable`) when their <script> tag loads.
+  // That reassignment only changes the window property - it can't reach back
+  // into this module's own closure-captured `BootstrapTable` binding. So the
+  // dispatcher must resolve the constructor to use at call time, once all
+  // extension scripts have had a chance to load, rather than capturing it
+  // once up front - otherwise loaded extensions would never actually apply.
+  function getConstructor() {
+    return typeof window !== 'undefined' && window.BootstrapTable || BootstrapTable$1;
+  }
   function initBootstrapTable(elements, option) {
     var els = typeof elements === 'string' ? Array.from(document.querySelectorAll(elements)) : Array.isArray(elements) ? elements : [elements];
     var value;
@@ -17307,7 +17335,7 @@
           continue;
         }
         var options = Utils.extend(true, {}, BootstrapTable$1.DEFAULTS, getDataAttrs(el), _typeof(option) === 'object' && option);
-        data = new BootstrapTable$1(el, options);
+        data = new (getConstructor())(el, options);
         _instanceMap.set(el, data);
         data.init();
       }
@@ -17318,6 +17346,11 @@
     }
     return typeof value === 'undefined' ? els.length === 1 ? els[0] : els : value;
   }
+  function getInstance(el) {
+    return _instanceMap.get(typeof el === 'string' ? document.querySelector(el) : el);
+  }
+  BootstrapTable$1.init = initBootstrapTable;
+  BootstrapTable$1.getInstance = getInstance;
 
   // BOOTSTRAP TABLE INIT
   // =======================
@@ -17328,9 +17361,6 @@
     });
   });
 
-  exports.default = BootstrapTable$1;
-  exports.initBootstrapTable = initBootstrapTable;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
+  return BootstrapTable$1;
 
 }));

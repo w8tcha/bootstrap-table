@@ -153,6 +153,16 @@ export default {
         headers['Content-Type'] = request.contentType
       }
 
+      Object.assign(headers, request.headers)
+
+      if (typeof request.beforeSend === 'function') {
+        request.beforeSend({
+          setRequestHeader (name, value) {
+            headers[name] = value
+          }
+        })
+      }
+
       if (method === 'GET') {
         if (request.data && typeof request.data === 'object') {
           const searchParams = new URLSearchParams()

@@ -92,7 +92,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar .export')
         .should('exist')
         .window().then(win => {
-          const allCols = win.$('#table').bootstrapTable('getOptions').columns[0]
+          const allCols = win.BootstrapTable.getInstance('#table').getOptions().columns[0]
           const secretCol = allCols.find(c => c.field === 'secret')
 
           expect(secretCol).to.not.be.undefined
@@ -106,7 +106,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar .export')
         .should('exist')
         .window().then(win => {
-          const allCols = win.$('#table').bootstrapTable('getOptions').columns[0]
+          const allCols = win.BootstrapTable.getInstance('#table').getOptions().columns[0]
           const iconCol = allCols.find(c => c.field === 'icon')
 
           expect(iconCol).to.not.be.undefined
@@ -120,21 +120,23 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar .export')
         .should('exist')
         .window().then(win => {
-          const events = win.$.fn.bootstrapTable.events
+          const events = win.BootstrapTable.EVENTS
 
           expect(events).to.have.property('export-started.bs.table')
           expect(events['export-started.bs.table']).to.equal('onExportStarted')
         })
     })
 
-    it('Test export-started jQuery event listener fires correctly', () => {
+    it('Test export-started event listener fires correctly', () => {
       cy.visit(`${baseUrl}export-events.html`)
         .get('.fixed-table-toolbar .export')
         .should('exist')
         .window().then(win => {
           expect(win._exportStarted).to.be.undefined
 
-          win.$('#table').trigger('export-started.bs.table')
+          win.document.getElementById('table').dispatchEvent(
+            new win.CustomEvent('export-started.bs.table', { bubbles: true })
+          )
           expect(win._exportStarted).to.equal(true)
         })
     })
@@ -145,14 +147,14 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar .export')
         .should('exist')
         .window().then(win => {
-          const events = win.$.fn.bootstrapTable.events
+          const events = win.BootstrapTable.EVENTS
 
           expect(events).to.have.property('export-saved.bs.table')
           expect(events['export-saved.bs.table']).to.equal('onExportSaved')
         })
     })
 
-    it('Test export-saved jQuery event listener receives data', () => {
+    it('Test export-saved event listener receives data', () => {
       cy.visit(`${baseUrl}export-events.html`)
         .get('.fixed-table-toolbar .export')
         .should('exist')
@@ -162,7 +164,9 @@ module.exports = (theme = '') => {
 
           const testData = [{ id: 1 }, { id: 2 }]
 
-          win.$('#table').trigger('export-saved.bs.table', [testData])
+          win.document.getElementById('table').dispatchEvent(
+            new win.CustomEvent('export-saved.bs.table', { bubbles: true, detail: [testData] })
+          )
 
           expect(win._exportSaved).to.equal(true)
           expect(win._exportedData).to.deep.equal(testData)
@@ -175,10 +179,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-body')
         .should('exist')
         .window().then(win => {
-          const $table = win.$('#table')
-
-          // Verify the method exists
-          expect(typeof $table.bootstrapTable).to.equal('function')
+          const table = win.document.getElementById('table')
 
           let tableExportCalled = false
           const originalTableExport = win.$.fn.tableExport
@@ -193,14 +194,14 @@ module.exports = (theme = '') => {
             let exportStarted = false
             let exportSaved = false
 
-            $table.on('export-started.bs.table', () => {
+            table.addEventListener('export-started.bs.table', () => {
               exportStarted = true
             })
-            $table.on('export-saved.bs.table', () => {
+            table.addEventListener('export-saved.bs.table', () => {
               exportSaved = true
             })
 
-            $table.bootstrapTable('exportTable', { type: 'csv' })
+            win.BootstrapTable.init(table, 'exportTable', { type: 'csv' })
 
             expect(exportStarted, 'export-started event should be triggered').to.be.true
             expect(exportSaved, 'export-saved event should be triggered').to.be.true
@@ -217,7 +218,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar .export')
         .should('exist')
         .window().then(win => {
-          const opts = win.$('#table').bootstrapTable('getOptions')
+          const opts = win.BootstrapTable.getInstance('#table').getOptions()
 
           expect(typeof opts.exportOptions.fileName).to.equal('function')
           expect(opts.exportOptions.fileName()).to.equal('custom-export-name')

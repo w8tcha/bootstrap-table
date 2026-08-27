@@ -60,6 +60,11 @@ export function getBootstrapVersion () {
 
   if (typeof window !== 'undefined' && window.bootstrap?.Tooltip?.VERSION) {
     bootstrapVersion = parseInt(window.bootstrap.Tooltip.VERSION, 10)
+  } else if (typeof window !== 'undefined' && window.$?.fn?.tooltip?.Constructor?.VERSION) {
+    // Bootstrap 3 has no window.bootstrap namespace (it's jQuery-plugin-only),
+    // so it's indistinguishable from "no Bootstrap JS at all" above. Its
+    // jQuery plugins do expose a version the same way Bootstrap 4's did.
+    bootstrapVersion = parseInt(window.$.fn.tooltip.Constructor.VERSION, 10)
   }
 
   return bootstrapVersion

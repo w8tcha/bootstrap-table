@@ -17,8 +17,12 @@ export default {
     }
 
     opts.iconsPrefix = opts.iconsPrefix || BootstrapTable.iconsPrefix || iconsPrefix
-    opts.icons = Object.assign(Utils.getIcons(Constants.ICONS, opts.iconsPrefix),
-      BootstrapTable.icons, opts.icons)
+    // Merge into a fresh object: Constants.ICONS[prefix] is the shared, per-theme
+    // icon map (mutated in place by extensions via Utils.assignIcons), so it must
+    // not be used as the Object.assign target - that would both leak per-instance
+    // opts.icons overrides into shared global state, and (since BootstrapTable.icons
+    // is the full multi-theme ICONS map) create a self-reference, e.g. icons.bi = icons.
+    opts.icons = Object.assign({}, Utils.getIcons(Constants.ICONS, opts.iconsPrefix), opts.icons)
 
     // normalize orderList once at init so the click hot path deals only with arrays
     opts.orderList = Utils.normalizeOrderList(opts.orderList)

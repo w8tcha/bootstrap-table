@@ -58,9 +58,11 @@ export default class extends BootstrapTable {
         el.setAttribute('data-toggle', id)
         next.setAttribute('data-position', 'bottom')
         next.setAttribute('data-alignment', 'right')
-        // TODO: replace with Foundation native API when jQuery is not available
-        if (window.Foundation?.Dropdown) {
-          new window.Foundation.Dropdown(next)
+        // Foundation's Dropdown expects a jQuery-wrapped element (it calls
+        // this.$element.data(...) internally) - it's a hard jQuery-based
+        // dependency of the theme itself, not something we can avoid here.
+        if (window.Foundation?.Dropdown && window.$) {
+          new window.Foundation.Dropdown(window.$(next))
         }
       })
 
@@ -82,9 +84,11 @@ export default class extends BootstrapTable {
       if (pane) {
         pane.setAttribute('data-position', 'top')
         pane.setAttribute('data-alignment', 'left')
-        // TODO: replace with Foundation native API when jQuery is not available
-        if (window.Foundation?.Dropdown) {
-          new window.Foundation.Dropdown(pane)
+        // Foundation's Dropdown expects a jQuery-wrapped element (it calls
+        // this.$element.data(...) internally) - it's a hard jQuery-based
+        // dependency of the theme itself, not something we can avoid here.
+        if (window.Foundation?.Dropdown && window.$) {
+          new window.Foundation.Dropdown(window.$(pane))
         }
       }
 

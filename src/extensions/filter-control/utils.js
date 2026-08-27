@@ -475,7 +475,7 @@ export function createControls (that, header) {
         return
       }
 
-      if (currentTarget.matches(':checkbox') || currentTarget.matches(':radio')) {
+      if (currentTarget.matches('input[type="checkbox"]') || currentTarget.matches('input[type="radio"]')) {
         return
       }
 

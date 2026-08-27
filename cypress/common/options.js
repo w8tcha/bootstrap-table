@@ -1,66 +1,16 @@
 module.exports = (theme = '') => {
   const baseUrl = require('./utils')(theme, 'options')
 
-  // Load menu configuration defensively, since the config file may not exist
-  // in local checkouts (it is generated/populated in CI).
-  let menus = []
-  let configLoaded = false
-
-  try {
-    const configModule = require('../html/assets/js/config')
-
-    menus = configModule.menus
-    configLoaded = true
-  } catch (err) {
-    // If the config module itself is missing, fall back to running all tests unconditionally.
-    // For any other kind of error (e.g. syntax/runtime errors inside the config module),
-    // rethrow so CI does not silently pass with a broken config.
-    const isModuleNotFound =
-      err &&
-      err.code === 'MODULE_NOT_FOUND' &&
-      typeof err.message === 'string' &&
-      err.message.includes('../html/assets/js/config')
-
-    if (isModuleNotFound) {
-      // If the config is unavailable, fall back to running all tests unconditionally.
-      // This allows local development without the full CI setup.
-
-      console.warn(
-        'Options tests: ../html/assets/js/config not found; running all tests unconditionally.'
-      )
-    } else {
-      throw err
-    }
+  // A small number of option pages only make sense for the themes whose
+  // native class conventions they exercise; every other test runs for
+  // every theme unconditionally.
+  const THEME_RESTRICTIONS = {
+    'Buttons Class': ['', 'bootstrap3', 'bootstrap4']
   }
 
-  const optionsMenu = Array.isArray(menus) ?
-    menus.find(it => it && it.title === 'Options') :
-    null
-  const list = optionsMenu && Array.isArray(optionsMenu.children) ?
-    optionsMenu.children :
-    []
-
-  // Helper function to create a test that checks the theme condition
   const testIf = (label, fn) => {
-    // If config is not loaded, run all tests unconditionally
-    if (!configLoaded) {
-      it(`Test ${label}`, fn)
-      return
-    }
-
-    const item = list.find(it => it.label === label)
-
-    // If config is loaded but item is missing, fail explicitly
-    if (!item) {
-      const missingTitle = `Test ${label} (config missing)`
-
-      it(missingTitle, () => {
-        throw new Error(`Menu config entry for label "${label}" not found in "Options" menu.`)
-      })
-      return
-    }
-
-    const shouldTest = !item.show || item.show.includes(theme)
+    const allowedThemes = THEME_RESTRICTIONS[label]
+    const shouldTest = !allowedThemes || allowedThemes.includes(theme)
     const title = `Test ${label}`
 
     if (shouldTest) {
@@ -79,8 +29,8 @@ module.exports = (theme = '') => {
     })
 
     testIf('AJAX Options', () => {
-      cy.visit(`${baseUrl}ajax-options.html`)
-        .intercept('GET', '**/json/data1.json').as('ajax')
+      cy.intercept('GET', '**/data1.json*').as('ajax')
+        .visit(`${baseUrl}ajax-options.html`)
         .wait('@ajax')
         .should(({ request }) => {
           expect(request.headers).to.have.property('custom-auth-token')

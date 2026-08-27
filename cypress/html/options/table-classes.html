@@ -1,0 +1,117 @@
+<script>
+init({
+  title: 'Table Classes',
+  desc: 'Use `classes` option to set the table styles. The default `classes` is `\'table table-bordered table-hover\'`.',
+  links: ['bootstrap-table.min.css'],
+  scripts: ['bootstrap-table.min.js']
+})
+</script>
+
+<template>
+  <div class="toolbar">
+    <div class="checkbox">
+      <label>
+        <input
+          type="checkbox"
+          checked
+          disabled
+        >
+        <code>table</code>
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input
+          type="checkbox"
+          checked
+        >
+        <code>table-bordered</code>
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input
+          type="checkbox"
+          checked
+        >
+        <code>table-hover</code>
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input
+          type="checkbox"
+          checked
+        >
+        <code>table-striped</code>
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox">
+        <code>table-dark</code>
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox">
+        <code>table-sm</code>
+      </label>
+    </div>
+  </div>
+
+  <div class="checkbox">
+    <label>
+      <input type="checkbox">
+      <code>table-borderless</code>
+    </label>
+  </div>
+
+  <table
+    id="table"
+    data-url="json/data1.json"
+  >
+    <thead>
+      <tr>
+        <th data-field="id">
+          Item ID
+        </th>
+        <th data-field="name">
+          Item Name
+        </th>
+        <th data-field="price">
+          Item Price
+        </th>
+      </tr>
+    </thead>
+  </table>
+</template>
+
+<script>
+  function mounted () {
+    const table = document.getElementById('table')
+
+    const getClasses = () => [...document.querySelectorAll('.toolbar input:checked')]
+      .map(input => input.nextElementSibling.textContent)
+      .join(' ')
+
+    document.querySelectorAll('.toolbar input').forEach(input => {
+      input.addEventListener('change', () => {
+        BootstrapTable.init(table, 'refreshOptions', {
+          classes: getClasses()
+        })
+      })
+    })
+
+    BootstrapTable.init(table, {
+      classes: getClasses()
+    })
+  }
+</script>
+
+<style>
+  .checkbox {
+    float: left;
+    margin-right: 15px;
+  }
+</style>

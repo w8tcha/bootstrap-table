@@ -57,7 +57,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
 
           expect(instance).to.exist
           expect(instance.options.showPrint).to.be.true
@@ -70,7 +70,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -104,7 +104,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -128,7 +128,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -158,7 +158,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -182,7 +182,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -216,7 +216,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -250,7 +250,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
 
           expect(instance.options.printAsFilteredAndSortedOnUI).to.be.true
         })
@@ -262,7 +262,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -297,7 +297,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -328,7 +328,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -356,7 +356,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -382,7 +382,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -410,7 +410,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -436,7 +436,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -463,7 +463,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -488,7 +488,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -513,7 +513,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -539,7 +539,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -563,7 +563,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -588,7 +588,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 
@@ -652,7 +652,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
 
           let printCount = 0
@@ -694,7 +694,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
 
           let printCount = 0
@@ -734,7 +734,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
 
           let printCount = 0
@@ -770,7 +770,7 @@ module.exports = (theme = '') => {
         .get('.fixed-table-toolbar [name="print"]')
         .should('exist')
         .window().then(win => {
-          const instance = win.$('#table').data('bootstrap.table')
+          const instance = win.BootstrapTable.getInstance('#table')
           const data = instance.getData()
           const stub = stubWindowOpen(win)
 

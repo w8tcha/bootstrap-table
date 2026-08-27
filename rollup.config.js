@@ -94,13 +94,17 @@ for (const file of files) {
   const isLocaleFile = normalizedFile.startsWith('src/locale/')
 
   if (isMainFile) {
-    // Main file: UMD, no external deps, no inject
+    // Main file: UMD, no external deps, no inject.
+    // exports: 'default' keeps window.BootstrapTable as the class itself (not
+    // {default, initBootstrapTable}) since every extension bundle expects to
+    // receive the class as its injected 'BootstrapTable' global.
     config.push({
       input: file,
       output: {
         name: 'BootstrapTable',
         file: out,
-        format: 'umd'
+        format: 'umd',
+        exports: 'default'
       },
       external: [],
       plugins: [...basePlugins]

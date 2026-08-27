@@ -22,7 +22,7 @@ module.exports = (theme = '') => {
       cy.visit(`${baseUrl}reorder-columns.html`)
         .get('.bootstrap-table').should('exist')
       cy.window().then(win => {
-        win.$('#table').bootstrapTable('orderColumns', {
+        win.BootstrapTable.init('#table', 'orderColumns', {
           name: 0,
           id: 1,
           price: 2
@@ -40,7 +40,7 @@ module.exports = (theme = '') => {
       cy.visit(`${baseUrl}reorder-columns.html`)
         .get('.bootstrap-table').should('exist')
       cy.window().then(win => {
-        win.$('#table').bootstrapTable('orderColumns', {
+        win.BootstrapTable.init('#table', 'orderColumns', {
           price: 0,
           name: 1,
           id: 2
