@@ -529,6 +529,6 @@ export default {
     'en-US': EN
   },
   METHODS,
-  THEME: `bootstrap${bootstrapVersion}`,
+  THEME: `bootstrap${bootstrapVersion || 5}`,
   VERSION
 }

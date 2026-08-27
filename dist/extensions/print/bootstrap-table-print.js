@@ -5446,15 +5446,43 @@
       }
 
       /**
+       * Finds all descendants of an element matching a selector.
+       * @param {Element} el - The element to search within.
+       * @param {string} selector - CSS selector.
+       * @returns {Element[]} Array of matched elements.
+       */
+    }, {
+      key: "find",
+      value:
+      /**
+       * Find child elements
+       * @param {Element|string} element - Parent element or selector
+       * @param {string} selector - CSS selector
+       * @returns {Element[]} Array of matched child elements
+       */
+      function find(element, selector) {
+        if (typeof element === 'string') element = this.$(element);
+        if (!element) return [];
+        return Array.from(element.querySelectorAll(selector));
+      }
+
+      /**
+       * Find first matching child element
+       * @param {Element|string} element - Parent element or selector
+       * @param {string} selector - CSS selector
+       * @returns {Element|null} First matched child element
+       */
+    }, {
+      key: "create",
+      value:
+      /**
        * Create DOM element
        * @param {string} html - HTML string. Note: This method uses innerHTML and can execute scripts.
        *                        Always sanitize user input before passing it to this method.
        * @returns {Element|null} Created DOM element. Returns null if html is empty, not a string,
        *                         or contains only whitespace.
        */
-    }, {
-      key: "create",
-      value: function create(html) {
+      function create(html) {
         if (typeof html !== 'string') return null;
         var trimmed = html.trim();
         if (!trimmed) return null;
@@ -5661,27 +5689,6 @@
         }
         return newElement;
       }
-
-      /**
-       * Find child elements
-       * @param {Element|string} element - Parent element or selector
-       * @param {string} selector - CSS selector
-       * @returns {Element[]} Array of matched child elements
-       */
-    }, {
-      key: "find",
-      value: function find(element, selector) {
-        if (typeof element === 'string') element = this.$(element);
-        if (!element) return [];
-        return Array.from(element.querySelectorAll(selector));
-      }
-
-      /**
-       * Find first matching child element
-       * @param {Element|string} element - Parent element or selector
-       * @param {string} selector - CSS selector
-       * @returns {Element|null} First matched child element
-       */
     }, {
       key: "findFirst",
       value: function findFirst(element, selector) {

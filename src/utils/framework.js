@@ -6,6 +6,7 @@
  *
  * @module utils/framework
  */
+import DOMHelper from '../helpers/dom.js'
 
 /**
  * Returns the prefix for the icons based on the theme.
@@ -53,21 +54,33 @@ export function assignIcons (icons, icon, values) {
 /**
  * Gets the Bootstrap version.
  *
- * @returns {number} The Bootstrap version number (3, 4, or 5), defaulting to 5.
+ * Outside a browser (no `window` at all, e.g. SSR) this defaults to 5.
+ * In a browser, it returns the detected version (5 via window.bootstrap,
+ * or 3/4 via jQuery's dropdown plugin - Bootstrap 3 has no window.bootstrap
+ * namespace, since it's jQuery-plugin-only), or `undefined` when neither
+ * signal is present (e.g. a non-Bootstrap theme like bulma or semantic).
+ *
+ * @returns {number|undefined} The Bootstrap version number (3, 4, or 5).
  */
 export function getBootstrapVersion () {
-  let bootstrapVersion = 5
-
   if (typeof window !== 'undefined' && window.bootstrap?.Tooltip?.VERSION) {
-    bootstrapVersion = parseInt(window.bootstrap.Tooltip.VERSION, 10)
-  } else if (typeof window !== 'undefined' && window.$?.fn?.tooltip?.Constructor?.VERSION) {
-    // Bootstrap 3 has no window.bootstrap namespace (it's jQuery-plugin-only),
-    // so it's indistinguishable from "no Bootstrap JS at all" above. Its
-    // jQuery plugins do expose a version the same way Bootstrap 4's did.
-    bootstrapVersion = parseInt(window.$.fn.tooltip.Constructor.VERSION, 10)
+    return parseInt(window.bootstrap.Tooltip.VERSION, 10)
   }
 
-  return bootstrapVersion
+  const jqDropdownVersion = globalThis.$?.fn?.dropdown?.Constructor?.VERSION
+
+  if (jqDropdownVersion) {
+    return parseInt(jqDropdownVersion, 10)
+  }
+
+  // No signal at all: outside a browser (e.g. SSR) default to 5, but inside
+  // a real browser with neither window.bootstrap nor jQuery's dropdown
+  // plugin present, this genuinely is a non-Bootstrap theme (bulma, semantic).
+  if (typeof window === 'undefined' && typeof globalThis.$ === 'undefined') {
+    return 5
+  }
+
+  return undefined
 }
 
 /**
@@ -78,8 +91,21 @@ export function getBootstrapVersion () {
  */
 export function getSearchInput (that) {
   if (typeof that.options.searchSelector === 'string') {
-    return document.querySelector(that.options.searchSelector)
+    return DOMHelper.$(that.options.searchSelector)
   }
 
-  return that.$toolbar?.querySelector('.search input') ?? null
+  if (!that.$toolbar || (Array.isArray(that.$toolbar) && that.$toolbar.length === 0)) {
+    return null
+  }
+
+  const toolbarResult = DOMHelper.$(that.$toolbar)
+  const toolbarEl = Array.isArray(toolbarResult) ? toolbarResult[0] : toolbarResult
+
+  if (!toolbarEl) {
+    return null
+  }
+
+  const matches = DOMHelper.find(toolbarEl, '.search input')
+
+  return matches[0] ?? null
 }

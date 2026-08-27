@@ -47,6 +47,18 @@ class DOMHelper {
   }
 
   /**
+   * Finds all descendants of an element matching a selector.
+   * @param {Element} el - The element to search within.
+   * @param {string} selector - CSS selector.
+   * @returns {Element[]} Array of matched elements.
+   */
+  static find (el, selector) {
+    if (!el || typeof el.querySelectorAll !== 'function') return []
+
+    return Array.from(el.querySelectorAll(selector))
+  }
+
+  /**
    * Create DOM element
    * @param {string} html - HTML string. Note: This method uses innerHTML and can execute scripts.
    *                        Always sanitize user input before passing it to this method.
