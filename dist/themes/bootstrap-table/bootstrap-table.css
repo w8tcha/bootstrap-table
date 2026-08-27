@@ -759,10 +759,7 @@ div.fixed-table-scroll-outer {
 .modal {
   position: fixed;
   display: none;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  inset: 0;
 }
 .modal.show {
   display: flex;
@@ -780,10 +777,7 @@ div.fixed-table-scroll-outer {
 }
 .modal .modal-background {
   position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  inset: 0;
   z-index: 998;
   background-color: rgba(10, 10, 10, 0.86);
 }

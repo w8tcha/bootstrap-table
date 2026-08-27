@@ -4,7 +4,6 @@
  */
 
 
-
 BootstrapTable.theme = 'bootstrap-table'
 
 export default class extends BootstrapTable {

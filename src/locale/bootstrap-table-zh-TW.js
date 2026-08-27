@@ -4,7 +4,6 @@
  */
 
 
-
 BootstrapTable.locales['zh-TW'] = {
   formatAddLevel () {
     return '增加層級'

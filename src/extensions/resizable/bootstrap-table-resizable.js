@@ -7,7 +7,6 @@
  */
 
 
-
 // resizableColumns stores its state via jQuery .data() so we check for it there
 const isInit = that => {
   if (typeof window.$ !== 'undefined') {

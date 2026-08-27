@@ -7,7 +7,6 @@
  */
 
 
-
 const rowAttr = (row, index) => ({
   id: `customId_${index}`
 })

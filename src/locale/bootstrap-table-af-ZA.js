@@ -4,7 +4,6 @@
  */
 
 
-
 BootstrapTable.locales['af-ZA'] = BootstrapTable.locales['af'] = {
   formatAddLevel () {
     return 'Voeg \'n vlak by'

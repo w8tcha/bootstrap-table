@@ -7,7 +7,6 @@
  */
 
 
-
 const Utils = BootstrapTable.utils
 
 const TYPE_NAME = {

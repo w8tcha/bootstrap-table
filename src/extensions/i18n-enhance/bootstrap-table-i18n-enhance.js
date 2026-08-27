@@ -4,7 +4,6 @@
  */
 
 
-
 BootstrapTable.methods.push('changeTitle')
 BootstrapTable.methods.push('changeLocale')
 

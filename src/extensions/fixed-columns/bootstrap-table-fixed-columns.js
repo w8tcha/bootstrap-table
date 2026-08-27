@@ -3,7 +3,6 @@
  */
 
 
-
 const Utils = BootstrapTable.utils
 
 // Reasonable defaults

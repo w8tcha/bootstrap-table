@@ -5,7 +5,6 @@
  */
 
 
-
 BootstrapTable.locales['hr-HR'] = BootstrapTable.locales['hr'] = {
   formatAddLevel () {
     return 'Add Level'

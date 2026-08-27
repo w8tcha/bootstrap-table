@@ -94,7 +94,7 @@ export function getSearchInput (that) {
     return DOMHelper.$(that.options.searchSelector)
   }
 
-  if (!that.$toolbar || (Array.isArray(that.$toolbar) && that.$toolbar.length === 0)) {
+  if (!that.$toolbar || Array.isArray(that.$toolbar) && that.$toolbar.length === 0) {
     return null
   }
 

@@ -5,7 +5,6 @@
  */
 
 
-
 BootstrapTable.locales['es-CL'] = {
   formatAddLevel () {
     return 'Add Level'

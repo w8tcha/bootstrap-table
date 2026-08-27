@@ -4,7 +4,6 @@
  */
 
 
-
 const debounce = (func, wait) => {
   let timeout = 0
 

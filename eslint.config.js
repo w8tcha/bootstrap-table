@@ -11,6 +11,9 @@ export default [
         ...globals.browser,
         ...globals.node,
         $: true,
+        // injected by rollup at build time into extension/theme/locale bundles
+        // (see rollup.config.js's inject plugin) - not a real import
+        BootstrapTable: true,
         // cypress
         Cypress: true,
         cy: true,

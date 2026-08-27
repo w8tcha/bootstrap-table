@@ -195,7 +195,7 @@ BootstrapTable.theme = Constants.THEME
 // extension scripts have had a chance to load, rather than capturing it
 // once up front - otherwise loaded extensions would never actually apply.
 function getConstructor () {
-  return (typeof window !== 'undefined' && window.BootstrapTable) || BootstrapTable
+  return typeof window !== 'undefined' && window.BootstrapTable || BootstrapTable
 }
 
 function initBootstrapTable (elements, option, ...args) {

@@ -5,7 +5,6 @@
  */
 
 
-
 let isSingleSort = false
 const Utils = BootstrapTable.utils
 

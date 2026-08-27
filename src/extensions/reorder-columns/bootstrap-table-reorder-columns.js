@@ -8,7 +8,6 @@
  */
 
 
-
 if (typeof window.$ !== 'undefined' && window.$.akottr?.dragtable?.prototype) {
   window.$.akottr.dragtable.prototype._restoreState = function (persistObj) {
     let i = 0

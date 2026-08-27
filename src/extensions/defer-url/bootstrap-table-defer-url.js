@@ -14,7 +14,6 @@
  */
 
 
-
 Object.assign(BootstrapTable.defaults, {
   deferUrl: undefined
 })

@@ -4,7 +4,6 @@
  */
 
 
-
 const Utils = BootstrapTable.utils
 let initBodyCaller
 

@@ -5,7 +5,6 @@
  */
 
 
-
 const Utils = BootstrapTable.utils
 
 Utils.extend(BootstrapTable.defaults, {

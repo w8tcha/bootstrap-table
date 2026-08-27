@@ -5,7 +5,6 @@
  */
 
 
-
 BootstrapTable.locales['vi-VN'] = BootstrapTable.locales['vi'] = {
   formatAddLevel () {
     return 'Add Level'

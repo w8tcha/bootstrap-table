@@ -4,7 +4,6 @@
  */
 
 
-
 BootstrapTable.locales['id-ID'] = BootstrapTable.locales['id'] = {
   formatAddLevel () {
     return 'Menambahkan level'
