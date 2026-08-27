@@ -755,17 +755,17 @@ BootstrapTable.prototype.addLevel = function (index, sortPriority) {
 
   const nameSelectHtml = `${Utils.sprintf(theme.html.multipleSortSelect, this.constants.classes.paginationDropdown, 'multi-sort-name')}</select>`
   const orderSelectHtml = `${Utils.sprintf(theme.html.multipleSortSelect, this.constants.classes.paginationDropdown, 'multi-sort-order')}</select>`
-  const nameTmpl = document.createElement('template')
-  const orderTmpl = document.createElement('template')
+  const nameTemplate = document.createElement('template')
+  const orderTemplate = document.createElement('template')
 
-  nameTmpl.innerHTML = nameSelectHtml
-  orderTmpl.innerHTML = orderSelectHtml
+  nameTemplate.innerHTML = nameSelectHtml
+  orderTemplate.innerHTML = orderSelectHtml
 
   const td2 = document.createElement('td')
   const td3 = document.createElement('td')
 
-  td2.appendChild(nameTmpl.content.firstElementChild)
-  td3.appendChild(orderTmpl.content.firstElementChild)
+  td2.appendChild(nameTemplate.content.firstElementChild)
+  td3.appendChild(orderTemplate.content.firstElementChild)
   tr.appendChild(td1)
   tr.appendChild(td2)
   tr.appendChild(td3)
