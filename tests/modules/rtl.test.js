@@ -5,118 +5,72 @@
  * (initContainer), preservation of the original <table> dir for extensions,
  * and the physical semantics of column alignment.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import InitializationModule from '@/modules/initialization.js'
 import HeaderModule from '@/modules/header.js'
 import Utils from '@/utils/index.js'
 
 const { getRtlDirection, initContainer } = InitializationModule
 
-// Lightweight chainable jQuery stub for the parts of initContainer we exercise.
-function makeChainable () {
-  const c = {}
-
-  for (const m of ['find', 'insertAfter', 'after', 'append', 'addClass', 'css', 'show', 'hide', 'off', 'on']) {
-    c[m] = vi.fn(() => c)
-  }
-  c.length = 1
-  return c
-}
-
 describe('getRtlDirection', () => {
-  let original$
-
-  beforeEach(() => {
-    original$ = global.$
-  })
-
   afterEach(() => {
-    global.$ = original$
-    vi.restoreAllMocks()
+    document.documentElement.removeAttribute('dir')
   })
 
-  // ctx with a $el.attr getter; $('html') resolved via the global $ mock.
+  // ctx with a real $el; dir is set as a real attribute when provided.
   function ctx (rtl, { $elDir } = {}) {
-    return {
-      options: { rtl },
-      $el: { attr: vi.fn(() => $elDir) }
+    const el = document.createElement('table')
+
+    if ($elDir !== undefined) {
+      el.setAttribute('dir', $elDir)
     }
+    return { options: { rtl }, $el: el }
   }
 
   it('resolves false / "ltr" to ltr', () => {
-    global.$ = vi.fn()
     expect(getRtlDirection.call(ctx(false))).toBe('ltr')
     expect(getRtlDirection.call(ctx('ltr'))).toBe('ltr')
   })
 
   it('resolves true / "rtl" to rtl', () => {
-    global.$ = vi.fn()
     expect(getRtlDirection.call(ctx(true))).toBe('rtl')
     expect(getRtlDirection.call(ctx('rtl'))).toBe('rtl')
   })
 
   describe('auto probing', () => {
-    function mockHtml (htmlDir) {
-      global.$ = vi.fn(selector => {
-        if (selector === 'html') {
-          return { attr: vi.fn(() => htmlDir) }
-        }
-        return makeChainable()
-      })
-    }
-
     it('follows the table element dir when set', () => {
-      mockHtml('rtl')
+      document.documentElement.setAttribute('dir', 'rtl')
       expect(getRtlDirection.call(ctx('auto', { $elDir: 'rtl' }))).toBe('rtl')
     })
 
     it('falls back to <html> dir when the table has none', () => {
-      mockHtml('rtl')
-      expect(getRtlDirection.call(ctx('auto', { $elDir: undefined }))).toBe('rtl')
+      document.documentElement.setAttribute('dir', 'rtl')
+      expect(getRtlDirection.call(ctx('auto'))).toBe('rtl')
     })
 
     it('falls back to ltr when neither the table nor <html> has dir', () => {
-      mockHtml(undefined)
-      expect(getRtlDirection.call(ctx('auto', { $elDir: undefined }))).toBe('ltr')
+      expect(getRtlDirection.call(ctx('auto'))).toBe('ltr')
     })
 
     it('prefers the table element dir over <html>', () => {
-      mockHtml('rtl')
+      document.documentElement.setAttribute('dir', 'rtl')
       // table says ltr, html says rtl -> table wins
       expect(getRtlDirection.call(ctx('auto', { $elDir: 'ltr' }))).toBe('ltr')
     })
 
     it('treats uppercase DIR values case-insensitively', () => {
-      mockHtml(undefined)
       expect(getRtlDirection.call(ctx('auto', { $elDir: 'RTL' }))).toBe('rtl')
     })
   })
 })
 
 describe('initContainer direction injection', () => {
-  let original$
-  let capturedTemplates
+  function run (rtl, { elDir } = {}) {
+    const $el = document.createElement('table')
 
-  beforeEach(() => {
-    original$ = global.$
-    capturedTemplates = []
-    global.$ = vi.fn(html => {
-      if (typeof html === 'string') {
-        capturedTemplates.push(html)
-      }
-      return makeChainable()
-    })
-  })
-
-  afterEach(() => {
-    global.$ = original$
-    vi.restoreAllMocks()
-  })
-
-  function run (rtl) {
-    const $el = makeChainable()
-
-    $el.attr = vi.fn(() => undefined) // getter only; tracked for setter assertions
+    if (elDir !== undefined) {
+      $el.setAttribute('dir', elDir)
+    }
 
     const self = {
       options: {
@@ -134,90 +88,45 @@ describe('initContainer direction injection', () => {
 
     initContainer.call(self)
 
-    return { self, template: capturedTemplates[0], $el }
+    return { self, $el, container: self.$container }
   }
 
   it('injects dir="rtl" and bootstrap-table-rtl class when RTL', () => {
-    const { template } = run(true)
+    const { container } = run(true)
 
-    expect(template).toContain('dir="rtl"')
-    expect(template).toContain('bootstrap-table-rtl')
+    expect(container.getAttribute('dir')).toBe('rtl')
+    expect(container.classList.contains('bootstrap-table-rtl')).toBe(true)
   })
 
   it('injects neither dir nor class when LTR', () => {
-    const { template } = run(false)
+    const { container } = run(false)
 
-    expect(template).not.toContain('dir="rtl"')
-    expect(template).not.toContain('bootstrap-table-rtl')
+    expect(container.hasAttribute('dir')).toBe(false)
+    expect(container.classList.contains('bootstrap-table-rtl')).toBe(false)
   })
 
   it('keeps the root class ordering valid in RTL (no stray quotes)', () => {
-    const { template } = run(true)
+    const { container } = run(true)
 
-    // class attribute must still be well-formed
-    expect(template).toMatch(/class="bootstrap-table bootstrap3 bootstrap-table-rtl"\s+dir="rtl"/)
+    expect(container.className).toBe('bootstrap-table bootstrap3 bootstrap-table-rtl')
+    expect(container.getAttribute('dir')).toBe('rtl')
   })
 
   // The core must never SET dir on the original <table>, so print/filter-control
   // keep reading their own value. Cover both the explicit path (rtl: true, where
   // getRtlDirection never touches $el) and the auto path (where it reads
-  // $el.attr('dir') as a getter) to ensure neither issues a setter call.
+  // $el's own dir attribute) to ensure the original attribute is left untouched.
   it.each([
     ['explicit rtl', true],
     ['auto probing', 'auto']
   ])('does not modify this.$el dir attribute in %s mode (extension compatibility)', (_name, rtl) => {
-    // auto mode also probes $('html').attr('dir'); provide a stub for that.
-    global.$ = vi.fn(selector => {
-      if (selector === 'html') {
-        return { attr: vi.fn(() => 'ltr') }
-      }
-      return makeChainable()
-    })
+    const { $el } = run(rtl, { elDir: 'ltr' })
 
-    const $el = makeChainable()
-    // getter-only stub: returns 'ltr' (so auto resolves to ltr); we assert below
-    // that it is never called with a 2nd (value) argument.
-
-    $el.attr = vi.fn((...args) => args.length > 1 ? undefined : 'ltr')
-
-    const self = {
-      options: {
-        rtl,
-        loadingTemplate: msg => `<span>${msg}</span>`,
-        formatLoadingMessage: () => 'Loading',
-        classes: 'table',
-        paginationVAlign: 'bottom',
-        buttonsToolbar: undefined
-      },
-      constants: { theme: 'bootstrap3' },
-      $el,
-      getRtlDirection: InitializationModule.getRtlDirection
-    }
-
-    initContainer.call(self)
-
-    // Assert no attr('dir', value) setter call was made on the original <table>.
-    const dirSetter = $el.attr.mock.calls.find(
-      call => call[0] === 'dir' && call.length > 1 && call[1] !== undefined
-    )
-
-    expect(dirSetter).toBeUndefined()
+    expect($el.getAttribute('dir')).toBe('ltr')
   })
 })
 
 describe('column alignment keeps physical semantics (RTL does not flip align)', () => {
-  let original$
-
-  beforeEach(() => {
-    original$ = global.$
-    global.$ = vi.fn(() => ({ data: vi.fn(), off: vi.fn(), on: vi.fn() }))
-  })
-
-  afterEach(() => {
-    global.$ = original$
-    vi.restoreAllMocks()
-  })
-
   function createHeaderContext (align) {
     const column = Utils.extend({}, {
       field: 'name',
@@ -267,23 +176,13 @@ describe('column alignment keeps physical semantics (RTL does not flip align)', 
       header: {},
       _headerTrClasses: [''],
       _headerTrStyles: [''],
-      $el: {
-        is: () => false,
-        attr: () => 'test-table',
-        find: () => ({ each: () => {}, data: () => undefined }),
-        [0]: document.createElement('table')
-      },
-      $header: {
-        html: () => {},
-        show: () => {},
-        hide: () => {},
-        outerHeight: () => 50,
-        find: () => ({ each: () => {}, off: () => ({ on: () => {} }) })
-      },
-      $container: { off: () => ({ on: () => {} }) },
-      $tableHeader: { show: () => {}, hide: () => {} },
-      $selectAll: { off: () => {}, on: () => {} },
-      $tableLoading: { css: () => {} },
+      $el: document.createElement('table'),
+      $header: document.createElement('thead'),
+      $container: document.createElement('div'),
+      $tableHeader: document.createElement('div'),
+      $tableLoading: document.createElement('div'),
+      $selectAll: null,
+      _thDataMap: new WeakMap(),
       _timeoutId: {},
       _setDelayTimeout: () => {},
       resetView: () => {},

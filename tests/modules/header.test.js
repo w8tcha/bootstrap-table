@@ -1,6 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import HeaderModule from '@/modules/header.js'
 
+// jsdom reports offsetWidth/offsetHeight as 0 for every element (no layout
+// engine), which matches this suite's "hidden" default; tests that need a
+// "visible" element override both via defineProperty.
+function setOffsetSize (el, width, height) {
+  Object.defineProperty(el, 'offsetWidth', { value: width, configurable: true })
+  Object.defineProperty(el, 'offsetHeight', { value: height, configurable: true })
+}
+
 function createHeaderMockContext (overrides = {}) {
   const timeoutIds = {}
 
@@ -22,27 +30,13 @@ function createHeaderMockContext (overrides = {}) {
     _headerTrClasses: [''],
     _headerTrStyles: [''],
     header: {},
-    $el: {
-      is: vi.fn(() => false),
-      attr: vi.fn(() => 'test-table'),
-      find: vi.fn(() => ({ each: vi.fn(), data: vi.fn() })),
-      [0]: document.createElement('table')
-    },
-    $header: {
-      html: vi.fn(),
-      show: vi.fn(),
-      hide: vi.fn(),
-      outerHeight: vi.fn(() => 50),
-      find: vi.fn(() => ({
-        each: vi.fn(),
-        data: vi.fn(),
-        off: vi.fn(() => ({ on: vi.fn() }))
-      }))
-    },
-    $container: { off: vi.fn(() => ({ on: vi.fn() })) },
-    $tableHeader: { show: vi.fn(), hide: vi.fn() },
-    $tableLoading: { css: vi.fn() },
-    $selectAll: { off: vi.fn(), on: vi.fn() },
+    $el: document.createElement('table'),
+    $header: document.createElement('thead'),
+    $container: document.createElement('div'),
+    $tableHeader: document.createElement('div'),
+    $tableLoading: document.createElement('div'),
+    $selectAll: null,
+    _thDataMap: new WeakMap(),
     _timeoutId: timeoutIds,
     _setDelayTimeout: vi.fn((type, callback, delay) => {
       clearTimeout(timeoutIds[type])
@@ -68,14 +62,9 @@ describe('HeaderModule', () => {
   describe('ResizeObserver hidden-to-visible detection', () => {
     let ctx
     let originalResizeObserver
-    let original$
 
     beforeEach(() => {
       originalResizeObserver = globalThis.ResizeObserver
-      // @ts-expect-error - testing purposes
-      original$ = global.$
-      // @ts-expect-error - testing purposes
-      global.$ = vi.fn(() => ({ off: vi.fn(), on: vi.fn() }))
       ctx = createHeaderMockContext()
       Object.assign(ctx, HeaderModule)
     })
@@ -86,8 +75,6 @@ describe('HeaderModule', () => {
         ctx._resizeObserver = null
       }
       globalThis.ResizeObserver = originalResizeObserver
-      // @ts-expect-error - testing purposes
-      global.$ = original$
       vi.restoreAllMocks()
     })
 
@@ -97,12 +84,11 @@ describe('HeaderModule', () => {
         this.observe = vi.fn()
         this.disconnect = vi.fn()
       })
-      ctx.$el.is = vi.fn(() => true)
 
       ctx.initHeader()
 
       expect(ctx._resizeObserver).toBeTruthy()
-      expect(ctx._resizeObserver.observe).toHaveBeenCalledWith(ctx.$el[0])
+      expect(ctx._resizeObserver.observe).toHaveBeenCalledWith(ctx.$el)
     })
 
     it('should not create ResizeObserver when table is visible at init', () => {
@@ -113,7 +99,7 @@ describe('HeaderModule', () => {
       })
 
       globalThis.ResizeObserver = MockRO
-      ctx.$el.is = vi.fn(() => false)
+      setOffsetSize(ctx.$el, 800, 50)
 
       ctx.initHeader()
 
@@ -129,7 +115,6 @@ describe('HeaderModule', () => {
         this.observe = vi.fn()
         this.disconnect = vi.fn()
       })
-      ctx.$el.is = vi.fn(() => true)
 
       ctx.initHeader()
 
@@ -153,7 +138,6 @@ describe('HeaderModule', () => {
         this.observe = vi.fn()
         this.disconnect = vi.fn()
       })
-      ctx.$el.is = vi.fn(() => true)
 
       ctx.initHeader()
 
@@ -173,7 +157,6 @@ describe('HeaderModule', () => {
         this.observe = vi.fn()
         this.disconnect = vi.fn()
       })
-      ctx.$el.is = vi.fn(() => true)
 
       ctx.initHeader()
 
@@ -193,7 +176,6 @@ describe('HeaderModule', () => {
         this.observe = vi.fn()
         this.disconnect = vi.fn()
       })
-      ctx.$el.is = vi.fn(() => true)
 
       ctx.initHeader()
 
@@ -216,7 +198,6 @@ describe('HeaderModule', () => {
         this.observe = vi.fn()
         this.disconnect = vi.fn()
       })
-      ctx.$el.is = vi.fn(() => true)
 
       ctx.initHeader()
 

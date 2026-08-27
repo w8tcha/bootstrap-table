@@ -1,20 +1,29 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import DataModule from '@/modules/data.js'
 import { normalizeOrderList } from '@/utils/search-sort.js'
-
-// Self-referencing jQuery chain stub: any of `add/find/eq/remove` returns the
-// same chain, so the header DOM calls in onSort are no-ops without nesting.
-const headerChain = {
-  add: () => headerChain,
-  find: () => headerChain,
-  eq: () => headerChain,
-  remove: () => headerChain
-}
 
 // Builds a minimal `this` context for exercising DataModule.onSort in isolation.
 // orderList inputs are normalized the same way init/initHeader do, so tests can
 // pass raw strings/arrays and observe the post-init behavior.
 function createSortContext ({ options = {}, columns = [] } = {}) {
+  // One vanilla `th`-like element per field, so a remembered `dataset.order`
+  // (written by onSort itself, or seeded directly by a test) persists across
+  // clicks exactly like the real DOM does.
+  const thElements = {}
+
+  columns.forEach(column => {
+    thElements[column.field] = { dataset: { field: column.field } }
+  })
+
+  const $header = {
+    querySelectorAll: () => [],
+    querySelector: selector => {
+      const match = /data-field="([^"]+)"/.exec(selector)
+
+      return match ? thElements[match[1]] : null
+    }
+  }
+
   const ctx = {
     options: {
       sortName: undefined,
@@ -25,10 +34,8 @@ function createSortContext ({ options = {}, columns = [] } = {}) {
       ...options,
       orderList: normalizeOrderList(options.orderList)
     },
-    // per-field remembered order, written by onSort via `$el.data('order', val)`
-    _remembered: {},
-    $header: headerChain,
-    $header_: {}
+    $header,
+    $header_: null
   }
 
   ctx.columns = columns.map(column => ({ ...column, orderList: normalizeOrderList(column.orderList) }))
@@ -41,31 +48,15 @@ function createSortContext ({ options = {}, columns = [] } = {}) {
   // so onSort's tail calls are no-ops in this isolated test.
   ctx._sort = vi.fn()
   ctx.resetCaret = vi.fn()
+  ctx._thElements = thElements
   return ctx
 }
 
 // Simulates a click on a column header for `field`, returning the resulting sort state.
 function click (ctx, field) {
-  const $this = {
-    data (key, val) {
-      if (arguments.length === 1) {
-        return key === 'field' ? field : ctx._remembered[field]
-      }
-      if (key === 'order') {
-        ctx._remembered[field] = val
-      }
-    },
-    index () {
-      return 0
-    },
-    add () {
-      return this
-    }
-  }
+  const thInner = { parentElement: ctx._thElements[field] }
 
-  // @ts-expect-error - `$` is a rollup-injected global, mocked here for tests
-  global.$ = vi.fn(() => ({ parent: () => $this }))
-  ctx.onSort({ type: 'click', currentTarget: {} })
+  ctx.onSort({ type: 'click', currentTarget: thInner })
   return { sortName: ctx.options.sortName, sortOrder: ctx.options.sortOrder }
 }
 
@@ -80,19 +71,6 @@ function cycleOf (ctx, field, times) {
 }
 
 describe('onSort orderList cycle', () => {
-  let original$
-
-  beforeEach(() => {
-    // @ts-expect-error - testing purposes
-    original$ = global.$
-  })
-
-  afterEach(() => {
-    // @ts-expect-error - testing purposes
-    global.$ = original$
-    vi.restoreAllMocks()
-  })
-
   it('reproduces legacy behavior with the default cycle (asc → desc → asc)', () => {
     const ctx = createSortContext({ columns: [{ field: 'name' }] })
 
@@ -151,19 +129,6 @@ describe('onSort orderList cycle', () => {
 })
 
 describe('onSort sortReset', () => {
-  let original$
-
-  beforeEach(() => {
-    // @ts-expect-error - testing purposes
-    original$ = global.$
-  })
-
-  afterEach(() => {
-    // @ts-expect-error - testing purposes
-    global.$ = original$
-    vi.restoreAllMocks()
-  })
-
   it('appends an undefined terminal state with the default cycle (asc → desc → undefined → asc)', () => {
     const ctx = createSortContext({
       options: { sortReset: true },
@@ -198,19 +163,6 @@ describe('onSort sortReset', () => {
 })
 
 describe('onSort legacy column order fallback', () => {
-  let original$
-
-  beforeEach(() => {
-    // @ts-expect-error - testing purposes
-    original$ = global.$
-  })
-
-  afterEach(() => {
-    // @ts-expect-error - testing purposes
-    global.$ = original$
-    vi.restoreAllMocks()
-  })
-
   it('keeps the order: "desc" cycle byte-for-byte when sortReset is off (desc → asc → desc)', () => {
     const ctx = createSortContext({
       columns: [{ field: 'date', order: 'desc' }]
@@ -248,19 +200,6 @@ describe('onSort legacy column order fallback', () => {
 })
 
 describe('onSort rememberOrder', () => {
-  let original$
-
-  beforeEach(() => {
-    // @ts-expect-error - testing purposes
-    original$ = global.$
-  })
-
-  afterEach(() => {
-    // @ts-expect-error - testing purposes
-    global.$ = original$
-    vi.restoreAllMocks()
-  })
-
   it('flips each column from its own remembered direction when switching columns', () => {
     const ctx = createSortContext({
       options: { rememberOrder: true, sortName: 'b', sortOrder: 'asc' },
@@ -268,7 +207,8 @@ describe('onSort rememberOrder', () => {
     })
 
     // column a was last sorted desc, column b was last sorted asc
-    ctx._remembered = { a: 'desc', b: 'asc' }
+    ctx._thElements.a.dataset.order = 'desc'
+    ctx._thElements.b.dataset.order = 'asc'
 
     // switching to a flips its remembered desc -> asc
     expect(click(ctx, 'a').sortOrder).toBe('asc')
@@ -291,19 +231,6 @@ describe('onSort rememberOrder', () => {
 })
 
 describe('onSort server pagination', () => {
-  let original$
-
-  beforeEach(() => {
-    // @ts-expect-error - testing purposes
-    original$ = global.$
-  })
-
-  afterEach(() => {
-    // @ts-expect-error - testing purposes
-    global.$ = original$
-    vi.restoreAllMocks()
-  })
-
   it('selects orderList[0] for the first click; the request wire format is unchanged', () => {
     const ctx = createSortContext({
       options: { sidePagination: 'server' },
