@@ -21,7 +21,7 @@ const _instanceMap = new WeakMap()
 function getDataAttrs (el) {
   const data = {}
 
-  for (const key in el.dataset) {
+  for (const key of Object.keys(el.dataset)) {
     const value = el.dataset[key]
 
     try {
