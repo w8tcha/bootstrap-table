@@ -9,13 +9,13 @@ module.exports = (theme = '') => {
 
       // Hover a row in the main table body
       cy.get('.fixed-table-container > .fixed-table-body tr[data-index="0"]')
-        .trigger('mouseenter')
+        .trigger('mouseenter', { force: true })
       cy.get('.fixed-columns .fixed-table-body tr[data-index="0"]')
         .should('have.class', 'hover-row')
 
       // Leave the row - hover-row should be removed from the synced fixed row
       cy.get('.fixed-table-container > .fixed-table-body tr[data-index="0"]')
-        .trigger('mouseleave')
+        .trigger('mouseleave', { force: true })
       cy.get('.fixed-columns .fixed-table-body tr[data-index="0"]')
         .should('not.have.class', 'hover-row')
     })
