@@ -351,9 +351,13 @@ export default {
             return
           }
 
+          // currentTarget is only valid while the event is dispatching, so it
+          // must be captured now rather than read back inside the timeout
+          const currentTarget = event.currentTarget
+
           clearTimeout(timeoutId) // doesn't matter if it's 0
           timeoutId = setTimeout(() => {
-            this.onSearch({ currentTarget: event.currentTarget })
+            this.onSearch({ currentTarget })
           }, opts.searchTimeOut)
         })
       }

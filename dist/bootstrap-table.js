@@ -17070,10 +17070,14 @@
             if ([37, 38, 39, 40].includes(event.keyCode)) {
               return;
             }
+
+            // currentTarget is only valid while the event is dispatching, so it
+            // must be captured now rather than read back inside the timeout
+            var currentTarget = event.currentTarget;
             clearTimeout(timeoutId); // doesn't matter if it's 0
             timeoutId = setTimeout(function () {
               _this.onSearch({
-                currentTarget: event.currentTarget
+                currentTarget: currentTarget
               });
             }, opts.searchTimeOut);
           });
