@@ -17159,7 +17159,8 @@
   var _instanceMap = new WeakMap();
   function getDataAttrs(el) {
     var data = {};
-    for (var key in el.dataset) {
+    for (var _i = 0, _Object$keys = Object.keys(el.dataset); _i < _Object$keys.length; _i++) {
+      var key = _Object$keys[_i];
       var value = el.dataset[key];
       try {
         data[key] = JSON.parse(value);
@@ -17246,8 +17247,8 @@
     }, {
       key: "destroy",
       value: function destroy() {
-        for (var _i = 0, _Object$keys = Object.keys(this._timeoutId); _i < _Object$keys.length; _i++) {
-          var type = _Object$keys[_i];
+        for (var _i2 = 0, _Object$keys2 = Object.keys(this._timeoutId); _i2 < _Object$keys2.length; _i2++) {
+          var type = _Object$keys2[_i2];
           clearTimeout(this._timeoutId[type]);
         }
         if (this._resizeObserver) {
