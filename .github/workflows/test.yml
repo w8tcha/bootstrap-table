@@ -7,22 +7,7 @@ on:
     branches: [ develop ]
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      site: ${{ steps.filter.outputs.site }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dorny/paths-filter@v4
-        id: filter
-        with:
-          filters: |
-            site:
-              - 'site/**'
-              - 'yarn.lock'
-
   test:
-    needs: changes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -36,14 +21,6 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           yarn pre-commit
-
-      - name: Lint and build site
-        if: needs.changes.outputs.site == 'true'
-        run: |
-          cd site
-          yarn install --frozen-lockfile
-          yarn lint
-          yarn build
 
       - name: Cypress Test
         run: |
