@@ -41,7 +41,8 @@ describe('sprintf', () => {
   })
 
   it('should handle null arguments', () => {
-    expect(string.sprintf('Test %s', null)).toBe('Test null')
+    expect(string.sprintf('Test %s', null)).toBe('')
+    expect(string.sprintf('%s %s', 'A', null)).toBe('')
   })
 })
 
