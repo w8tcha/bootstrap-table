@@ -8317,7 +8317,7 @@
     var i = 0;
     var str = _str.replace(/%s/g, function () {
       var arg = args[i++];
-      if (typeof arg === 'undefined') {
+      if (typeof arg === 'undefined' || arg === null) {
         flag = false;
         return '';
       }

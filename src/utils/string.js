@@ -97,7 +97,7 @@ export function sprintf (_str, ...args) {
   const str = _str.replace(/%s/g, () => {
     const arg = args[i++]
 
-    if (typeof arg === 'undefined') {
+    if (typeof arg === 'undefined' || arg === null) {
       flag = false
       return ''
     }
