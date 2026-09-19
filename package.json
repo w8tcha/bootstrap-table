@@ -23,8 +23,8 @@
     "doc": "site"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.5",
-    "@babel/preset-env": "^8.0.5",
+    "@babel/core": "^8.0.6",
+    "@babel/preset-env": "^8.0.6",
     "@eslint/js": "^10.0.1",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
@@ -36,10 +36,10 @@
     "clean-css": "^5.3.3",
     "core-js": "^3.50.0",
     "cross-env": "^10.1.0",
-    "cspell": "^10.3.2",
+    "cspell": "^10.3.3",
     "cypress": "^16.1.0",
     "editorconfig-checker": "^7.0.0",
-    "eslint": "^10.10.0",
+    "eslint": "^10.11.0",
     "eslint-plugin-import-x": "^4.17.1",
     "glob": "^13.0.6",
     "globals": "^17.12.0",
