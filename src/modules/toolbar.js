@@ -381,9 +381,7 @@ export default {
         opts.showButtonIcons ? Utils.sprintf(this.constants.html.icon, opts.iconsPrefix, opts.icons.clearSearch) : '',
         opts.showButtonText ? opts.formatClearSearch() : ''
       )
-      const searchInputHtml = `<input class="${this.constants.classes.input}
-        ${Utils.sprintf(' %s%s', this.constants.classes.inputPrefix, opts.iconSize)}
-        search-input" type="search" aria-label="${opts.formatSearch()}" placeholder="${opts.formatSearch()}" autocomplete="off">`
+      const searchInputHtml = `<input class="${this.constants.classes.input} ${Utils.sprintf(' %s%s', this.constants.classes.inputPrefix, opts.iconSize)} search-input" name="search" type="search" aria-label="${opts.formatSearch()}" placeholder="${opts.formatSearch()}" autocomplete="off">`
       let searchInputFinalHtml = searchInputHtml
 
       if (opts.showSearchButton || opts.showSearchClearButton) {
