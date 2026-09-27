@@ -31,7 +31,6 @@ restrictions:
     * Table Export: [tableExport.jquery.plugin](https://github.com/hhurz/tableExport.jquery.plugin)
     * Table Reorder-Columns: [jquery-ui](https://code.jquery.com/ui/) and [dragTable](https://github.com/akottr/dragtable/)
     * Table Reorder-Rows: [tablednd](https://github.com/isocra/TableDnD)
-    * Table Resizable: [jquery-resizable-columns](https://github.com/dobtco/jquery-resizable-columns)
     * Table Treegrid: Dependence: [jquery-treegrid](https://github.com/maxazan/jquery-treegrid) v0.3.0
 
 

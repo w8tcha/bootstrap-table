@@ -6,7 +6,7 @@ group: extensions
 toc: true
 ---
 
-Dependence: [jquery-resizable-columns](https://github.com/dobtco/jquery-resizable-columns) v0.2.3
+Lets users resize columns by dragging the borders between header cells. No external dependencies (jQuery and jquery-resizable-columns are no longer required); works with mouse, pen and touch input.
 
 ## Usage
 
@@ -32,6 +32,22 @@ Dependence: [jquery-resizable-columns](https://github.com/dobtco/jquery-resizabl
 
 - **Default:** `false`
 
-## Known issues
+### resizableMinWidth
 
-- **This plugin does not work when the `height` is set.**
+- **attribute:** `data-resizable-min-width`
+
+- **type:** `Number`
+
+- **Detail:**
+
+  The minimum width (in pixels) a column can be shrunk to while resizing.
+
+- **Default:** `30`
+
+## Persisting widths
+
+Column widths survive re-renders such as showing/hiding columns. To persist them across page loads, load [store.js](https://github.com/marcuswestin/store.js) (so `window.store` exists) and give the table a `data-resizable-columns-id` attribute. Widths are saved per column `data-field`.
+
+## Styling
+
+The drag handles are rendered as `.rc-handle` elements inside a `.rc-handle-container`; the table gets the class `rc-table-resizing` while a drag is in progress.
