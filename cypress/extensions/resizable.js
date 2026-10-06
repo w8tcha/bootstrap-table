@@ -20,7 +20,8 @@ module.exports = (theme = '') => {
   describe('Resizable Test', () => {
     const visit = () => {
       cy.visit(`${baseUrl}resizable.html`)
-        .get('#table tbody tr').should('have.length.gte', 1)
+        // wait for real data rows, not the "no records" placeholder shown while loading
+        .get('#table tbody tr[data-index]').should('have.length.gte', 1)
     }
 
     it('should render one handle between each pair of columns', () => {
