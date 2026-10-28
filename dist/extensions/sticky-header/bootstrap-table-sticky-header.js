@@ -68,7 +68,12 @@
     })();
   }
   function _iterableToArray(r) {
-    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+    var e = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+    if (Array.isArray(r) && (null == e || e === ("undefined" != typeof Symbol && [][Symbol.iterator]) || e === []["@@iterator"])) return r;
+    if (null != e) {
+      for (var t, o = [], a = e.call(r); !(t = a.next()).done;) o.push(t.value);
+      return o;
+    }
   }
   function _nonIterableSpread() {
     throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");

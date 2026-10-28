@@ -9,40 +9,43 @@
     for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
     return n;
   }
-  function _arrayWithHoles(r) {
-    if (Array.isArray(r)) return r;
-  }
   function _arrayWithoutHoles(r) {
     if (Array.isArray(r)) return _arrayLikeToArray(r);
   }
   function _iterableToArray(r) {
-    if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
+    var e = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+    if (Array.isArray(r) && (null == e || e === ("undefined" != typeof Symbol && [][Symbol.iterator]) || e === []["@@iterator"])) return r;
+    if (null != e) {
+      for (var t, o = [], a = e.call(r); !(t = a.next()).done;) o.push(t.value);
+      return o;
+    }
   }
-  function _iterableToArrayLimit(r, l) {
-    var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-    if (null != t) {
-      var e,
+  function _iterableToArrayLimit(r, t) {
+    var e = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+    if (Array.isArray(r) && (null == e || e === ("undefined" != typeof Symbol && [][Symbol.iterator]) || e === []["@@iterator"])) return r;
+    if (null != e) {
+      var l,
         n,
         i,
-        u,
-        a = [],
-        f = true,
-        o = false;
+        a,
+        u = [],
+        o = true,
+        f = false;
       try {
-        if (i = (t = t.call(r)).next, 0 === l) {
-          if (Object(t) !== t) return;
-          f = !1;
-        } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
+        if (i = (e = e.call(r)).next, 0 === t) {
+          if (Object(e) !== e) return;
+          o = !1;
+        } else for (; !(o = (l = i.call(e)).done) && (u.push(l.value), u.length !== t); o = !0);
       } catch (r) {
-        o = true, n = r;
+        f = true, n = r;
       } finally {
         try {
-          if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return;
+          if (!o && null != e.return && (a = e.return(), Object(a) !== a)) return;
         } finally {
-          if (o) throw n;
+          if (f) throw n;
         }
       }
-      return a;
+      return u;
     }
   }
   function _nonIterableRest() {
@@ -52,7 +55,7 @@
     throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
   function _slicedToArray(r, e) {
-    return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
+    return _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
   }
   function _toConsumableArray(r) {
     return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
