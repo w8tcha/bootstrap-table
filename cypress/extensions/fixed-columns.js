@@ -7,6 +7,9 @@ module.exports = (theme = '') => {
         .get('.bootstrap-table').should('exist')
         .get('.fixed-columns').should('exist')
 
+      // Wait until the fixed body is rendered; the hover listeners are bound at the same time
+      cy.get('.fixed-columns .fixed-table-body tr[data-index="0"]').should('exist')
+
       // Hover a row in the main table body
       cy.get('.fixed-table-container > .fixed-table-body tr[data-index="0"]')
         .trigger('mouseenter', { force: true })
