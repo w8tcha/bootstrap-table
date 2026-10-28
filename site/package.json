@@ -11,6 +11,7 @@
     "algolia": "node scripts/algolia-index.js"
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.2",
     "@astrojs/mdx": "^8.0.1",
     "@astrojs/prism": "^4.0.1",
     "@astrojs/sitemap": "^3.7.2",
@@ -23,7 +24,7 @@
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
     "eslint": "^10.3.0",
-    "eslint-plugin-astro": "^3.1.0",
+    "eslint-plugin-astro": "^3.2.1",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }

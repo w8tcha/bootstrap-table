@@ -129,11 +129,11 @@
   function _toConsumableArray(r) {
     return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
-  function _toPrimitive(t, r) {
+  function _toPrimitive(t, e) {
     if ("object" != typeof t || !t) return t;
-    var e = t[Symbol.toPrimitive];
-    if (void 0 !== e) {
-      var i = e.call(t, r);
+    var r;
+    if ("undefined" != typeof Symbol && void 0 !== (r = t[Symbol.toPrimitive])) {
+      var i = r.call(t, e);
       if ("object" != typeof i) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
@@ -711,10 +711,10 @@
   	var store = sharedStore.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
   	(store.versions || (store.versions = [])).push({
-  	  version: '3.50.0',
+  	  version: '3.51.0',
   	  mode: IS_PURE ? 'pure' : 'global',
   	  copyright: '© 2013–2025 Denis Pushkarev (zloirock.ru), 2025–2026 CoreJS Company (core-js.io). All rights reserved.',
-  	  license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
+  	  license: 'https://github.com/zloirock/core-js/blob/v3.51.0/LICENSE',
   	  source: 'https://github.com/zloirock/core-js'
   	});
   	return sharedStore.exports;
@@ -6989,6 +6989,7 @@
   /* eslint-disable no-use-before-define */
   var Utils$1 = BootstrapTable.utils;
   var searchControls = 'select, input:not([type="checkbox"]):not([type="radio"])';
+  var selectionInputTypes = ['password', 'search', 'tel', 'text', 'url'];
   function getInputClass(that) {
     var isSelect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     var formControlClass = isSelect ? that.constants.classes.select : that.constants.classes.input;
@@ -7115,13 +7116,23 @@
           var range = elem.createTextRange();
           range.move('character', caretPos);
           range.select();
-        } else if (elem.setSelectionRange) {
+        } else if (elem.setSelectionRange && canSetCaretPosition(elem)) {
           elem.setSelectionRange(caretPos, caretPos);
         }
       }
     } catch (ex) {
       console.error(ex);
     }
+  }
+  function canSetCaretPosition(elem) {
+    var tagName = elem.tagName && elem.tagName.toLowerCase();
+    if (tagName === 'textarea') {
+      return true;
+    }
+    if (tagName !== 'input') {
+      return false;
+    }
+    return selectionInputTypes.includes(elem.type);
   }
   function setValues(that) {
     var field = null;
@@ -7344,13 +7355,13 @@
       if (header._fcMouseupHandler) header.removeEventListener('mouseup', header._fcMouseupHandler);
       if (header._fcRadioHandler) header.removeEventListener('change', header._fcRadioHandler);
       header._fcKeyupHandler = function (e) {
+        var _obj$keyCode;
         if (!e.target.matches('input')) return;
         var currentTarget = e.target;
         var keyCode = e.keyCode;
-        var obj = e.detail ? {
-          keyCode: e.detail.keyCode
-        } : null;
-        var effectiveKeyCode = obj ? obj.keyCode : keyCode;
+        var obj = e.detail && _typeof(e.detail) === 'object' ? e.detail : null;
+        var effectiveKeyCode = (_obj$keyCode = obj === null || obj === void 0 ? void 0 : obj.keyCode) !== null && _obj$keyCode !== void 0 ? _obj$keyCode : keyCode;
+        var isInitial = (obj === null || obj === void 0 ? void 0 : obj.isInitial) === true;
         if (that.options.searchOnEnterKey && effectiveKeyCode !== 13) {
           return;
         }
@@ -7364,7 +7375,8 @@
         currentTarget.timeoutId = setTimeout(function () {
           that.onColumnSearch({
             currentTarget: currentTarget,
-            keyCode: effectiveKeyCode
+            keyCode: effectiveKeyCode,
+            isInitial: isInitial
           });
         }, that.options.searchTimeOut);
       };
@@ -7372,13 +7384,17 @@
         if (!e.target.matches('select')) return;
         var currentTarget = e.target;
         var value = currentTarget.value;
+        var obj = e.detail && _typeof(e.detail) === 'object' ? e.detail : null;
+        var isInitial = (obj === null || obj === void 0 ? void 0 : obj.isInitial) === true;
         var normalizedValue = value === null ? currentTarget.multiple ? [] : null : value;
         currentTarget.value = normalizedValue;
         clearTimeout(currentTarget.timeoutId || 0);
         currentTarget.timeoutId = setTimeout(function () {
+          var _obj$keyCode2;
           that.onColumnSearch({
             currentTarget: currentTarget,
-            keyCode: e.keyCode
+            keyCode: (_obj$keyCode2 = obj === null || obj === void 0 ? void 0 : obj.keyCode) !== null && _obj$keyCode2 !== void 0 ? _obj$keyCode2 : e.keyCode,
+            isInitial: isInitial
           });
         }, that.options.searchTimeOut);
       };
@@ -7456,7 +7472,7 @@
         });
       }
       if (that.options.sidePagination !== 'server') {
-        that.triggerSearch();
+        that.triggerSearch(true);
       }
       if (!that.options.filterControlVisible) {
         header.querySelectorAll('.filter-control, .no-filter-control').forEach(function (el) {
@@ -7895,6 +7911,10 @@
         cacheValues(this);
         if (filterColumnsDefaults) {
           this.filterColumnsPartial = filterColumnsDefaults;
+          // Apply the restored filters to the data before re-rendering, so the
+          // restore does not depend on the deferred initial search running
+          // after the 250ms restore timer (broken when searchTimeOut < 250).
+          this.initSearch();
           this.updatePagination();
 
           // eslint-disable-next-line guard-for-in
@@ -7977,7 +7997,12 @@
         if (controls.length > 0) {
           this.filterColumnsPartial = {};
           var firstControl = controls[0];
-          firstControl.dispatchEvent(new Event(firstControl.tagName === 'INPUT' ? 'keyup' : 'change'));
+          firstControl.dispatchEvent(new CustomEvent(firstControl.tagName === 'SELECT' ? 'change' : 'keyup', {
+            bubbles: true,
+            detail: {
+              keyCode: 13
+            }
+          }));
         } else {
           return;
         }
@@ -8004,19 +8029,20 @@
       value: function onColumnSearch(_ref3) {
         var _this4 = this;
         var currentTarget = _ref3.currentTarget,
-          keyCode = _ref3.keyCode;
+          keyCode = _ref3.keyCode,
+          isInitial = _ref3.isInitial;
         if (isKeyAllowed(keyCode)) {
           return;
         }
         cacheValues(this);
-        var isInitialRender = !this._initialized;
+        var isInitialRender = !this._initialized || isInitial === true;
 
         // Cookie extension support
         if (!this.options.cookie) {
           if (!isInitialRender) {
             this.options.pageNumber = 1;
           }
-        } else {
+        } else if (!isInitialRender) {
           // Force call the initServer method in Cookie extension
           this._filterControlValuesLoaded = true;
         }
@@ -8031,7 +8057,13 @@
           var elementValue = element.value;
           var text = elementValue ? elementValue.trim() : '';
           var field = (_element$closest = element.closest('[data-field]')) === null || _element$closest === void 0 ? void 0 : _element$closest.dataset.field;
-          _this4.trigger('column-search', field, text);
+
+          // Skip empty values on the initial render: the cookie extension
+          // persists every column-search event, and an empty one here (before
+          // its 250ms restore timer) would clobber the saved filter cookie.
+          if (!isInitialRender || text) {
+            _this4.trigger('column-search', field, text);
+          }
           if (text) {
             _this4.filterColumnsPartial[field] = text;
           } else {
@@ -8082,13 +8114,20 @@
     }, {
       key: "triggerSearch",
       value: function triggerSearch() {
+        var isInitial = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
         var searchControls = getSearchControls(this);
         searchControls.forEach(function (element) {
-          if (element.tagName === 'SELECT') {
-            element.dispatchEvent(new Event('change'));
-          } else {
-            element.dispatchEvent(new Event('keyup'));
+          var eventName = element.tagName === 'SELECT' ? 'change' : 'keyup';
+          var eventData = {
+            keyCode: 13
+          };
+          if (isInitial) {
+            eventData.isInitial = true;
           }
+          element.dispatchEvent(new CustomEvent(eventName, {
+            bubbles: true,
+            detail: eventData
+          }));
         });
       }
     }, {

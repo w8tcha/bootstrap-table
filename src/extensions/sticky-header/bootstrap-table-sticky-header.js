@@ -58,8 +58,8 @@ export default class extends BootstrapTable {
     this.$tableBody.addEventListener('scroll', this._stickyBodyScrollHandler)
   }
 
-  onColumnSearch ({ currentTarget, keyCode }) {
-    super.onColumnSearch({ currentTarget, keyCode })
+  onColumnSearch (...args) {
+    super.onColumnSearch(...args)
     if (!this.options.stickyHeader) {
       return
     }

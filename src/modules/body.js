@@ -352,11 +352,13 @@ export default {
           return Utils.h('div', { class: cardViewClass })
         }
 
+        const fieldTitle = Utils.getFieldTitle(this.columns, field)
         const cardTitle = this.options.showHeader ?
           Utils.h('span', {
             class: ['card-view-title', cellStyle.classes],
             style: attrs.style,
-            html: Utils.getFieldTitle(this.columns, field)
+            html: this.options.escape && this.options.escapeTitle ?
+              Utils.escapeHTML(fieldTitle) : fieldTitle
           }) : ''
 
         return Utils.h('div', { class: cardViewClass }, [
@@ -447,14 +449,11 @@ export default {
       }
     }
 
-    this.$el.removeAttribute('role')
-
     // show no records
     if (!hasTr) {
       this.$body.innerHTML = Utils.sprintf('<tr class="no-records-found"><td colspan="%s">%s</td></tr>',
         this.getVisibleFields().length + Utils.getDetailViewIndexOffset(this.options),
         this.options.formatNoMatches())
-      this.$el.setAttribute('role', 'presentation')
     } else if (!this.options.virtualScroll) {
       this.$body.innerHTML = ''
       this.$body.appendChild(trFragments)
@@ -620,10 +619,26 @@ export default {
     let scrollTo = options.value
 
     if (options.unit === 'rows') {
-      scrollTo = 0
-      const trs = Array.from(this.$body.querySelectorAll(':scope > tr')).slice(0, options.value)
+      let rowCount = options.value
+      let trs = Array.from(this.$body.querySelectorAll(':scope > tr'))
 
-      trs.forEach(tr => {
+      scrollTo = 0
+
+      if (this.options.virtualScroll && this.virtualScroll) {
+        // Rows outside the rendered block are replaced by spacer rows,
+        // so count them with the item height instead of the spacer height
+        const { itemHeight, startIndex = 0 } = this.virtualScroll
+        const rowsAbove = Math.min(rowCount, startIndex)
+
+        trs = trs.filter(tr => !tr.matches('.virtual-scroll-top, .virtual-scroll-bottom'))
+        rowCount -= rowsAbove
+        const rowsBelow = Math.max(rowCount - trs.length, 0)
+
+        rowCount -= rowsBelow
+        scrollTo += (rowsAbove + rowsBelow) * itemHeight
+      }
+
+      trs.slice(0, rowCount).forEach(tr => {
         scrollTo += outerHeight(tr)
       })
     }

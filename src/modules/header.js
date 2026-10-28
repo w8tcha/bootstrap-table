@@ -589,15 +589,17 @@ export default {
       return
     }
 
-    this.columns[this.fieldsColumnsIndex[params.field]].title =
-      this.options.escape && this.options.escapeTitle ? Utils.escapeHTML(params.title) : params.title
+    this.columns[this.fieldsColumnsIndex[params.field]].title = params.title
 
     if (this.columns[this.fieldsColumnsIndex[params.field]].visible) {
       for (const el of this.$header.querySelectorAll('th[data-field]')) {
         if (el.dataset.field === params.field) {
           const thInner = el.querySelector('.th-inner')
 
-          if (thInner) thInner.innerHTML = params.title
+          if (thInner) {
+            thInner.innerHTML = this.options.escape && this.options.escapeTitle ?
+              Utils.escapeHTML(params.title) : params.title
+          }
           break
         }
       }

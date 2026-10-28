@@ -625,10 +625,10 @@
   	var store = sharedStore.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
   	(store.versions || (store.versions = [])).push({
-  	  version: '3.50.0',
+  	  version: '3.51.0',
   	  mode: IS_PURE ? 'pure' : 'global',
   	  copyright: '© 2013–2025 Denis Pushkarev (zloirock.ru), 2025–2026 CoreJS Company (core-js.io). All rights reserved.',
-  	  license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
+  	  license: 'https://github.com/zloirock/core-js/blob/v3.51.0/LICENSE',
   	  source: 'https://github.com/zloirock/core-js'
   	});
   	return sharedStore.exports;
@@ -4477,6 +4477,7 @@
     this.trigger('multiple-sort');
   };
   BootstrapTable.prototype.addLevel = function (index, sortPriority) {
+    var _this2 = this;
     var text = index === 0 ? this.options.formatSortBy() : this.options.formatThenBy();
     var tbody = this.$sortModal.querySelector('tbody');
     var tr = document.createElement('tr');
@@ -4496,13 +4497,14 @@
     tr.appendChild(td2);
     tr.appendChild(td3);
     tbody.appendChild(tr);
-    var multiSortName = this.$sortModal.querySelector('.multi-sort-name:last-of-type') || this.$sortModal.querySelectorAll('.multi-sort-name')[this.$sortModal.querySelectorAll('.multi-sort-name').length - 1];
-    var multiSortOrder = this.$sortModal.querySelector('.multi-sort-order:last-of-type') || this.$sortModal.querySelectorAll('.multi-sort-order')[this.$sortModal.querySelectorAll('.multi-sort-order').length - 1];
+    var multiSortName = td2.querySelector('.multi-sort-name');
+    var multiSortOrder = td3.querySelector('.multi-sort-order');
     this.columns.forEach(function (column) {
       if (column.sortable === false || column.visible === false) {
         return;
       }
-      multiSortName.insertAdjacentHTML('beforeend', "<option value=\"".concat(column.field, "\">").concat(column.title, "</option>"));
+      var title = _this2.options.escape && _this2.options.escapeTitle ? Utils.escapeHTML(column.title) : column.title;
+      multiSortName.insertAdjacentHTML('beforeend', "<option value=\"".concat(column.field, "\">").concat(title, "</option>"));
     });
     Object.entries(this.options.formatSortOrders()).forEach(function (_ref3) {
       var _ref4 = _slicedToArray(_ref3, 2),
@@ -4543,14 +4545,14 @@
     if (current === 1) deleteBtn === null || deleteBtn === void 0 || deleteBtn.setAttribute('disabled', 'disabled');
   };
   BootstrapTable.prototype.multiSort = function (sortPriority) {
-    var _this2 = this;
+    var _this3 = this;
     this.options.sortPriority = sortPriority;
     this.options.sortName = undefined;
     if (this.options.sidePagination === 'server') {
       var queryParams = this.options.queryParams;
       this.options.queryParams = function (params) {
-        params.multiSort = _this2.options.sortPriority;
-        return Utils.calculateObjectValue(_this2.options, queryParams, [params]);
+        params.multiSort = _this3.options.sortPriority;
+        return Utils.calculateObjectValue(_this3.options, queryParams, [params]);
       };
       isSingleSort = false;
       this.initServer(this.options.silentSort);

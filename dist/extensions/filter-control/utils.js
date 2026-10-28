@@ -589,10 +589,10 @@
   	var store = sharedStore.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
   	(store.versions || (store.versions = [])).push({
-  	  version: '3.50.0',
+  	  version: '3.51.0',
   	  mode: IS_PURE ? 'pure' : 'global',
   	  copyright: '© 2013–2025 Denis Pushkarev (zloirock.ru), 2025–2026 CoreJS Company (core-js.io). All rights reserved.',
-  	  license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
+  	  license: 'https://github.com/zloirock/core-js/blob/v3.51.0/LICENSE',
   	  source: 'https://github.com/zloirock/core-js'
   	});
   	return sharedStore.exports;
@@ -6545,6 +6545,7 @@
   /* eslint-disable no-use-before-define */
   var Utils = BootstrapTable.utils;
   var searchControls = 'select, input:not([type="checkbox"]):not([type="radio"])';
+  var selectionInputTypes = ['password', 'search', 'tel', 'text', 'url'];
   function getInputClass(that) {
     var isSelect = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     var formControlClass = isSelect ? that.constants.classes.select : that.constants.classes.input;
@@ -6684,13 +6685,23 @@
           var range = elem.createTextRange();
           range.move('character', caretPos);
           range.select();
-        } else if (elem.setSelectionRange) {
+        } else if (elem.setSelectionRange && canSetCaretPosition(elem)) {
           elem.setSelectionRange(caretPos, caretPos);
         }
       }
     } catch (ex) {
       console.error(ex);
     }
+  }
+  function canSetCaretPosition(elem) {
+    var tagName = elem.tagName && elem.tagName.toLowerCase();
+    if (tagName === 'textarea') {
+      return true;
+    }
+    if (tagName !== 'input') {
+      return false;
+    }
+    return selectionInputTypes.includes(elem.type);
   }
   function setValues(that) {
     var field = null;
@@ -6913,13 +6924,13 @@
       if (header._fcMouseupHandler) header.removeEventListener('mouseup', header._fcMouseupHandler);
       if (header._fcRadioHandler) header.removeEventListener('change', header._fcRadioHandler);
       header._fcKeyupHandler = function (e) {
+        var _obj$keyCode;
         if (!e.target.matches('input')) return;
         var currentTarget = e.target;
         var keyCode = e.keyCode;
-        var obj = e.detail ? {
-          keyCode: e.detail.keyCode
-        } : null;
-        var effectiveKeyCode = obj ? obj.keyCode : keyCode;
+        var obj = e.detail && _typeof(e.detail) === 'object' ? e.detail : null;
+        var effectiveKeyCode = (_obj$keyCode = obj === null || obj === void 0 ? void 0 : obj.keyCode) !== null && _obj$keyCode !== void 0 ? _obj$keyCode : keyCode;
+        var isInitial = (obj === null || obj === void 0 ? void 0 : obj.isInitial) === true;
         if (that.options.searchOnEnterKey && effectiveKeyCode !== 13) {
           return;
         }
@@ -6933,7 +6944,8 @@
         currentTarget.timeoutId = setTimeout(function () {
           that.onColumnSearch({
             currentTarget: currentTarget,
-            keyCode: effectiveKeyCode
+            keyCode: effectiveKeyCode,
+            isInitial: isInitial
           });
         }, that.options.searchTimeOut);
       };
@@ -6941,13 +6953,17 @@
         if (!e.target.matches('select')) return;
         var currentTarget = e.target;
         var value = currentTarget.value;
+        var obj = e.detail && _typeof(e.detail) === 'object' ? e.detail : null;
+        var isInitial = (obj === null || obj === void 0 ? void 0 : obj.isInitial) === true;
         var normalizedValue = value === null ? currentTarget.multiple ? [] : null : value;
         currentTarget.value = normalizedValue;
         clearTimeout(currentTarget.timeoutId || 0);
         currentTarget.timeoutId = setTimeout(function () {
+          var _obj$keyCode2;
           that.onColumnSearch({
             currentTarget: currentTarget,
-            keyCode: e.keyCode
+            keyCode: (_obj$keyCode2 = obj === null || obj === void 0 ? void 0 : obj.keyCode) !== null && _obj$keyCode2 !== void 0 ? _obj$keyCode2 : e.keyCode,
+            isInitial: isInitial
           });
         }, that.options.searchTimeOut);
       };
@@ -7025,7 +7041,7 @@
         });
       }
       if (that.options.sidePagination !== 'server') {
-        that.triggerSearch();
+        that.triggerSearch(true);
       }
       if (!that.options.filterControlVisible) {
         header.querySelectorAll('.filter-control, .no-filter-control').forEach(function (el) {

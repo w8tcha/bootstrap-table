@@ -771,16 +771,17 @@ BootstrapTable.prototype.addLevel = function (index, sortPriority) {
   tr.appendChild(td3)
   tbody.appendChild(tr)
 
-  const multiSortName = this.$sortModal.querySelector('.multi-sort-name:last-of-type') ||
-    this.$sortModal.querySelectorAll('.multi-sort-name')[this.$sortModal.querySelectorAll('.multi-sort-name').length - 1]
-  const multiSortOrder = this.$sortModal.querySelector('.multi-sort-order:last-of-type') ||
-    this.$sortModal.querySelectorAll('.multi-sort-order')[this.$sortModal.querySelectorAll('.multi-sort-order').length - 1]
+  const multiSortName = td2.querySelector('.multi-sort-name')
+  const multiSortOrder = td3.querySelector('.multi-sort-order')
 
   this.columns.forEach(column => {
     if (column.sortable === false || column.visible === false) {
       return
     }
-    multiSortName.insertAdjacentHTML('beforeend', `<option value="${column.field}">${column.title}</option>`)
+    const title = this.options.escape && this.options.escapeTitle ?
+      Utils.escapeHTML(column.title) : column.title
+
+    multiSortName.insertAdjacentHTML('beforeend', `<option value="${column.field}">${title}</option>`)
   })
 
   Object.entries(this.options.formatSortOrders()).forEach(([value, order]) => {

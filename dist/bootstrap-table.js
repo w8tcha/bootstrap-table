@@ -55,24 +55,30 @@
       throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
     var o,
-      a = true,
-      u = false;
+      a,
+      u = true;
     return {
       s: function () {
         t = t.call(r);
       },
       n: function () {
+        u = true;
         var r = t.next();
-        return a = r.done, r;
+        return r.done ? {
+          done: true
+        } : {
+          value: r.value,
+          done: u = false
+        };
       },
       e: function (r) {
-        u = true, o = r;
+        o = true, a = r;
       },
       f: function () {
         try {
-          a || null == t.return || t.return();
+          u || null == t.return || t.return();
         } finally {
-          if (u) throw o;
+          if (o) throw a;
         }
       }
     };
@@ -145,15 +151,15 @@
   function _toConsumableArray(r) {
     return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
   }
-  function _toPrimitive(t, r) {
+  function _toPrimitive(t, e) {
     if ("object" != typeof t || !t) return t;
-    var e = t[Symbol.toPrimitive];
-    if (void 0 !== e) {
-      var i = e.call(t, r);
+    var r;
+    if ("undefined" != typeof Symbol && void 0 !== (r = t[Symbol.toPrimitive])) {
+      var i = r.call(t, e);
       if ("object" != typeof i) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    return ("string" === r ? String : Number)(t);
+    return ("string" === e ? String : Number)(t);
   }
   function _toPropertyKey(t) {
     var i = _toPrimitive(t, "string");
@@ -727,10 +733,10 @@
   	var store = sharedStore.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
   	(store.versions || (store.versions = [])).push({
-  	  version: '3.50.0',
+  	  version: '3.51.0',
   	  mode: IS_PURE ? 'pure' : 'global',
   	  copyright: '© 2013–2025 Denis Pushkarev (zloirock.ru), 2025–2026 CoreJS Company (core-js.io). All rights reserved.',
-  	  license: 'https://github.com/zloirock/core-js/blob/v3.50.0/LICENSE',
+  	  license: 'https://github.com/zloirock/core-js/blob/v3.51.0/LICENSE',
   	  source: 'https://github.com/zloirock/core-js'
   	});
   	return sharedStore.exports;
@@ -11228,7 +11234,7 @@
 
   var Utils = _objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2(_objectSpread2({}, framework), object), string), dom), tableData), searchSort), helper), checkbox);
 
-  var VERSION = '1.27.3';
+  var VERSION = '1.28.0';
   var bootstrapVersion = Utils.getBootstrapVersion();
   var CONSTANTS = {
     3: {
@@ -12824,10 +12830,11 @@
               class: cardViewClass
             });
           }
+          var fieldTitle = Utils.getFieldTitle(_this2.columns, field);
           var cardTitle = _this2.options.showHeader ? Utils.h('span', {
             class: ['card-view-title', cellStyle.classes],
             style: attrs.style,
-            html: Utils.getFieldTitle(_this2.columns, field)
+            html: _this2.options.escape && _this2.options.escapeTitle ? Utils.escapeHTML(fieldTitle) : fieldTitle
           }) : '';
           return Utils.h('div', {
             class: cardViewClass
@@ -12904,12 +12911,10 @@
           }
         }
       }
-      this.$el.removeAttribute('role');
 
       // show no records
       if (!hasTr) {
         this.$body.innerHTML = Utils.sprintf('<tr class="no-records-found"><td colspan="%s">%s</td></tr>', this.getVisibleFields().length + Utils.getDetailViewIndexOffset(this.options), this.options.formatNoMatches());
-        this.$el.setAttribute('role', 'presentation');
       } else if (!this.options.virtualScroll) {
         this.$body.innerHTML = '';
         this.$body.appendChild(trFragments);
@@ -13051,9 +13056,26 @@
       }
       var scrollTo = options.value;
       if (options.unit === 'rows') {
+        var rowCount = options.value;
+        var trs = Array.from(this.$body.querySelectorAll(':scope > tr'));
         scrollTo = 0;
-        var trs = Array.from(this.$body.querySelectorAll(':scope > tr')).slice(0, options.value);
-        trs.forEach(function (tr) {
+        if (this.options.virtualScroll && this.virtualScroll) {
+          // Rows outside the rendered block are replaced by spacer rows,
+          // so count them with the item height instead of the spacer height
+          var _this$virtualScroll = this.virtualScroll,
+            itemHeight = _this$virtualScroll.itemHeight,
+            _this$virtualScroll$s = _this$virtualScroll.startIndex,
+            startIndex = _this$virtualScroll$s === void 0 ? 0 : _this$virtualScroll$s;
+          var rowsAbove = Math.min(rowCount, startIndex);
+          trs = trs.filter(function (tr) {
+            return !tr.matches('.virtual-scroll-top, .virtual-scroll-bottom');
+          });
+          rowCount -= rowsAbove;
+          var rowsBelow = Math.max(rowCount - trs.length, 0);
+          rowCount -= rowsBelow;
+          scrollTo += (rowsAbove + rowsBelow) * itemHeight;
+        }
+        trs.slice(0, rowCount).forEach(function (tr) {
           scrollTo += outerHeight(tr);
         });
       }
@@ -15937,7 +15959,7 @@
       if (!params.hasOwnProperty('field') || !params.hasOwnProperty('title')) {
         return;
       }
-      this.columns[this.fieldsColumnsIndex[params.field]].title = this.options.escape && this.options.escapeTitle ? Utils.escapeHTML(params.title) : params.title;
+      this.columns[this.fieldsColumnsIndex[params.field]].title = params.title;
       if (this.columns[this.fieldsColumnsIndex[params.field]].visible) {
         var _iterator5 = _createForOfIteratorHelper(this.$header.querySelectorAll('th[data-field]')),
           _step5;
@@ -15946,7 +15968,9 @@
             var el = _step5.value;
             if (el.dataset.field === params.field) {
               var thInner = el.querySelector('.th-inner');
-              if (thInner) thInner.innerHTML = params.title;
+              if (thInner) {
+                thInner.innerHTML = this.options.escape && this.options.escapeTitle ? Utils.escapeHTML(params.title) : params.title;
+              }
               break;
             }
           }
@@ -16886,7 +16910,7 @@
                   value: i,
                   checked: !!checked,
                   disabled: !!disabled,
-                  label: column.switchableLabel || column.title
+                  label: column.switchableLabel || (opts.escape && opts.escapeTitle ? Utils.escapeHTML(column.title) : column.title)
                 });
 
                 // Bootstrap 3/4 needs to be wrapped with toolbarDropdownItem

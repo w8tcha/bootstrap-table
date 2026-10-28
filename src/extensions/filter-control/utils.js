@@ -3,6 +3,7 @@
 /* eslint-disable no-use-before-define */
 const Utils = BootstrapTable.utils
 const searchControls = 'select, input:not([type="checkbox"]):not([type="radio"])'
+const selectionInputTypes = ['password', 'search', 'tel', 'text', 'url']
 
 export function getInputClass (that, isSelect = false) {
   const formControlClass = isSelect ? that.constants.classes.select : that.constants.classes.input
@@ -175,13 +176,27 @@ export function setCaretPosition (elem, caretPos) {
 
         range.move('character', caretPos)
         range.select()
-      } else if (elem.setSelectionRange) {
+      } else if (elem.setSelectionRange && canSetCaretPosition(elem)) {
         elem.setSelectionRange(caretPos, caretPos)
       }
     }
   } catch (ex) {
     console.error(ex)
   }
+}
+
+function canSetCaretPosition (elem) {
+  const tagName = elem.tagName && elem.tagName.toLowerCase()
+
+  if (tagName === 'textarea') {
+    return true
+  }
+
+  if (tagName !== 'input') {
+    return false
+  }
+
+  return selectionInputTypes.includes(elem.type)
 }
 
 export function setValues (that) {
@@ -463,9 +478,9 @@ export function createControls (that, header) {
       const currentTarget = e.target
       const keyCode = e.keyCode
 
-      const obj = e.detail ? { keyCode: e.detail.keyCode } : null
-
-      const effectiveKeyCode = obj ? obj.keyCode : keyCode
+      const obj = e.detail && typeof e.detail === 'object' ? e.detail : null
+      const effectiveKeyCode = obj?.keyCode ?? keyCode
+      const isInitial = obj?.isInitial === true
 
       if (that.options.searchOnEnterKey && effectiveKeyCode !== 13) {
         return
@@ -481,7 +496,7 @@ export function createControls (that, header) {
 
       clearTimeout(currentTarget.timeoutId || 0)
       currentTarget.timeoutId = setTimeout(() => {
-        that.onColumnSearch({ currentTarget, keyCode: effectiveKeyCode })
+        that.onColumnSearch({ currentTarget, keyCode: effectiveKeyCode, isInitial })
       }, that.options.searchTimeOut)
     }
 
@@ -489,6 +504,8 @@ export function createControls (that, header) {
       if (!e.target.matches('select')) return
       const currentTarget = e.target
       const value = currentTarget.value
+      const obj = e.detail && typeof e.detail === 'object' ? e.detail : null
+      const isInitial = obj?.isInitial === true
       const normalizedValue = value === null ?
         currentTarget.multiple ? [] : null :
         value
@@ -497,7 +514,7 @@ export function createControls (that, header) {
 
       clearTimeout(currentTarget.timeoutId || 0)
       currentTarget.timeoutId = setTimeout(() => {
-        that.onColumnSearch({ currentTarget, keyCode: e.keyCode })
+        that.onColumnSearch({ currentTarget, keyCode: obj?.keyCode ?? e.keyCode, isInitial })
       }, that.options.searchTimeOut)
     }
 
@@ -576,7 +593,7 @@ export function createControls (that, header) {
     }
 
     if (that.options.sidePagination !== 'server') {
-      that.triggerSearch()
+      that.triggerSearch(true)
     }
 
     if (!that.options.filterControlVisible) {
