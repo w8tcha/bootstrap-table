@@ -14,7 +14,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: latest
+          node-version: current
           cache: 'yarn'
 
       - name: Lint src and check docs
