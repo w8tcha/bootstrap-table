@@ -8,16 +8,16 @@
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     return e;
   }
-  function _callSuper(t, o, e) {
-    return o = _getPrototypeOf(o), _possibleConstructorReturn(t, _isNativeReflectConstruct() ? Reflect.construct(o, e || [], _getPrototypeOf(t).constructor) : o.apply(t, e));
+  function _callSuper(e, c, p) {
+    return c = _getPrototypeOf(c), _possibleConstructorReturn(e, _isNativeReflectConstruct() ? Reflect.construct(c, p || [], _getPrototypeOf(e).constructor) : c.apply(e, p));
   }
   function _classCallCheck(a, n) {
     if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
   }
-  function _defineProperties(e, r) {
-    for (var t = 0; t < r.length; t++) {
-      var o = r[t];
-      o.enumerable = o.enumerable || false, o.configurable = true, "value" in o && (o.writable = true), Object.defineProperty(e, _toPropertyKey(o.key), o);
+  function _defineProperties(r, t) {
+    for (var o = 0; o < t.length; o++) {
+      var i = t[o];
+      i.enumerable = i.enumerable || false, i.configurable = true, "value" in i && (i.writable = true), Object.defineProperty(r, _toPropertyKey(i.key), i);
     }
   }
   function _createClass(e, r, t) {
@@ -30,9 +30,9 @@
       return t.__proto__ || Object.getPrototypeOf(t);
     }, _getPrototypeOf(t);
   }
-  function _inherits(t, e) {
-    if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function");
-    t.prototype = Object.create(e && e.prototype, {
+  function _inherits(t, r) {
+    if ("function" != typeof r && null !== r) throw new TypeError("Super expression must either be null or a function");
+    t.prototype = Object.create(r && r.prototype, {
       constructor: {
         value: t,
         writable: true,
@@ -40,7 +40,7 @@
       }
     }), Object.defineProperty(t, "prototype", {
       writable: false
-    }), e && _setPrototypeOf(t, e);
+    }), r && _setPrototypeOf(t, r);
   }
   function _isNativeReflectConstruct() {
     try {
@@ -70,9 +70,9 @@
     }
     return (String )(t);
   }
-  function _toPropertyKey(t) {
-    var i = _toPrimitive(t, "string");
-    return "symbol" == typeof i ? i : i + "";
+  function _toPropertyKey(r) {
+    var o = _toPrimitive(r, "string");
+    return "symbol" == typeof o ? o : o + "";
   }
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};

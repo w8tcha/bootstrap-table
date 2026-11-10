@@ -13,16 +13,16 @@
     if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     return e;
   }
-  function _callSuper(t, o, e) {
-    return o = _getPrototypeOf(o), _possibleConstructorReturn(t, _isNativeReflectConstruct() ? Reflect.construct(o, e || [], _getPrototypeOf(t).constructor) : o.apply(t, e));
+  function _callSuper(e, c, p) {
+    return c = _getPrototypeOf(c), _possibleConstructorReturn(e, _isNativeReflectConstruct() ? Reflect.construct(c, p || [], _getPrototypeOf(e).constructor) : c.apply(e, p));
   }
   function _classCallCheck(a, n) {
     if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
   }
-  function _defineProperties(e, r) {
-    for (var t = 0; t < r.length; t++) {
-      var o = r[t];
-      o.enumerable = o.enumerable || false, o.configurable = true, "value" in o && (o.writable = true), Object.defineProperty(e, _toPropertyKey(o.key), o);
+  function _defineProperties(r, t) {
+    for (var o = 0; o < t.length; o++) {
+      var i = t[o];
+      i.enumerable = i.enumerable || false, i.configurable = true, "value" in i && (i.writable = true), Object.defineProperty(r, _toPropertyKey(i.key), i);
     }
   }
   function _createClass(e, r, t) {
@@ -30,21 +30,21 @@
       writable: false
     }), e;
   }
-  function _createForOfIteratorHelper(r, e) {
-    var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-    if (!t) {
-      if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e) {
-        t && (r = t);
-        var n = 0,
+  function _createForOfIteratorHelper(e, t) {
+    var n = "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
+    if (!n) {
+      if (Array.isArray(e) || (n = _unsupportedIterableToArray(e)) || t) {
+        n && (e = n);
+        var o = 0,
           F = function () {};
         return {
           s: F,
           n: function () {
-            return n >= r.length ? {
+            return o >= e.length ? {
               done: true
             } : {
               done: false,
-              value: r[n++]
+              value: e[o++]
             };
           },
           e: function (r) {
@@ -55,41 +55,41 @@
       }
       throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
     }
-    var o,
-      a,
-      u = true;
+    var a,
+      u,
+      i = true;
     return {
       s: function () {
-        t = t.call(r);
+        n = n.call(e);
       },
       n: function () {
-        u = true;
-        var r = t.next();
+        i = true;
+        var r = n.next();
         return r.done ? {
           done: true
         } : {
           value: r.value,
-          done: u = false
+          done: i = false
         };
       },
       e: function (r) {
-        o = true, a = r;
+        a = true, u = r;
       },
       f: function () {
         try {
-          u || null == t.return || t.return();
+          i || null == n.return || n.return();
         } finally {
-          if (o) throw a;
+          if (a) throw u;
         }
       }
     };
   }
   function _get() {
-    return _get = "undefined" != typeof Reflect && Reflect.get ? Reflect.get.bind() : function (e, t, r) {
-      var p = _superPropBase(e, t);
-      if (p) {
-        var n = Object.getOwnPropertyDescriptor(p, t);
-        return n.get ? n.get.call(arguments.length < 3 ? e : r) : n.value;
+    return _get = "undefined" != typeof Reflect && Reflect.get ? Reflect.get.bind() : function (t, r, n) {
+      var l = _superPropBase(t, r);
+      if (l) {
+        var f = Object.getOwnPropertyDescriptor(l, r);
+        return f.get ? f.get.call(arguments.length < 3 ? t : n) : f.value;
       }
     }, _get.apply(null, arguments);
   }
@@ -98,9 +98,9 @@
       return t.__proto__ || Object.getPrototypeOf(t);
     }, _getPrototypeOf(t);
   }
-  function _inherits(t, e) {
-    if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function");
-    t.prototype = Object.create(e && e.prototype, {
+  function _inherits(t, r) {
+    if ("function" != typeof r && null !== r) throw new TypeError("Super expression must either be null or a function");
+    t.prototype = Object.create(r && r.prototype, {
       constructor: {
         value: t,
         writable: true,
@@ -108,7 +108,7 @@
       }
     }), Object.defineProperty(t, "prototype", {
       writable: false
-    }), e && _setPrototypeOf(t, e);
+    }), r && _setPrototypeOf(t, r);
   }
   function _isNativeReflectConstruct() {
     try {
@@ -128,15 +128,15 @@
       return t.__proto__ = e, t;
     }, _setPrototypeOf(t, e);
   }
-  function _superPropBase(t, o) {
-    for (; !{}.hasOwnProperty.call(t, o) && null !== (t = _getPrototypeOf(t)););
-    return t;
+  function _superPropBase(o, t) {
+    for (; !{}.hasOwnProperty.call(o, t) && null !== (o = _getPrototypeOf(o)););
+    return o;
   }
-  function _superPropGet(t, o, e, r) {
-    var p = _get(_getPrototypeOf(t.prototype ), o, e);
-    return 2 & r && "function" == typeof p ? function (t) {
-      return p.apply(e, t);
-    } : p;
+  function _superPropGet(r, e, p, f) {
+    var n = _get(_getPrototypeOf(r.prototype ), e, p);
+    return 2 & f && "function" == typeof n ? function (t) {
+      return n.apply(p, t);
+    } : n;
   }
   function _toPrimitive(t, e) {
     if ("object" != typeof t || !t) return t;
@@ -148,15 +148,15 @@
     }
     return (String )(t);
   }
-  function _toPropertyKey(t) {
-    var i = _toPrimitive(t, "string");
-    return "symbol" == typeof i ? i : i + "";
+  function _toPropertyKey(r) {
+    var o = _toPrimitive(r, "string");
+    return "symbol" == typeof o ? o : o + "";
   }
-  function _unsupportedIterableToArray(r, a) {
-    if (r) {
-      if ("string" == typeof r) return _arrayLikeToArray(r, a);
-      var t = {}.toString.call(r).slice(8, -1);
-      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+  function _unsupportedIterableToArray(t, e) {
+    if (t) {
+      if ("string" == typeof t) return _arrayLikeToArray(t, e);
+      var o = {}.toString.call(t).slice(8, -1);
+      return "Object" === o && t.constructor && (o = t.constructor.name), "Map" === o || "Set" === o ? Array.from(t) : "Arguments" === o || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o) ? _arrayLikeToArray(t, e) : void 0;
     }
   }
 

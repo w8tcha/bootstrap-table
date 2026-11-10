@@ -9,8 +9,8 @@
     for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
     return n;
   }
-  function _arrayWithoutHoles(r) {
-    if (Array.isArray(r)) return _arrayLikeToArray(r);
+  function _arrayWithoutHoles(a) {
+    if (Array.isArray(a)) return _arrayLikeToArray(a);
   }
   function _iterableToArray(r) {
     var e = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
@@ -23,8 +23,8 @@
   function _nonIterableSpread() {
     throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
-  function _toConsumableArray(r) {
-    return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
+  function _toConsumableArray(a) {
+    return _arrayWithoutHoles(a) || _iterableToArray(a) || _unsupportedIterableToArray(a) || _nonIterableSpread();
   }
   function _typeof(o) {
     "@babel/helpers - typeof";
@@ -35,11 +35,11 @@
       return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
     }, _typeof(o);
   }
-  function _unsupportedIterableToArray(r, a) {
-    if (r) {
-      if ("string" == typeof r) return _arrayLikeToArray(r, a);
-      var t = {}.toString.call(r).slice(8, -1);
-      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+  function _unsupportedIterableToArray(t, e) {
+    if (t) {
+      if ("string" == typeof t) return _arrayLikeToArray(t, e);
+      var o = {}.toString.call(t).slice(8, -1);
+      return "Object" === o && t.constructor && (o = t.constructor.name), "Map" === o || "Set" === o ? Array.from(t) : "Arguments" === o || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(o) ? _arrayLikeToArray(t, e) : void 0;
     }
   }
 
